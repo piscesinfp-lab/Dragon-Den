@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Loft — Communal Tavern Design</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0b08;
+    --parchment: #e8dfc8;
+    --aged: #c9b98a;
+    --bark: #4a2e12;
+    --walnut: #6b3f1a;
+    --moss: #2e4a2a;
+    --fern: #4a7a42;
+    --ember: #c84a1a;
+    --candle: #d4883a;
+    --smoke: #7a7060;
+    --vellum: #f2ead4;
+    --shadow: rgba(0,0,0,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: 'IM Fell English', Georgia, serif;
+    overflow-x: hidden;
+  }
+
+  /* grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 60px 24px;
+  }
+
+  .hero-glow {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 100%, rgba(200,74,26,0.2) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 20% 50%, rgba(74,122,66,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 80% 30%, rgba(212,136,58,0.08) 0%, transparent 50%);
+  }
+
+  .candle-flicker {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 120px;
+    background: linear-gradient(to top, var(--ember), var(--candle), transparent);
+    filter: blur(1px);
+    animation: flicker 3s ease-in-out infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 0.4; transform: translateX(-50%) scaleX(1); }
+    25% { opacity: 0.6; transform: translateX(-48%) scaleX(1.2); }
+    50% { opacity: 0.35; transform: translateX(-52%) scaleX(0.8); }
+    75% { opacity: 0.5; transform: translateX(-49%) scaleX(1.1); }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.5em;
+    color: var(--fern);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: rise 1s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 400;
+    line-height: 0.95;
+    color: var(--vellum);
+    text-shadow: 0 0 60px rgba(212,136,58,0.3), 2px 4px 20px rgba(0,0,0,0.8);
+    opacity: 0;
+    animation: rise 1s 0.5s forwards;
+  }
+
+  .hero-title em {
+    display: block;
+    font-style: italic;
+    color: var(--candle);
+    font-size: 0.55em;
+    letter-spacing: 0.05em;
+    margin-top: 8px;
+  }
+
+  .hero-desc {
+    font-style: italic;
+    color: var(--smoke);
+    font-size: 1.05rem;
+    margin-top: 24px;
+    max-width: 480px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: rise 1s 0.7s forwards;
+  }
+
+  .hero-dims {
+    margin-top: 32px;
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    opacity: 0;
+    animation: rise 1s 0.9s forwards;
+  }
+
+  .dim-item {
+    text-align: center;
+  }
+
+  .dim-num {
+    font-size: 1.8rem;
+    color: var(--candle);
+    line-height: 1;
+  }
+
+  .dim-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--smoke);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTIONS */
+  section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .rule {
+    width: 60px;
+    height: 1px;
+    background: var(--candle);
+    margin-bottom: 14px;
+    opacity: 0.5;
+  }
+
+  .tag {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.45em;
+    color: var(--fern);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 400;
+    color: var(--vellum);
+    margin-bottom: 10px;
+    line-height: 1.15;
+  }
+
+  .intro {
+    font-style: italic;
+    color: var(--smoke);
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-bottom: 40px;
+    max-width: 620px;
+  }
+
+  /* FLOOR MAP */
+  .floor-map {
+    background: #100e0a;
+    border: 1px solid rgba(201,185,138,0.15);
+    border-radius: 3px;
+    padding: 32px 24px;
+    font-family: 'Josefin Sans', monospace;
+    font-size: 0.7rem;
+    line-height: 2;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .floor-map::before {
+    content: 'FLOOR PLAN — 27\'0" × 11\'10"';
+    display: block;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--smoke);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .map-line { white-space: pre; }
+  .mc { color: var(--candle); }
+  .mf { color: var(--fern); }
+  .ms { color: rgba(201,185,138,0.35); }
+  .me { color: var(--ember); }
+
+  /* ZONE CARDS */
+  .zones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 40px;
+  }
+
+  .zone {
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .zone-a {
+    background: linear-gradient(135deg, #1a0f06, #120d08);
+    border: 1px solid rgba(200,74,26,0.2);
+  }
+
+  .zone-b {
+    background: linear-gradient(135deg, #0a120a, #080e08);
+    border: 1px solid rgba(74,122,66,0.2);
+  }
+
+  .zone::after {
+    content: attr(data-glyph);
+    position: absolute;
+    bottom: -10px;
+    right: 10px;
+    font-size: 80px;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+
+  .zone-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .zone-a .zone-label { color: var(--ember); }
+  .zone-b .zone-label { color: var(--fern); }
+
+  .zone h3 {
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--vellum);
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .zone p {
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--smoke);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .zone ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .zone ul li {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.8rem;
+    color: var(--aged);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+
+  .zone ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    font-size: 0.7rem;
+    opacity: 0.5;
+  }
+
+  /* FURNITURE LAYOUT */
+  .furniture-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .fcard {
+    background: #100e0a;
+    border: 1px solid rgba(201,185,138,0.1);
+    border-radius: 2px;
+    padding: 22px;
+    transition: border-color 0.3s;
+  }
+
+  .fcard:hover { border-color: rgba(201,185,138,0.25); }
+
+  .fcard-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .fcard-icon { font-size: 1.4rem; }
+
+  .fcard-title {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--parchment);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .fcard p {
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--smoke);
+    line-height: 1.65;
+    margin-bottom: 12px;
+  }
+
+  .fcard-spec {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--candle);
+    letter-spacing: 0.05em;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 10px;
+    line-height: 1.6;
+  }
+
+  /* TRANSITION ZONE */
+  .transition-bar {
+    background: linear-gradient(90deg, #1a0f06, #0d120d, #1a0f06);
+    border-top: 1px solid rgba(201,185,138,0.08);
+    border-bottom: 1px solid rgba(201,185,138,0.08);
+    padding: 32px 40px;
+    text-align: center;
+  }
+
+  .transition-bar h3 {
+    font-size: 1.3rem;
+    color: var(--aged);
+    margin-bottom: 8px;
+  }
+
+  .transition-bar p {
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--smoke);
+    line-height: 1.7;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* LIGHTING */
+  .light-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .light-card {
+    background: #100e0a;
+    border: 1px solid rgba(201,185,138,0.08);
+    padding: 20px;
+    text-align: center;
+    border-radius: 2px;
+  }
+
+  .light-orb {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+  }
+
+  .light-name {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    margin-bottom: 8px;
+  }
+
+  .light-desc {
+    font-size: 0.82rem;
+    font-style: italic;
+    color: var(--smoke);
+    line-height: 1.6;
+  }
+
+  /* DND SECTION */
+  .dnd-box {
+    background: linear-gradient(135deg, #0e0c08, #130f0a);
+    border: 1px solid rgba(200,74,26,0.25);
+    border-radius: 3px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dnd-box::before {
+    content: '⚔️';
+    position: absolute;
+    top: -20px;
+    right: -10px;
+    font-size: 140px;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  .dnd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 24px;
+  }
+
+  .dnd-item h4 {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--candle);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .dnd-item ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dnd-item ul li {
+    font-size: 0.9rem;
+    color: var(--smoke);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.55;
+  }
+
+  .dnd-item ul li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    color: var(--ember);
+    font-size: 0.5rem;
+    top: 5px;
+  }
+
+  /* SHOPPING */
+  .shop-wrap {
+    background: #0d0b08;
+    border: 1px solid rgba(201,185,138,0.12);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    color: var(--smoke);
+    text-transform: uppercase;
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(201,185,138,0.1);
+    background: #100e0a;
+  }
+
+  td {
+    padding: 13px 18px;
+    font-size: 0.87rem;
+    color: var(--smoke);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  td:first-child { color: var(--parchment); font-weight: 400; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+  }
+
+  .b-low { background: rgba(74,122,66,0.2); color: var(--fern); }
+  .b-mid { background: rgba(212,136,58,0.2); color: var(--candle); }
+  .b-split { background: rgba(200,74,26,0.2); color: var(--ember); }
+
+  .tip-box {
+    margin-top: 20px;
+    padding: 20px 24px;
+    border-left: 2px solid var(--candle);
+    background: rgba(212,136,58,0.05);
+  }
+
+  .tip-box p {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--smoke);
+    line-height: 1.7;
+  }
+
+  .tip-box strong { color: var(--parchment); font-style: normal; font-family: 'Josefin Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; }
+
+  /* COMMUNAL NOTE */
+  .communal-note {
+    background: rgba(74,122,66,0.06);
+    border: 1px solid rgba(74,122,66,0.2);
+    border-radius: 3px;
+    padding: 28px 32px;
+    margin-top: 40px;
+  }
+
+  .communal-note h4 {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--fern);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .communal-note p {
+    font-size: 0.92rem;
+    font-style: italic;
+    color: var(--smoke);
+    line-height: 1.75;
+  }
+
+  footer {
+    text-align: center;
+    padding: 60px 24px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  footer p {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: rgba(201,185,138,0.2);
+    letter-spacing: 0.2em;
+  }
+
+  @media (max-width: 620px) {
+    .zones, .dnd-grid, .light-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="candle-flicker"></div>
+  <div style="position:relative; z-index:2;">
+    <div class="hero-eyebrow">Loft Design Concept · 27'0" × 11'10"</div>
+    <h1 class="hero-title">
+      The Loft
+      <em>A Communal Tavern</em>
+    </h1>
+    <p class="hero-desc">Dark, warm, and alive with candlelight. A place where roommates gather, dice roll, and stories begin.</p>
+    <div class="hero-dims">
+      <div class="dim-item">
+        <div class="dim-num">27'</div>
+        <div class="dim-label">Length</div>
+      </div>
+      <div class="dim-item">
+        <div class="dim-num">11'10"</div>
+        <div class="dim-label">Width</div>
+      </div>
+      <div class="dim-item">
+        <div class="dim-num">2</div>
+        <div class="dim-label">Zones</div>
+      </div>
+      <div class="dim-item">
+        <div class="dim-num">∞</div>
+        <div class="dim-label">Vibes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONCEPT -->
+<section>
+  <div class="rule"></div>
+  <div class="tag">The Concept</div>
+  <h2>A Tavern in Two Halves</h2>
+  <p class="intro">The loft's long narrow shape is a gift — it naturally divides into two distinct zones without walls or visual clutter. One end anchors the gathering, one end holds the quest. The whole space reads as communal, but it carries your world.</p>
+
+  <div class="floor-map">
+<span class="map-line"><span class="ms">╔══════════════════════════════════════════════════════════════╗</span></span>
+<span class="map-line"><span class="ms">║</span>  <span class="mc">[ READING / LIBRARY NOOK ]</span>          <span class="mf">[ TAVERN GATHERING ]</span>   <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">║</span>                                                              <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">║</span>  <span class="mc">bookshelf    armchair</span>        <span class="me">DnD TABLE</span>   <span class="mf">sectional/</span>        <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">║</span>  <span class="mc">floor lamp   window nook</span>     <span class="me">center</span>      <span class="mf">floor cushions</span>    <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">║</span>                                                              <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">║</span>  <span class="mc">←— quiet zone ——</span>   <span class="ms">[ TRANSITION ]</span>   <span class="mf">——— social zone —→</span>   <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">║</span>                     <span class="ms">rug boundary</span>                           <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">║</span>                     <span class="ms">low shelf / bar cart</span>                   <span class="ms">║</span></span>
+<span class="map-line"><span class="ms">╚══════════════════════════════════════════════════════════════╝</span></span>
+
+<span class="ms">Left (~10–11ft): Reading / personal nook</span>
+<span class="ms">Center (~5ft): Soft divider — low shelf, trailing plants, rug edge</span>
+<span class="ms">Right (~11–12ft): Social gathering + DnD command table</span>
+  </div>
+</section>
+
+<!-- TWO ZONES -->
+<section style="padding-top: 0;">
+  <div class="tag">Dual Zone Breakdown</div>
+  <h2>Zone by Zone</h2>
+  <p class="intro">Both zones share the same dark-forest-tavern palette. Neither feels like a different room — just a different mood.</p>
+
+  <div class="zones">
+    <div class="zone zone-b" data-glyph="📖">
+      <div class="zone-label">Zone One · Left End</div>
+      <h3>The Nook</h3>
+      <p>Your personal corner. A place to read, decompress, think. Low light, surrounded by books and plants. This is the introvert's retreat within a communal space.</p>
+      <ul>
+        <li>Deep armchair or loveseat with a throw — dark green or charcoal</li>
+        <li>Tall bookshelf along the wall — dark wood, display books + small decor</li>
+        <li>Arc floor lamp or tall Edison lamp — warm amber, dimmable</li>
+        <li>Window seat cushion if there's a window on that end</li>
+        <li>Small side table for your drink, a candle, dice tray</li>
+        <li>Trailing pothos or small fern on the shelf</li>
+        <li>A subtle dragon figure lives here — subtle claim without shouting</li>
+      </ul>
+    </div>
+    <div class="zone zone-a" data-glyph="🎲">
+      <div class="zone-label">Zone Two · Right End</div>
+      <h3>The Table</h3>
+      <p>Command central. The DnD table anchors this end — big enough for maps, minis, and snacks. Doubles as a dinner / hangout table when not in quest mode.</p>
+      <ul>
+        <li>Round or rectangular table — seats 5–6 comfortably</li>
+        <li>Mixed seating: 2–3 chairs + floor cushions or poufs for overflow</li>
+        <li>Overhead pendant light directly above the table — warm, dimmable</li>
+        <li>Low shelving nearby for rulebooks, DnD boxes, game storage</li>
+        <li>A small "bar cart" style shelf: snacks, drinks, dice bowl, candles</li>
+        <li>Large dark rug anchors the whole zone</li>
+        <li>Wall-mounted map or fantasy art above the shelf — sets the scene</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSITION -->
+<div class="transition-bar">
+  <h3>The Threshold</h3>
+  <p>The divider between zones doesn't need a wall — just a visual signal. A low bookshelf or console table perpendicular to the wall, a change in rug, trailing plants hanging from a tension rod or wall hook. Cross it and the energy shifts.</p>
+</div>
+
+<!-- FURNITURE -->
+<section>
+  <div class="tag">Furniture Picks</div>
+  <h2>What Goes Where</h2>
+  <p class="intro">Starting fresh means you can nail the scale. The loft at 27×12 can hold a lot — but we're going intentional, not stuffed.</p>
+
+  <div class="furniture-grid">
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">🪑</div>
+        <div class="fcard-title">Main Seating</div>
+      </div>
+      <p>A small sectional or L-shaped sofa for the social zone. Keep it low-profile — the room is communal so it should feel open. Dark fabric: charcoal, forest green, or deep brown.</p>
+      <div class="fcard-spec">Wayfair, IKEA KIVIK / SÖDERHAMN · $300–700<br>FB Marketplace for steals on good couches</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">🪵</div>
+        <div class="fcard-title">The DnD Table</div>
+      </div>
+      <p>Dark wood or wood-look table, round preferred (no head of table, everyone's equal). Seats 5–6. If budget allows, a table with a removable topper and felt center is the dream for minis + maps.</p>
+      <div class="fcard-spec">IKEA MÖRBYLÅNGA, Amazon dark dining tables · $150–400<br>Ultimate: Wyrmwood or Stronghold (splurge, save for later)</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">📚</div>
+        <div class="fcard-title">Bookshelf</div>
+      </div>
+      <p>Tall dark wood shelf for the reading nook — anchors that end of the room. Books, a few small plants, a candle or two, one dragon figure. Not overstuffed.</p>
+      <div class="fcard-spec">IKEA BILLY (black-brown) · $80–130<br>Or thrift a solid wood one and spray it dark</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">💺</div>
+        <div class="fcard-title">Reading Chair</div>
+      </div>
+      <p>A deep armchair — the kind you disappear into. Bonus if it swivels. Velvet or textured fabric in forest green, rust, or charcoal. This is your throne in the communal space.</p>
+      <div class="fcard-spec">Amazon, Wayfair, TJ Maxx · $120–300<br>Look for "accent chair" + "velvet" + dark color</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">🛋️</div>
+        <div class="fcard-title">Floor Cushions / Poufs</div>
+      </div>
+      <p>For DnD overflow seating — 3–4 large floor cushions or round poufs stack out of the way when not in use. Great for a 6-person party when chairs run out.</p>
+      <div class="fcard-spec">Amazon, World Market, HomeGoods · $20–50 each<br>Moroccan poufs are cheap and look incredible</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">🍶</div>
+        <div class="fcard-title">Bar Cart / Supply Shelf</div>
+      </div>
+      <p>Near the table — holds snacks, drinks, dice, candles, session notes. A rolling cart means it moves when you need the space. This is the "innkeeper's counter" of your tavern.</p>
+      <div class="fcard-spec">IKEA RÅSKOG cart · $40 · Perfect size<br>Or a small dark 2-shelf rolling cart from Amazon</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">🪨</div>
+        <div class="fcard-title">Rugs</div>
+      </div>
+      <p>Two rugs define the zones. Nook rug: smaller, textured, warm — like a worn Persian or jute. Table rug: large and dark, anchors the whole social zone. The gap between them IS the threshold.</p>
+      <div class="fcard-spec">Rugs USA, Wayfair, Amazon · $60–180 each<br>Look for "vintage distressed" or "tribal dark"</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-top">
+        <div class="fcard-icon">🪴</div>
+        <div class="fcard-title">Plants</div>
+      </div>
+      <p>The forest feeling lives in your plants. Tall snake plant in the corner, trailing pothos on the shelf, a small bamboo arrangement on the table. Low maintenance is key — you're not here to tend a garden.</p>
+      <div class="fcard-spec">IKEA, Trader Joe's, local nursery · $10–40 each<br>Pothos and snake plants are basically unkillable</div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTING -->
+<section>
+  <div class="tag">Atmosphere</div>
+  <h2>Lighting the Tavern</h2>
+  <p class="intro">Lighting is everything in a dark-themed space. Multiple warm sources at different heights beats one bright overhead every time.</p>
+
+  <div class="light-grid">
+    <div class="light-card">
+      <div class="light-orb" style="background: radial-gradient(circle at 40% 35%, #f5c842, #c8401a, #3a1a08);"></div>
+      <div class="light-name">Pendant Above Table</div>
+      <div class="light-desc">A single warm pendant over the DnD table. Rattan, black metal cage, or Edison bulb style. Dimmable. This is the campfire.</div>
+    </div>
+    <div class="light-card">
+      <div class="light-orb" style="background: radial-gradient(circle at 40% 35%, #d4883a, #8a4a10, #2a1a08);"></div>
+      <div class="light-name">Arc Floor Lamp</div>
+      <div class="light-desc">Tall arc lamp in the reading nook — arcs over the armchair. Creates a reading pool of light without harsh overhead. Warm bulb only.</div>
+    </div>
+    <div class="light-card">
+      <div class="light-orb" style="background: radial-gradient(circle at 40% 35%, #ffe8a0, #d4883a, #4a2e12);"></div>
+      <div class="light-name">Candles + LED Candles</div>
+      <div class="light-desc">Real candles on the table (safely) + battery LED candles on the shelf. Nothing sets a tavern mood like flickering flame.</div>
+    </div>
+    <div class="light-card">
+      <div class="light-orb" style="background: radial-gradient(circle at 40% 35%, #4a8a42, #2e5a2a, #0d1a0d);"></div>
+      <div class="light-name">Shelf LED Strips</div>
+      <div class="light-desc">Warm amber or switchable RGB under the bookshelf. Backlights the books and decor. Your RGB controller reaches here too.</div>
+    </div>
+    <div class="light-card">
+      <div class="light-orb" style="background: radial-gradient(circle at 40% 35%, #c84a1a, #7a1a08, #1a0808);"></div>
+      <div class="light-name">Govee String Lights</div>
+      <div class="light-desc">Warm fairy lights or globe string lights along the ceiling perimeter or draped from a corner. Cheap, massive impact, very tavern.</div>
+    </div>
+    <div class="light-card">
+      <div class="light-orb" style="background: radial-gradient(circle at 40% 35%, #6060cc, #2a1a6b, #0a0816);"></div>
+      <div class="light-name">RGB Accent (Optional)</div>
+      <div class="light-desc">One RGB strip behind the bookshelf or along the floor edge for when the DnD session goes late. Deep blue or purple — "arcane hour" mode.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DND DETAILS -->
+<section>
+  <div class="tag">Quest Central</div>
+  <h2>DnD Session Setup</h2>
+  <p class="intro">The table does double duty — normal hangout by day, campaign table by night. Here's how to make it work for both.</p>
+
+  <div class="dnd-box">
+    <div class="dnd-grid">
+      <div class="dnd-item">
+        <h4>Table Essentials</h4>
+        <ul>
+          <li>Dark felt or leather table runner for the center — minis don't slide, dice roll beautifully</li>
+          <li>A dedicated dice tray (wooden, dark-stained) on the bar cart</li>
+          <li>Mini LED lanterns at the table corners for atmosphere during sessions</li>
+          <li>Lazy Susan center for shared books/maps so everyone can reach</li>
+        </ul>
+      </div>
+      <div class="dnd-item">
+        <h4>Storage Nearby</h4>
+        <ul>
+          <li>Low shelf or ottoman with storage: rulebooks, adventure modules, campaign binders</li>
+          <li>One drawer or box per player for their character sheet + dice</li>
+          <li>A flat tray for the DM — screen, notes, monster cards, initiative tracker</li>
+          <li>Map/mat storage: rolled maps in a tall vase or tube behind the shelf</li>
+        </ul>
+      </div>
+      <div class="dnd-item">
+        <h4>Atmosphere Extras</h4>
+        <ul>
+          <li>Bluetooth speaker for ambient dungeon music (Syrinscape app, lo-fi tavern playlists)</li>
+          <li>A small projector can display dungeon maps on the table or wall</li>
+          <li>Fantasy art print above the table — a map, a monster, a key scene</li>
+          <li>Scented candle: cedar, smoke, or forest — smell is underrated for immersion</li>
+        </ul>
+      </div>
+      <div class="dnd-item">
+        <h4>Quick Convert (Non-DnD Mode)</h4>
+        <ul>
+          <li>The felt runner rolls up and stores in 10 seconds</li>
+          <li>Dice and minis go back on the bar cart</li>
+          <li>Table becomes: dinner table, board game table, hangout surface</li>
+          <li>The vibe stays — the function changes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOPPING -->
+<section>
+  <div class="tag">Budget Breakdown</div>
+  <h2>Loft Shopping List</h2>
+  <p class="intro">Starting fresh from zero — prioritized by what transforms the space first.</p>
+
+  <div class="shop-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Where to Look</th>
+          <th>Budget</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sectional or Sofa (dark fabric)</td>
+          <td>FB Marketplace, Wayfair, IKEA KIVIK</td>
+          <td><span class="badge b-mid">$200–600</span></td>
+        </tr>
+        <tr>
+          <td>DnD / Dining Table (seats 5–6)</td>
+          <td>IKEA, Amazon, FB Marketplace</td>
+          <td><span class="badge b-mid">$150–350</span></td>
+        </tr>
+        <tr>
+          <td>Dining Chairs (2–3)</td>
+          <td>IKEA, Wayfair, thrift</td>
+          <td><span class="badge b-low">$80–200</span></td>
+        </tr>
+        <tr>
+          <td>Reading Armchair (velvet/dark)</td>
+          <td>TJ Maxx, Amazon, Wayfair</td>
+          <td><span class="badge b-mid">$120–280</span></td>
+        </tr>
+        <tr>
+          <td>Tall Bookshelf (dark)</td>
+          <td>IKEA BILLY, thrift + spray paint</td>
+          <td><span class="badge b-low">$50–130</span></td>
+        </tr>
+        <tr>
+          <td>Floor Cushions / Poufs (3–4)</td>
+          <td>World Market, Amazon, HomeGoods</td>
+          <td><span class="badge b-low">$60–160 total</span></td>
+        </tr>
+        <tr>
+          <td>Large Rug (social zone, 6×9 or 8×10)</td>
+          <td>Rugs USA, Wayfair, FB Marketplace</td>
+          <td><span class="badge b-mid">$80–200</span></td>
+        </tr>
+        <tr>
+          <td>Nook Rug (smaller, textured)</td>
+          <td>TJ Maxx, HomeGoods, Amazon</td>
+          <td><span class="badge b-low">$30–80</span></td>
+        </tr>
+        <tr>
+          <td>Pendant Light (above table)</td>
+          <td>Amazon, IKEA, Home Depot</td>
+          <td><span class="badge b-low">$30–80</span></td>
+        </tr>
+        <tr>
+          <td>Arc Floor Lamp</td>
+          <td>Amazon, IKEA, Target</td>
+          <td><span class="badge b-low">$40–90</span></td>
+        </tr>
+        <tr>
+          <td>Bar Cart / IKEA RÅSKOG</td>
+          <td>IKEA ($40) or Amazon</td>
+          <td><span class="badge b-low">$35–60</span></td>
+        </tr>
+        <tr>
+          <td>String / Fairy Lights</td>
+          <td>Amazon, Target</td>
+          <td><span class="badge b-low">$15–30</span></td>
+        </tr>
+        <tr>
+          <td>Plants (3–4 total)</td>
+          <td>IKEA, Trader Joe's, nursery</td>
+          <td><span class="badge b-low">$25–60</span></td>
+        </tr>
+        <tr>
+          <td>Fantasy Art Print (wall)</td>
+          <td>Etsy, Redbubble, Pinterest → print local</td>
+          <td><span class="badge b-low">$15–40</span></td>
+        </tr>
+        <tr>
+          <td>Candles + Holders</td>
+          <td>TJ Maxx, HomeGoods, IKEA</td>
+          <td><span class="badge b-low">$20–40</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tip-box">
+    <p><strong>Phase 1 Total (the room-changers):</strong> Sofa + table + rug + lighting — roughly <strong style="color:var(--candle)">$500–1,000</strong> if you hit FB Marketplace and IKEA hard.<br><br>
+    <strong>The secret weapon:</strong> Facebook Marketplace for the couch and table. People offload great dark furniture constantly. Search "dark wood dining table," "charcoal sectional," "green velvet chair" — you'll find them for 30–50% of retail. The loft is communal so your roommates might split some of these costs too — worth asking.</p>
+  </div>
+
+  <div class="communal-note">
+    <h4>Communal Space Strategy</h4>
+    <p>Since roommates share this space, lean into the aesthetic being <em>universally appealing</em> — dark, warm, cozy tavern energy reads as sophisticated and welcoming to basically everyone. It's not "your room," it's "a really cool place to hang out." The dragon nod stays subtle here: one figure on the bookshelf, a fantasy art print. The bedroom is where the full collection lives. The loft just carries the <em>feeling</em> of that world.</p>
+  </div>
+</section>
+
+<footer>
+  <p>The Loft · Communal Tavern Concept · Roll for atmosphere</p>
+  <br>
+  <p style="font-size: 1.5rem; opacity: 0.05;">🎲</p>
+</footer>
+
+</body>
+</html>

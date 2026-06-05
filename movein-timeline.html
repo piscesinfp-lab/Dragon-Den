@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Move-In Timeline — Dragon Den</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void:#07090a; --deep:#0c1210; --moss:#2a4530; --jade:#3d7a4a;
+    --stone:#7a7060; --cream:#e8dcc8; --ember:#c8401a; --gold:#c9933a;
+    --mist:rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.95); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  .hero { min-height:55vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 50% at 30% 80%,rgba(200,64,26,0.12) 0%,transparent 55%), radial-gradient(ellipse 50% 40% at 70% 20%,rgba(201,147,58,0.1) 0%,transparent 50%); }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--ember); text-transform:uppercase; margin-bottom:14px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,4.5rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--gold) 50%,var(--ember) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:1rem; margin-top:12px; position:relative; }
+  .hero-divider { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--ember),transparent); margin:22px auto; position:relative; }
+  .hero-specs { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; position:relative; }
+  .spec { text-align:center; }
+  .spec-num { font-family:'Cinzel',serif; font-size:1.3rem; color:var(--gold); }
+  .spec-label { font-family:'Cinzel',serif; font-size:0.48rem; letter-spacing:0.3em; color:var(--stone); text-transform:uppercase; margin-top:3px; }
+
+  section { max-width:900px; margin:0 auto; padding:70px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.ember { color:var(--ember); }
+  .section-tag.gold { color:var(--gold); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.6rem,4vw,2.6rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:1rem; line-height:1.75; margin-bottom:32px; max-width:640px; }
+
+  /* URGENCY BANNER */
+  .urgent { background:rgba(200,64,26,0.1); border:1px solid rgba(200,64,26,0.3); border-radius:3px; padding:18px 22px; margin-bottom:32px; display:flex; gap:14px; align-items:flex-start; }
+  .urgent-icon { font-size:1.4rem; flex-shrink:0; }
+  .urgent h5 { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.2em; color:var(--ember); text-transform:uppercase; margin-bottom:6px; }
+  .urgent p { font-size:0.88rem; color:var(--stone); line-height:1.65; font-style:italic; }
+
+  /* PHASE TIMELINE */
+  .timeline { display:flex; flex-direction:column; gap:0; }
+  .phase-block { position:relative; padding-left:28px; margin-bottom:8px; }
+  .phase-block::before { content:''; position:absolute; left:9px; top:44px; bottom:-8px; width:2px; background:rgba(61,122,74,0.2); }
+  .phase-block:last-child::before { display:none; }
+  .phase-dot { position:absolute; left:0; top:22px; width:20px; height:20px; border-radius:50%; border:2px solid var(--jade); background:var(--void); display:flex; align-items:center; justify-content:center; }
+  .phase-dot.active { background:var(--ember); border-color:var(--ember); }
+  .phase-dot.urgent-dot { background:var(--gold); border-color:var(--gold); }
+  .phase-dot span { font-size:0.55rem; color:var(--cream); font-family:'Cinzel',serif; }
+  .phase-content { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:20px 22px; margin-left:8px; }
+  .phase-content.active-phase { border-color:rgba(200,64,26,0.3); }
+  .phase-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .phase-title { font-family:'Cinzel',serif; font-size:0.85rem; letter-spacing:0.12em; color:var(--cream); font-weight:600; }
+  .phase-badge { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.2em; padding:3px 10px; border-radius:20px; }
+  .pb-now { background:rgba(200,64,26,0.2); color:var(--ember); }
+  .pb-week1 { background:rgba(201,147,58,0.2); color:var(--gold); }
+  .pb-week2 { background:rgba(61,122,74,0.2); color:var(--jade); }
+  .pb-month { background:rgba(255,255,255,0.06); color:var(--stone); }
+  .phase-tasks { display:flex; flex-direction:column; gap:0; }
+  .task { display:flex; align-items:flex-start; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.04); cursor:pointer; transition:background 0.2s; border-radius:2px; padding-left:4px; }
+  .task:last-child { border-bottom:none; }
+  .task:hover { background:var(--mist); }
+  .task-check { width:18px; height:18px; border:1px solid rgba(255,255,255,0.15); border-radius:3px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .task.done .task-check { background:var(--jade); border-color:var(--jade); }
+  .task.done .task-check::after { content:'✓'; font-size:0.65rem; color:white; }
+  .task.done .task-text { opacity:0.4; text-decoration:line-through; }
+  .task-text { flex:1; }
+  .task-main { font-size:0.88rem; color:var(--cream); line-height:1.4; }
+  .task-sub { font-size:0.8rem; color:var(--stone); font-style:italic; margin-top:2px; line-height:1.4; }
+  .task-cost { font-family:'Cinzel',serif; font-size:0.62rem; color:var(--gold); letter-spacing:0.08em; white-space:nowrap; margin-top:2px; }
+
+  /* PRIORITY BOX */
+  .priority-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-bottom:28px; }
+  .priority-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:20px; }
+  .priority-card::before { content:''; display:block; height:2px; margin:-20px -20px 16px; border-radius:3px 3px 0 0; }
+  .pc-day1::before { background:var(--ember); }
+  .pc-week1::before { background:var(--gold); }
+  .pc-month::before { background:var(--jade); }
+  .priority-num { font-family:'Cinzel',serif; font-size:2rem; font-weight:900; opacity:0.15; line-height:1; margin-bottom:6px; }
+  .priority-label { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:8px; }
+  .pc-day1 .priority-label { color:var(--ember); }
+  .pc-week1 .priority-label { color:var(--gold); }
+  .pc-month .priority-label { color:var(--jade); }
+  .priority-card p { font-size:0.86rem; color:var(--stone); line-height:1.65; font-style:italic; }
+
+  .callout { padding:20px 24px; border-radius:3px; margin:24px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout.ember { border-left-color:var(--ember); background:rgba(200,64,26,0.06); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:8px; }
+  .callout.ember h5 { color:var(--ember); }
+  .callout.gold h5 { color:var(--gold); }
+  .callout p { font-size:0.9rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  /* FIRST NIGHT KIT */
+  .kit-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .kit-item { background:var(--deep); border:1px solid rgba(255,255,255,0.05); border-radius:3px; padding:16px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; transition:border-color 0.2s; }
+  .kit-item:hover { border-color:rgba(61,122,74,0.3); }
+  .kit-item.packed { border-color:rgba(61,122,74,0.4); }
+  .kit-item.packed .kit-icon { opacity:0.4; }
+  .kit-item.packed .kit-label { opacity:0.4; text-decoration:line-through; }
+  .kit-check { width:16px; height:16px; border:1px solid rgba(255,255,255,0.15); border-radius:2px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .kit-item.packed .kit-check { background:var(--jade); border-color:var(--jade); }
+  .kit-item.packed .kit-check::after { content:'✓'; font-size:0.55rem; color:white; }
+  .kit-label { font-size:0.85rem; color:var(--cream); line-height:1.4; }
+  .kit-note { font-size:0.75rem; color:var(--stone); font-style:italic; margin-top:3px; }
+
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.25),transparent); }
+  footer { text-align:center; padding:60px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.2); letter-spacing:0.2em; }
+
+  @media(max-width:600px){ .priority-grid,.kit-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Move-In</div>
+  <a onclick="nav('priority')">Priority</a>
+  <a onclick="nav('before')">Before Sunday</a>
+  <a onclick="nav('day1')">Day 1</a>
+  <a onclick="nav('week1')">Week 1</a>
+  <a onclick="nav('week2')">Week 2</a>
+  <a onclick="nav('month1')">Month 1+</a>
+  <a onclick="nav('firstnight')">First Night Kit</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">⚡ Move-In This Sunday</div>
+  <h1 class="hero-title">Order of<br>Operations</h1>
+  <p class="hero-sub">$500–1,000 budget · Phase by phase · Sunday to Month 1</p>
+  <div class="hero-divider"></div>
+  <div class="hero-specs">
+    <div class="spec"><div class="spec-num">Days Away</div><div class="spec-label">Move-In</div></div>
+    <div class="spec"><div class="spec-num">$150–200</div><div class="spec-label">Day 1 Budget</div></div>
+    <div class="spec"><div class="spec-num">$500–1k</div><div class="spec-label">Total Budget</div></div>
+    <div class="spec"><div class="spec-num">4 Phases</div><div class="spec-label">Build Order</div></div>
+  </div>
+</div>
+
+<!-- PRIORITY -->
+<div class="divider"></div>
+<section id="priority">
+  <div class="section-tag ember">Budget Strategy</div>
+  <h2>$500–1,000 Phased Right</h2>
+  <p class="intro">With Sunday days away and a tight budget, ruthless prioritization is the move. Sleep first, function second, aesthetic third. The room gets built in layers over weeks — not all at once.</p>
+
+  <div class="urgent">
+    <div class="urgent-icon">🚨</div>
+    <div>
+      <h5>Sunday Is Days Away</h5>
+      <p>Do NOT try to do everything at once. The trap is spending $800 on Day 1 and having nothing left for things you actually need week 2. Spend $150–200 on Day 1 essentials, then phase everything else. The room will look sparse for a week — that's fine. It will look intentional within a month.</p>
+    </div>
+  </div>
+
+  <div class="priority-grid">
+    <div class="priority-card pc-day1">
+      <div class="priority-num">1</div>
+      <div class="priority-label">Day 1 — $150–200</div>
+      <p>Sleep setup, desk + PC functional, bathroom basics. You need to sleep, work, and not live out of boxes. Nothing else matters yet.</p>
+    </div>
+    <div class="priority-card pc-week1">
+      <div class="priority-num">2</div>
+      <div class="priority-label">Week 1–2 — $150–300</div>
+      <p>Paint the bedroom and bathroom. Hang curtains. Get the RGB strips up. This is the highest-leverage spending — transforms the whole space before any furniture arrives.</p>
+    </div>
+    <div class="priority-card pc-month">
+      <div class="priority-num">3</div>
+      <div class="priority-label">Month 1+ — $200–500</div>
+      <p>Murphy bed, floating shelves, closet organization, loft furniture. These get phased in as budget allows. The room functions without them — they elevate it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE SUNDAY -->
+<div class="divider"></div>
+<section id="before">
+  <div class="section-tag ember">Before You Move In</div>
+  <h2>Do These Before Sunday</h2>
+  <p class="intro">Things that are easier to do before your stuff arrives — or that you need to have ready on day one.</p>
+
+  <div class="timeline">
+    <div class="phase-block">
+      <div class="phase-dot urgent-dot"><span>!</span></div>
+      <div class="phase-content active-phase">
+        <div class="phase-header">
+          <div class="phase-title">Today / Tomorrow — Order Online Now</div>
+          <div class="phase-badge pb-now">Urgent</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Order blackout curtains + matte black rod</div>
+              <div class="task-sub">NICETOWN on Amazon — dark green or charcoal. Prime delivers in 1–2 days. You need these Day 1 for sleep</div>
+              <div class="task-cost">~$45–65</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Order Govee RGBIC light strips × 2 packs</div>
+              <div class="task-sub">Govee.com or Amazon Prime — they'll arrive within your first few days</div>
+              <div class="task-cost">~$30–50</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Order velvet slim hangers × 50 pack</div>
+              <div class="task-sub">Dark grey or black — you'll unpack clothes directly onto these</div>
+              <div class="task-cost">~$18–22</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Order dual monitor arm mount</div>
+              <div class="task-sub">VIVO brand on Amazon — your desk setup won't feel right without this</div>
+              <div class="task-cost">~$35–55</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Check Facebook Marketplace NOW for Murphy bed</div>
+              <div class="task-sub">Search your area — message sellers today, arrange pickup for week 2. Good ones go fast</div>
+              <div class="task-cost">$200–500 depending on find</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Buy paint supplies — NOT paint yet</div>
+              <div class="task-sub">Get a stud finder, painter's tape, roller + tray, drop cloth. Paint comes after move-in when room is empty</div>
+              <div class="task-cost">~$25–40</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-dot"><span>S</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Saturday — Pack Smart</div>
+          <div class="phase-badge pb-now">Day Before</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Pack a "First Night" bag separately — keep it accessible</div>
+              <div class="task-sub">Bedding, towel, toiletries, chargers, laptop, one change of clothes. This bag does NOT go in the truck last</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Label all boxes by room clearly</div>
+              <div class="task-sub">BEDROOM / BATHROOM / LOFT / KITCHEN. Saves hours on move-in day</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Pack PC last, unpack first</div>
+              <div class="task-sub">Tower in original box if you have it, or wrapped in moving blanket. Goes in car, not truck if possible</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Charge everything overnight</div>
+              <div class="task-sub">Phone, laptop, headset, anything wireless. You won't know where your chargers are Sunday afternoon</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Confirm internet situation with landlord</div>
+              <div class="task-sub">Is there existing WiFi? Do you need to set up a new account? Do this now not Sunday</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DAY 1 -->
+<div class="divider"></div>
+<section id="day1">
+  <div class="section-tag ember">Sunday — Move-In Day</div>
+  <h2>Day 1 Order of Operations</h2>
+  <p class="intro">Do these in this exact order. The order matters — you don't want to set up the bed and then have to move it to set up the desk.</p>
+
+  <div class="callout ember">
+    <h5>The Golden Rule of Move-In Day</h5>
+    <p>Get the bedroom functional before anything else. You need to sleep tonight. Everything else — loft, bathroom decor, unpacking books — waits until you have a bed set up and the PC running. Do not get distracted arranging the loft at 3pm and then have nowhere to sleep at midnight.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="phase-block">
+      <div class="phase-dot"><span>1</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">First Thing — Walk the Space Empty</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Walk every room before bringing anything in</div>
+              <div class="task-sub">Note outlet locations, light switches, where natural light hits. Takes 10 minutes, informs everything</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Find the stud locations in your bedroom walls</div>
+              <div class="task-sub">Use your stud finder now while the walls are bare. Mark with painter's tape. You'll need this for curtain rod + shelves</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Take photos of every room empty</div>
+              <div class="task-sub">You'll want these for reference, and for the before/after when it's done</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Test all outlets, light switches, and fixtures</div>
+              <div class="task-sub">Find out now if anything doesn't work — tell the landlord immediately</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-dot"><span>2</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Bring In — Bedroom First</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Bring in your desk — place against the west wall</div>
+              <div class="task-sub">This is the anchor. Everything else in the bedroom positions relative to the desk</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Set up the PC tower on the floor left of the desk</div>
+              <div class="task-sub">Connect monitors, keyboard, mouse. Get it booting before you do anything else — you'll need it tonight</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Install curtain rod + blackout curtains on the west wall window</div>
+              <div class="task-sub">4–6" above frame, 6" past each side. Do this before dark — you'll sleep better</div>
+              <div class="task-cost">~$45–65 if ordered</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Set up your temporary sleep situation</div>
+              <div class="task-sub">Until Murphy bed arrives: air mattress on the south wall, or mattress on the floor. Make it. Put clean bedding on it. Done</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Connect to internet</div>
+              <div class="task-sub">WiFi or ethernet — get this running. You'll need it for everything that follows</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-dot"><span>3</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Bathroom — Functional Minimum</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Hang a towel bar or hook — you need somewhere to hang your towel tonight</div>
+              <div class="task-sub">If the hardware swap isn't done yet, a Command hook works for Day 1</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Set out your First Night bag toiletries</div>
+              <div class="task-sub">Skincare routine, toothbrush, basics. Counter doesn't need to be organized — just accessible</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Shower curtain / liner if needed</div>
+              <div class="task-sub">Check if one is already installed — if not, this is a Day 1 Target run</div>
+              <div class="task-cost">~$10–20</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-dot"><span>4</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Evening — First Night Comfort</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Stick up your first Govee RGB strip temporarily</div>
+              <div class="task-sub">Even just behind the desk monitors. Set it to Forest green. The room will immediately feel like yours</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Order dinner — do not cook on Day 1</div>
+              <div class="task-sub">You've been moving all day. This is not the night to figure out the kitchen situation</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Do not unpack everything tonight</div>
+              <div class="task-sub">Boxes stacked neatly in the corner are fine. Sleep matters more than unpacking. The rest waits until Monday</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEK 1 -->
+<div class="divider"></div>
+<section id="week1">
+  <div class="section-tag gold">Week 1 — Mon to Sat</div>
+  <h2>The Transformation Week</h2>
+  <p class="intro">Paint is the week 1 priority. An empty or mostly empty room is dramatically easier to paint. Do it before the Murphy bed and shelves go up — you'll never want to paint around them.</p>
+
+  <div class="timeline">
+    <div class="phase-block">
+      <div class="phase-dot"><span>M</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Monday — Paint Prep</div>
+          <div class="phase-badge pb-week1">Week 1</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Buy paint — Sherwin-Williams store</div>
+              <div class="task-sub">Tricorn Black (1 gal) + Shade-Grown (1 qt) for bedroom. Mineral Deposit (1 gal) for bathroom. Gray tinted primer (1 gal). SW Emerald Interior finish</div>
+              <div class="task-cost">~$185–225</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Move all boxes and furniture to the center of the room</div>
+              <div class="task-sub">Tape off beams, trim, and window frames with painter's tape. Lay down drop cloth</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Prime all bedroom walls</div>
+              <div class="task-sub">Gray tinted primer — one coat. Let dry 2–4 hours before painting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-dot"><span>T</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Tuesday — Paint Bedroom</div>
+          <div class="phase-badge pb-week1">Week 1</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Paint north wall first — Shade-Grown forest green</div>
+              <div class="task-sub">Two coats. See how it reads before committing the other walls — it'll look incredible</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Paint remaining three bedroom walls — Tricorn Black</div>
+              <div class="task-sub">Two coats each. Work in sections: west wall, east wall, south wall. The room will look dramatically different by evening</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-dot"><span>W</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Wednesday — Bathroom + Setup</div>
+          <div class="phase-badge pb-week1">Week 1</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Prime + paint bathroom — Mineral Deposit</div>
+              <div class="task-sub">Small room, goes fast. Two coats satin. Keep window open — ventilation matters more in a small space</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Swap bathroom hardware to matte black while paint dries</div>
+              <div class="task-sub">Towel ring, toilet paper holder, robe hook. Screwdriver job, 30 minutes</div>
+              <div class="task-cost">~$35–65</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Mount curtain rod properly with studs</div>
+              <div class="task-sub">Now that paint is dry — properly mount the rod into studs, not just drywall</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-dot"><span>Th</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Thursday–Friday — Bedroom Setup</div>
+          <div class="phase-badge pb-week1">Week 1</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Move furniture back into position against painted walls</div>
+              <div class="task-sub">Desk back to west wall. The painted room will feel completely different — take it in</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Mount dual monitor arm + set up three-monitor layout</div>
+              <div class="task-sub">Clamp to desk edge. Route cables behind the arm post. This is the biggest desk upgrade</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Install RGB strips — beam underlighting first</div>
+              <div class="task-sub">Stick to underside of each exposed beam. Connect to controller. Turn on Forest mode and see the room come alive</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Install cable raceway on west wall</div>
+              <div class="task-sub">Paint it Tricorn Black before mounting. Routes all desk cables down to surge protector invisibly</div>
+              <div class="task-cost">~$15–20</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Hang first piece of dragon art on north wall</div>
+              <div class="task-sub">One print, properly framed, centered on the Shade-Grown green wall. This completes the statement wall</div>
+              <div class="task-cost">~$20–40</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEK 2 -->
+<div class="divider"></div>
+<section id="week2">
+  <div class="section-tag">Week 2</div>
+  <h2>Filling It In</h2>
+  <p class="intro">The room looks and feels intentional by now. Week 2 is about adding the layers that make it cozy and functional.</p>
+
+  <div class="timeline">
+    <div class="phase-block">
+      <div class="phase-dot"><span>2</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Week 2 — Structure + Comfort</div>
+          <div class="phase-badge pb-week2">Week 2</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Install Murphy bed (if sourced from FB Marketplace)</div>
+              <div class="task-sub">Bolt to studs on south wall. Two people makes this much easier — ask a roommate or friend</div>
+              <div class="task-cost">$200–500 depending on find</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Mount three floating shelves on east wall (dragon wall)</div>
+              <div class="task-sub">At 28", 44", and 60" height. Into studs. LED strips underneath each one</div>
+              <div class="task-cost">~$50–80 total</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Set up closet organization system</div>
+              <div class="task-sub">Double rod, drawer unit, top shelf bins, velvet hangers. Unpack clothes properly — not just dumped in</div>
+              <div class="task-cost">~$80–140</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Replace closet doors with dark curtain on IKEA VIDGA track</div>
+              <div class="task-sub">Screw track into ceiling. Hang curtain. Remove old louvered doors</div>
+              <div class="task-cost">~$40–60</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Get first plants — snake plant + pothos</div>
+              <div class="task-sub">One floor plant for the SW corner, one for the dragon shelf. IKEA or Trader Joe's</div>
+              <div class="task-cost">~$15–25</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Set up bathroom scent — reed diffuser + eucalyptus bundle</div>
+              <div class="task-sub">Reed diffuser on toilet tank, eucalyptus tied to shower head. Spa mode activated</div>
+              <div class="task-cost">~$15–25</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Set up bedroom ultrasonic diffuser</div>
+              <div class="task-sub">On desk shelf. Fill with distilled water + 3 drops cedarwood + 2 drops eucalyptus. Forest mode</div>
+              <div class="task-cost">~$20–30</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MONTH 1+ -->
+<div class="divider"></div>
+<section id="month1">
+  <div class="section-tag">Month 1 and Beyond</div>
+  <h2>The Long Game</h2>
+  <p class="intro">By end of Week 2 the bedroom and bathroom are done. Month 1 is about the loft and the finishing touches that take the space from good to extraordinary.</p>
+
+  <div class="timeline">
+    <div class="phase-block">
+      <div class="phase-dot"><span>M1</span></div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-title">Month 1 — Loft + Finishing</div>
+          <div class="phase-badge pb-month">Month 1</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Source loft sofa from FB Marketplace</div>
+              <div class="task-sub">Dark fabric, seats 3+. This is the biggest loft purchase — worth waiting for the right one at the right price</div>
+              <div class="task-cost">$150–400 on Marketplace</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Source DnD table from FB Marketplace or IKEA</div>
+              <div class="task-sub">Dark wood, seats 5–6. Positions directly in front of the triangle window</div>
+              <div class="task-cost">$80–250</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Hang pendant light above loft DnD table from beam</div>
+              <div class="task-sub">Screw hook into beam, swag cord to outlet. Warm Edison bulb</div>
+              <div class="task-cost">~$30–60</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Hang fantasy map or art print above loft table</div>
+              <div class="task-sub">Into stud on the adjacent wall. The backdrop for DnD sessions</div>
+              <div class="task-cost">~$20–35</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">Add galaxy projector to bedroom</div>
+              <div class="task-sub">Aimed at the A-frame sloped ceiling. Run with Forest mode lighting. The room becomes a forest at night</div>
+              <div class="task-cost">~$30–55</div>
+            </div>
+          </div>
+          <div class="task" onclick="toggleTask(this)">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-main">First dragon / collection piece for the shrine shelf</div>
+              <div class="task-sub">One intentional piece for the top shelf spotlight position. Take your time choosing this one</div>
+              <div class="task-cost">Whatever feels right</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FIRST NIGHT KIT -->
+<div class="divider"></div>
+<section id="firstnight">
+  <div class="section-tag gold">First Night Kit</div>
+  <h2>The Bag That Saves You</h2>
+  <p class="intro">Pack this separately from everything else. It goes in the car, not the truck. It's the only bag you absolutely cannot lose on move-in day.</p>
+
+  <div class="kit-grid" id="kit-grid">
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Pillow + pillowcase</div><div class="kit-note">You need to sleep tonight</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Bedding set — sheets + duvet</div><div class="kit-note">Make the bed before anything else</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Towel + washcloth</div><div class="kit-note">You will want a shower tonight</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Full skincare routine</div><div class="kit-note">Your SkinMedica/ZO lineup — don't skip</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Toothbrush + toothpaste</div><div class="kit-note">Basics</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Phone charger</div><div class="kit-note">Keep it on your person all day</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Laptop + charger</div><div class="kit-note">For anything you need to look up</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">One change of clothes</div><div class="kit-note">Moving is dirty work</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Medications</div><div class="kit-note">Any daily meds — in the car with you</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Snacks + water bottle</div><div class="kit-note">You won't have time to eat properly</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Trash bags × 5</div><div class="kit-note">Moving generates so much trash</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Paper towels + cleaner</div><div class="kit-note">Wipe down surfaces before your stuff goes on them</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Stud finder + drill</div><div class="kit-note">You'll want to mount the curtain rod Day 1</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Headset or earbuds</div><div class="kit-note">Music or podcasts make moving bearable</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">ID + lease documents</div><div class="kit-note">Keep physical copies accessible</div></div></div>
+    <div class="kit-item" onclick="toggleKit(this)"><div class="kit-check"></div><div><div class="kit-label">Emergency $50 cash</div><div class="kit-note">For whatever you forgot</div></div></div>
+  </div>
+
+  <div class="callout gold" style="margin-top:24px;">
+    <h5>The Morning After Rule</h5>
+    <p>Monday morning — before you do anything else — make your bed properly with clean sheets. This one act makes the whole space feel settled and intentional even when there are still boxes everywhere. A made bed in a dark-painted room with RGB strips glowing is already the Dragon Den. Everything else is just adding to it.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Move-In Timeline · Dragon Den · Sunday is the beginning</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">📦</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){ window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-52,behavior:'smooth'}); }
+}
+function toggleTask(el){
+  el.classList.toggle('done');
+  saveState();
+}
+function toggleKit(el){
+  el.classList.toggle('packed');
+  saveState();
+}
+function saveState(){
+  var tasks=[]; 
+  document.querySelectorAll('.task').forEach(function(t,i){ tasks.push(t.classList.contains('done')?1:0); });
+  var kits=[];
+  document.querySelectorAll('.kit-item').forEach(function(k,i){ kits.push(k.classList.contains('packed')?1:0); });
+  try{ localStorage.setItem('movein_tasks',JSON.stringify(tasks)); localStorage.setItem('movein_kits',JSON.stringify(kits)); }catch(e){}
+}
+function loadState(){
+  try{
+    var tasks=JSON.parse(localStorage.getItem('movein_tasks')||'[]');
+    var kits=JSON.parse(localStorage.getItem('movein_kits')||'[]');
+    document.querySelectorAll('.task').forEach(function(t,i){ if(tasks[i])t.classList.add('done'); });
+    document.querySelectorAll('.kit-item').forEach(function(k,i){ if(kits[i])k.classList.add('packed'); });
+  }catch(e){}
+}
+loadState();
+</script>
+</body>
+</html>

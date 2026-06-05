@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lighting Diagram — Dragon Den</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void:#07090a; --deep:#0c1210; --moss:#2a4530; --jade:#3d7a4a;
+    --stone:#7a7060; --cream:#e8dcc8; --ember:#c8401a; --gold:#c9933a;
+    --teal:#2a7a7a; --purple:#6a5acc; --mist:rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.97); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  .hero { min-height:45vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:90px 24px 50px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 55% 55% at 25% 75%,rgba(201,147,58,0.12) 0%,transparent 55%), radial-gradient(ellipse 45% 45% at 75% 25%,rgba(61,122,74,0.1) 0%,transparent 50%); }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--gold); text-transform:uppercase; margin-bottom:14px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,4rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--gold) 60%,var(--jade) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:0.95rem; margin-top:12px; position:relative; }
+
+  section { max-width:960px; margin:0 auto; padding:60px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.gold { color:var(--gold); }
+  .section-tag.ember { color:var(--ember); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.5rem,4vw,2.4rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:0.95rem; line-height:1.75; margin-bottom:28px; max-width:640px; }
+
+  /* MOOD SWITCHER */
+  .mood-switcher { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+  .mood-btn { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.2em; text-transform:uppercase; padding:8px 16px; border-radius:2px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:var(--stone); cursor:pointer; transition:all 0.25s; display:flex; align-items:center; gap:8px; }
+  .mood-btn:hover { color:var(--cream); }
+  .mood-btn.active { color:var(--cream); }
+  .mood-btn.forest.active { border-color:var(--jade); color:var(--jade); background:rgba(61,122,74,0.1); }
+  .mood-btn.dragon.active { border-color:var(--ember); color:var(--ember); background:rgba(200,64,26,0.1); }
+  .mood-btn.arcane.active { border-color:var(--purple); color:var(--purple); background:rgba(106,90,204,0.1); }
+  .mood-btn.candle.active { border-color:var(--gold); color:var(--gold); background:rgba(201,147,58,0.1); }
+  .mood-btn.focus.active { border-color:var(--stone); color:var(--cream); background:rgba(255,255,255,0.05); }
+  .mood-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  /* DIAGRAM CONTAINER */
+  .diagram-wrap { position:relative; border:1px solid rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; margin-bottom:24px; background:#060a08; }
+  .diagram-canvas { display:block; width:100%; height:auto; }
+  .diagram-label { position:absolute; font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.15em; text-transform:uppercase; pointer-events:none; white-space:nowrap; }
+
+  /* ZONE LEGEND */
+  .legend-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:28px; }
+  .legend-item { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:16px; display:flex; gap:12px; align-items:flex-start; }
+  .legend-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; margin-top:2px; }
+  .legend-text h5 { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:4px; font-weight:600; }
+  .legend-text p { font-size:0.82rem; color:var(--stone); line-height:1.5; font-style:italic; }
+  .legend-text .legend-spec { font-size:0.75rem; color:var(--jade); margin-top:4px; font-family:'Cinzel',serif; letter-spacing:0.05em; }
+
+  /* ZONE DETAIL CARDS */
+  .zone-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .zone-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:20px; position:relative; overflow:hidden; }
+  .zone-card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; }
+  .zc1::before { background:var(--gold); }
+  .zc2::before { background:var(--jade); }
+  .zc3::before { background:var(--ember); }
+  .zc4::before { background:var(--teal); }
+  .zc5::before { background:var(--purple); }
+  .zc6::before { background:#888; }
+  .zone-num { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.3em; text-transform:uppercase; margin-bottom:6px; }
+  .zc1 .zone-num { color:var(--gold); }
+  .zc2 .zone-num { color:var(--jade); }
+  .zc3 .zone-num { color:var(--ember); }
+  .zc4 .zone-num { color:var(--teal); }
+  .zc5 .zone-num { color:var(--purple); }
+  .zc6 .zone-num { color:var(--stone); }
+  .zone-card h4 { font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.1em; color:var(--cream); margin-bottom:10px; font-weight:600; }
+  .zone-card ul { list-style:none; display:flex; flex-direction:column; gap:5px; }
+  .zone-card li { font-size:0.83rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .zone-card li::before { content:'·'; position:absolute; left:2px; font-size:1.1rem; line-height:1; }
+  .zc1 li::before { color:var(--gold); }
+  .zc2 li::before { color:var(--jade); }
+  .zc3 li::before { color:var(--ember); }
+  .zc4 li::before { color:var(--teal); }
+  .zc5 li::before { color:var(--purple); }
+  .zc6 li::before { color:var(--stone); }
+  .zone-card li strong { color:var(--cream); font-weight:400; }
+
+  /* BATHROOM DIAGRAM */
+  .bath-diagram { background:#060a08; border:1px solid rgba(255,255,255,0.07); border-radius:3px; padding:0; overflow:hidden; margin-bottom:24px; }
+
+  .callout { padding:18px 22px; border-radius:3px; margin:20px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:7px; }
+  .callout.gold h5 { color:var(--gold); }
+  .callout p { font-size:0.88rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.25),transparent); }
+  footer { text-align:center; padding:50px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.18); letter-spacing:0.2em; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Lighting</div>
+  <a onclick="nav('bedroom')">Bedroom</a>
+  <a onclick="nav('zones')">Zone Detail</a>
+  <a onclick="nav('bathroom')">Bathroom</a>
+  <a onclick="nav('loft')">Loft</a>
+  <a onclick="nav('install')">Install Order</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Lighting Diagram · Dragon Den</div>
+  <h1 class="hero-title">Every Light,<br>Every Position</h1>
+  <p class="hero-sub">6 zones · 3 rooms · interactive mood preview · exact placement specs</p>
+</div>
+
+<!-- BEDROOM -->
+<div class="divider"></div>
+<section id="bedroom">
+  <div class="section-tag gold">Bedroom · 13'6" × 10'4"</div>
+  <h2>Bedroom Lighting Map</h2>
+  <p class="intro">Six zones working together. Switch moods below to see how the lighting shifts across the room.</p>
+
+  <!-- MOOD SWITCHER -->
+  <div class="mood-switcher">
+    <button class="mood-btn forest active" onclick="setMood('forest')"><div class="mood-dot" style="background:#3d7a4a"></div>Forest</button>
+    <button class="mood-btn dragon" onclick="setMood('dragon')"><div class="mood-dot" style="background:#c8401a"></div>Dragon</button>
+    <button class="mood-btn arcane" onclick="setMood('arcane')"><div class="mood-dot" style="background:#6a5acc"></div>Arcane</button>
+    <button class="mood-btn candle" onclick="setMood('candle')"><div class="mood-dot" style="background:#c9933a"></div>Candlelight</button>
+    <button class="mood-btn focus" onclick="setMood('focus')"><div class="mood-dot" style="background:#d0ccc0"></div>Focus</button>
+  </div>
+
+  <!-- SVG DIAGRAM -->
+  <div class="diagram-wrap">
+    <canvas id="bedroom-canvas" class="diagram-canvas" width="960" height="620"></canvas>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend-grid">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div><div class="legend-text"><h5>Zone 1 — Peak Pendant</h5><p>Center A-frame peak, hanging 3–4ft down from beam</p><div class="legend-spec">Smart bulb · dimmable · warm to cool</div></div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--jade)"></div><div class="legend-text"><h5>Zone 2 — Beam Underlighting</h5><p>Govee RGBIC strips on underside of each exposed beam</p><div class="legend-spec">Staple gun · ~3 beams · mood-synced</div></div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--ember)"></div><div class="legend-text"><h5>Zone 3 — Dragon Shelf RGB</h5><p>Under each floating shelf edge + puck on shrine piece</p><div class="legend-spec">Govee RGBIC · 3 strips · east wall</div></div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div><div class="legend-text"><h5>Zone 4 — Desk RGB</h5><p>Behind monitors (bias) + under desk shelf</p><div class="legend-spec">Govee Immersion · screen-reactive</div></div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div><div class="legend-text"><h5>Zone 5 — Galaxy Projector</h5><p>Aimed at A-frame sloped ceiling from desk corner</p><div class="legend-spec">BlissLights Ark · ~$35 · smart plug</div></div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#888"></div><div class="legend-text"><h5>Zone 6 — PC Internals</h5><p>Tower RGB through glass side panel, facing room</p><div class="legend-spec">iCUE / Synapse · synced to mood color</div></div></div>
+  </div>
+</section>
+
+<!-- ZONE DETAIL -->
+<div class="divider"></div>
+<section id="zones">
+  <div class="section-tag">Zone Detail</div>
+  <h2>Placement Specifications</h2>
+  <p class="intro">Exact heights, distances, and hardware for every zone. Measure twice, staple once.</p>
+
+  <div class="zone-cards">
+    <div class="zone-card zc1">
+      <div class="zone-num">Zone 1</div>
+      <h4>Peak Pendant</h4>
+      <ul>
+        <li><strong>Hook:</strong> Matte black screw cup hook into center ridge beam — pre-drill 1/16" pilot hole</li>
+        <li><strong>Drop length:</strong> 3–4 feet from beam — pendant should hang at ~5ft from floor</li>
+        <li><strong>Cord routing:</strong> Along beam to nearest outlet, tacked with cord clips every 12"</li>
+        <li><strong>Bulb:</strong> Smart Edison — Kasa or Govee, 2200–6500K range, dimmable</li>
+        <li><strong>Style:</strong> Rattan cage or dark metal cage — $25–50 Amazon</li>
+        <li><strong>Position:</strong> Center of room, directly under ridge beam peak</li>
+      </ul>
+    </div>
+    <div class="zone-card zc2">
+      <div class="zone-num">Zone 2</div>
+      <h4>Beam Underlighting</h4>
+      <ul>
+        <li><strong>Strip:</strong> Govee RGBIC 5m — cut to beam length, one strip per beam</li>
+        <li><strong>Mount:</strong> Staple gun every 10–12" OR 3M VHB tape — both hold well on wood</li>
+        <li><strong>Position:</strong> Center of beam underside, facing down into room</li>
+        <li><strong>Controller:</strong> Tucked at one beam end, hidden behind beam edge</li>
+        <li><strong>Power:</strong> Run cord along beam to nearest outlet — same cord path as pendant</li>
+        <li><strong>Beams to cover:</strong> All 3 visible cross-beams — ~12–15ft strip per beam</li>
+      </ul>
+    </div>
+    <div class="zone-card zc3">
+      <div class="zone-num">Zone 3</div>
+      <h4>Dragon Shelf RGB</h4>
+      <ul>
+        <li><strong>Strip:</strong> Govee RGBIC — one strip per shelf, cut to shelf width (~36–40")</li>
+        <li><strong>Position:</strong> Underside of shelf front edge, LED facing downward and outward</li>
+        <li><strong>Heights:</strong> Shelf 1 at 28" · Shelf 2 at 44" · Shelf 3 at 60" from floor</li>
+        <li><strong>Shrine spotlight:</strong> LED puck light screwed into underside of shelf above shrine piece — aimed down at 45°</li>
+        <li><strong>Controller:</strong> Velcroed to back of bottom shelf, accessible but hidden</li>
+        <li><strong>Power:</strong> Daisy-chain to a smart power strip on the east wall</li>
+      </ul>
+    </div>
+    <div class="zone-card zc4">
+      <div class="zone-num">Zone 4</div>
+      <h4>Desk RGB</h4>
+      <ul>
+        <li><strong>Monitor bias strip:</strong> Govee Immersion TV Backlight — camera clips to monitor top, strip runs behind all 3</li>
+        <li><strong>Shelf strip:</strong> Govee RGBIC under floating desk shelf front edge — faces monitors</li>
+        <li><strong>Bias strip height:</strong> Centered behind monitor cluster, 2–3" from wall</li>
+        <li><strong>Camera position:</strong> Top center of main (AOC) monitor, angled slightly down</li>
+        <li><strong>Power:</strong> USB-A into powered hub or directly into PC USB port</li>
+        <li><strong>Screen sync:</strong> Govee app → PC mode → screen color reactive</li>
+      </ul>
+    </div>
+    <div class="zone-card zc5">
+      <div class="zone-num">Zone 5</div>
+      <h4>Galaxy Projector</h4>
+      <ul>
+        <li><strong>Unit:</strong> BlissLights Ark or Encalife Atmosphere — $35–55</li>
+        <li><strong>Position:</strong> On desk shelf or small stand in desk corner, aimed at sloped ceiling</li>
+        <li><strong>Angle:</strong> Tilted ~30–45° upward toward the A-frame slope — fills the angled ceiling with stars or forest canopy</li>
+        <li><strong>Power:</strong> Smart plug — Kasa or Govee — scheduled on/off or voice controlled</li>
+        <li><strong>Best effect:</strong> Run with beam underlighting off or very dim — projector is the star</li>
+        <li><strong>Modes:</strong> Galaxy stars, aurora, or nebula — rotate with mood</li>
+      </ul>
+    </div>
+    <div class="zone-card zc6">
+      <div class="zone-num">Zone 6</div>
+      <h4>PC Internals</h4>
+      <ul>
+        <li><strong>Position:</strong> Tower on floor left of desk — glass side panel faces INTO the room</li>
+        <li><strong>Software:</strong> iCUE (Corsair), Razer Synapse, or ARGB controller app</li>
+        <li><strong>Sync:</strong> Match active mood color manually or via Govee API integration</li>
+        <li><strong>Effect:</strong> Slow color flow or static match — avoid rapid strobe effects</li>
+        <li><strong>Clearance:</strong> 6"+ from wall behind tower for exhaust — don't block RGB with cables</li>
+        <li><strong>No extra cost</strong> — uses existing PC RGB hardware</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- MOOD COLOR TABLE -->
+  <div style="background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-top:20px;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#0a0e0c;">
+          <th style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss);">Mood</th>
+          <th style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss);">Pendant</th>
+          <th style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss);">Beams</th>
+          <th style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss);">Shelves</th>
+          <th style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss);">Desk</th>
+          <th style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss);">Galaxy</th>
+        </tr>
+      </thead>
+      <tbody id="mood-table"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- BATHROOM -->
+<div class="divider"></div>
+<section id="bathroom">
+  <div class="section-tag ember">Bathroom · 9'5" × 5'0"</div>
+  <h2>Bathroom Lighting</h2>
+  <p class="intro">Simple but transformative. Three changes turn the existing bathroom lighting from clinical into spa.</p>
+
+  <div class="bath-diagram">
+    <canvas id="bath-canvas" style="display:block; width:100%; height:auto;" width="960" height="380"></canvas>
+  </div>
+
+  <div class="zone-cards" style="margin-top:20px;">
+    <div class="zone-card zc1">
+      <div class="zone-num">Primary Light</div>
+      <h4>Vanity Bar — Swapped</h4>
+      <ul>
+        <li><strong>Replace:</strong> Hollywood chrome bar with matte black bar fixture — same 4 screw holes</li>
+        <li><strong>Bulbs:</strong> Warm 2700K ST19 Edison bulbs — 4 per bar</li>
+        <li><strong>Effect:</strong> The Mineral Deposit walls glow deep teal-green under warm light — looks like an onsen</li>
+        <li><strong>Dimmer:</strong> If outlet has a switch, replace with a dimmer switch — $12 at Home Depot</li>
+      </ul>
+    </div>
+    <div class="zone-card zc3">
+      <div class="zone-num">Accent</div>
+      <h4>Mirror RGB Strip</h4>
+      <ul>
+        <li><strong>Strip:</strong> Short Govee RGBIC strip (1–2m) behind or around medicine cabinet mirror</li>
+        <li><strong>Default:</strong> Warm amber — makes the mirror glow like a vanity in a luxury hotel</li>
+        <li><strong>Spa mode:</strong> Switch to deep teal or soft green — matches Mineral Deposit walls</li>
+        <li><strong>Power:</strong> Plug into outlet beneath sink or beside mirror</li>
+        <li><strong>Mount:</strong> 3M tape on mirror back — no drilling</li>
+      </ul>
+    </div>
+    <div class="zone-card zc2">
+      <div class="zone-num">Ambient</div>
+      <h4>Flameless LED Candles</h4>
+      <ul>
+        <li><strong>Units:</strong> 2–3 battery LED candles — counter and toilet tank ledge</li>
+        <li><strong>Type:</strong> Warm flicker effect, remote controlled, timer function</li>
+        <li><strong>Position:</strong> One on counter beside skincare tray, one on toilet tank</li>
+        <li><strong>100% safe</strong> — no flame, no heat, no burning smell whatsoever</li>
+        <li>These are the ONLY candle-style items in the whole design</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- LOFT -->
+<div class="divider"></div>
+<section id="loft">
+  <div class="section-tag">Loft · 27'0" × 11'10"</div>
+  <h2>Loft Lighting Map</h2>
+  <p class="intro">Long narrow space with an A-frame peak and the triangle window at one end. Lighting divides the two zones while the string lights overhead unify everything.</p>
+
+  <div class="diagram-wrap">
+    <canvas id="loft-canvas" class="diagram-canvas" width="960" height="400"></canvas>
+  </div>
+
+  <div class="zone-cards">
+    <div class="zone-card zc1">
+      <div class="zone-num">DnD Zone</div>
+      <h4>Table Pendant</h4>
+      <ul>
+        <li><strong>Hook:</strong> Cup hook into A-frame beam directly above table center</li>
+        <li><strong>Drop:</strong> 2.5–3ft from beam — pendant at ~5.5ft, clears heads when standing</li>
+        <li><strong>Bulb:</strong> Edison warm 2200K, dimmable smart bulb</li>
+        <li><strong>Effect:</strong> Pool of warm light over the table — everything outside it falls to shadow</li>
+        <li><strong>Style:</strong> Cage pendant, rattan, or dark metal to match bedroom</li>
+      </ul>
+    </div>
+    <div class="zone-card zc2">
+      <div class="zone-num">Reading Zone</div>
+      <h4>Arc Floor Lamp</h4>
+      <ul>
+        <li><strong>Position:</strong> Behind and to the right of the reading armchair — arcs over the left shoulder</li>
+        <li><strong>Bulb:</strong> Smart bulb — warm 2700K for reading, slightly brighter for tasks</li>
+        <li><strong>No ceiling mounting needed</strong> — floor lamp, just plug in</li>
+        <li><strong>Style:</strong> Matte black arc, matching hardware throughout</li>
+        <li>Creates a personal reading pool that doesn't bleed into the DnD zone</li>
+      </ul>
+    </div>
+    <div class="zone-card zc4">
+      <div class="zone-num">Canopy</div>
+      <h4>Beam String Lights</h4>
+      <ul>
+        <li><strong>Lights:</strong> Warm globe string lights or fairy lights — 15–20ft length</li>
+        <li><strong>Route:</strong> Along one beam overhead, spanning from reading nook to above the DnD table</li>
+        <li><strong>Mount:</strong> Small staple clips every 18" — minimal holes, removable</li>
+        <li><strong>Power:</strong> Smart plug at nearest outlet — scheduled on at dusk, off at midnight</li>
+        <li><strong>Effect:</strong> Unifies both zones under one warm canopy — the tavern ceiling</li>
+      </ul>
+    </div>
+    <div class="zone-card zc5">
+      <div class="zone-num">Feature</div>
+      <h4>Triangle Window</h4>
+      <ul>
+        <li><strong>No treatment needed</strong> — the window is the feature, not the lighting</li>
+        <li>At night, the dark forest outside + interior pendant glow creates natural contrast</li>
+        <li>Optional: a very small accent light aimed at the window frame from below — silhouettes the triangle shape</li>
+        <li>Never put curtains here — the view is the point</li>
+      </ul>
+    </div>
+    <div class="zone-card zc6">
+      <div class="zone-num">Bookshelf</div>
+      <h4>Shelf Underlighting</h4>
+      <ul>
+        <li><strong>Strip:</strong> Short Govee strip under the reading nook bookshelf top shelf</li>
+        <li><strong>Default:</strong> Warm amber — books and decor glow</li>
+        <li><strong>Subtle dragon presence:</strong> The one dragon figure on this shelf, lit from below, glows</li>
+        <li>Keeps the reading nook visually interesting without overpowering the pendant above the table</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL ORDER -->
+<div class="divider"></div>
+<section id="install">
+  <div class="section-tag gold">Installation</div>
+  <h2>Install Order</h2>
+  <p class="intro">Do this in order — later steps depend on earlier ones being in place.</p>
+
+  <div style="display:flex; flex-direction:column; gap:0; border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; background:var(--deep);">
+    <div style="background:#0a0e0c; padding:12px 16px; display:grid; grid-template-columns:40px 1fr 140px; gap:12px; border-bottom:1px solid rgba(255,255,255,0.05);">
+      <span style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase;">Step</span>
+      <span style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase;">Task</span>
+      <span style="font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase;">When</span>
+    </div>
+    <div id="install-rows"></div>
+  </div>
+
+  <div class="callout gold" style="margin-top:20px;">
+    <h5>The First Night Shortcut</h5>
+    <p>On move-in Sunday you only need Step 1 done — tape the Govee strip temporarily behind your desk monitors and set it to Forest green. Even one zone running against the bare walls immediately makes the space feel like yours. Everything else gets installed properly over the following week once the paint is done.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Lighting Diagram · Dragon Den · Every light has a purpose</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">💡</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){ window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-52,behavior:'smooth'}); }
+}
+
+// ── MOOD SYSTEM ──────────────────────────────────────────────
+var MOODS = {
+  forest:  { name:'Forest',      pendant:'2700K warm', beams:'Deep green',     shelves:'Amber + green', desk:'Forest green', galaxy:'Off / nebula', pendant_c:'#d4883a', beam_c:'#3d7a4a', shelf_c:'#3d7a4a', desk_c:'#2a6a3a', pc_c:'#3d7a4a', ambient:'#0e1f12' },
+  dragon:  { name:'Dragon',      pendant:'2200K ember', beams:'Deep red',      shelves:'Ember red',     desk:'Screen-reactive', galaxy:'Off',       pendant_c:'#c8401a', beam_c:'#c8401a', shelf_c:'#c8401a', desk_c:'#c8401a', pc_c:'#c8401a', ambient:'#1a0505' },
+  arcane:  { name:'Arcane',      pendant:'Dim warm',   beams:'Blue-purple',    shelves:'Soft purple',   desk:'Blue bias',    galaxy:'Galaxy stars',  pendant_c:'#7a6acc', beam_c:'#6a5acc', shelf_c:'#5a4acc', desk_c:'#3a4acc', pc_c:'#6a5acc', ambient:'#06060f' },
+  candle:  { name:'Candlelight', pendant:'2200K amber', beams:'Warm amber',    shelves:'Warm amber',    desk:'Warm amber',   galaxy:'Aurora',        pendant_c:'#c9933a', beam_c:'#c9933a', shelf_c:'#c9933a', desk_c:'#8a6020', pc_c:'#c9933a', ambient:'#150e04' },
+  focus:   { name:'Focus',       pendant:'4000K cool', beams:'Off / very dim', shelves:'Off',           desk:'Cool white',   galaxy:'Off',           pendant_c:'#d0d8e8', beam_c:'#3a4040', shelf_c:'#1a1a1a', desk_c:'#a0b0c0', pc_c:'#8090a0', ambient:'#08080c' },
+};
+
+var currentMood = 'forest';
+
+function setMood(name){
+  currentMood = name;
+  document.querySelectorAll('.mood-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('.mood-btn.'+name).classList.add('active');
+  drawBedroom();
+  drawMoodTable();
+}
+
+// ── BEDROOM CANVAS ────────────────────────────────────────────
+function drawBedroom(){
+  var canvas = document.getElementById('bedroom-canvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var mood = MOODS[currentMood];
+
+  ctx.clearRect(0,0,W,H);
+
+  // Background — room floor
+  ctx.fillStyle = mood.ambient;
+  ctx.fillRect(0,0,W,H);
+
+  // Room outline
+  var rx=40, ry=40, rw=W-80, rh=H-80;
+
+  // Wall fills with mood ambient glow
+  // North wall (top) — Shade-Grown green
+  ctx.fillStyle = '#0f1f0f';
+  ctx.fillRect(rx, ry, rw, 18);
+
+  // East wall — dragon shelf wall
+  ctx.fillStyle = '#0a0f0a';
+  ctx.fillRect(rx+rw-18, ry, 18, rh);
+
+  // West wall — window wall
+  ctx.fillStyle = '#0a1010';
+  ctx.fillRect(rx, ry, 18, rh);
+
+  // South wall — murphy bed
+  ctx.fillStyle = '#0a0a0e';
+  ctx.fillRect(rx, ry+rh-18, rw, 18);
+
+  // Floor
+  ctx.fillStyle = 'rgba(42,28,10,0.4)';
+  ctx.fillRect(rx+18, ry+18, rw-36, rh-36);
+
+  // Room border
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(rx, ry, rw, rh);
+
+  // ── LABELS ──
+  ctx.font = '600 11px Cinzel, serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.textAlign = 'center';
+  ctx.fillText('NORTH WALL — Shade-Grown Green', W/2, ry+12);
+  ctx.textAlign = 'center';
+  ctx.save(); ctx.translate(rx+9, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('WEST — Window + Desk', 0, 0); ctx.restore();
+  ctx.save(); ctx.translate(rx+rw-9, H/2); ctx.rotate(Math.PI/2);
+  ctx.fillText('EAST — Dragon Shelves', 0, 0); ctx.restore();
+  ctx.textAlign = 'center';
+  ctx.fillText('SOUTH WALL — Murphy Bed', W/2, ry+rh-8);
+
+  // ── WINDOW (west wall, upper portion) ──
+  ctx.fillStyle = 'rgba(100,180,140,0.12)';
+  ctx.fillRect(rx+18, ry+60, 8, 100);
+  ctx.strokeStyle = 'rgba(100,180,140,0.4)';
+  ctx.lineWidth=1; ctx.strokeRect(rx+18, ry+60, 8, 100);
+  ctx.fillStyle='rgba(100,180,140,0.5)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.save(); ctx.translate(rx+22, ry+110); ctx.rotate(-Math.PI/2);
+  ctx.fillText('WINDOW', 0,0); ctx.restore();
+
+  // ── DESK (west wall, lower portion) ──
+  var deskX = rx+26, deskY = ry+180, deskW=200, deskH=55;
+  ctx.fillStyle = 'rgba(60,40,20,0.7)';
+  ctx.fillRect(deskX, deskY, deskW, deskH);
+  ctx.strokeStyle='rgba(90,60,30,0.6)'; ctx.lineWidth=1;
+  ctx.strokeRect(deskX, deskY, deskW, deskH);
+
+  // Monitors
+  var monColors = ['rgba(26,64,96,0.8)','rgba(26,64,96,0.9)','rgba(26,64,96,0.8)'];
+  var monW=54, monH=38, monY=deskY-42;
+  [0,1,2].forEach(function(i){
+    var mx = deskX + 10 + i*(monW+6);
+    ctx.fillStyle = monColors[i];
+    ctx.fillRect(mx, monY, monW, monH);
+    // Screen glow
+    var sg = ctx.createRadialGradient(mx+monW/2,monY+monH/2,2,mx+monW/2,monY+monH/2,monW/2);
+    sg.addColorStop(0, mood.desk_c+'55');
+    sg.addColorStop(1, 'transparent');
+    ctx.fillStyle=sg; ctx.fillRect(mx-10,monY-10,monW+20,monH+20);
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=0.5;
+    ctx.strokeRect(mx, monY, monW, monH);
+  });
+
+  // Desk RGB glow (zone 4)
+  var dg = ctx.createLinearGradient(deskX, deskY, deskX+deskW, deskY);
+  dg.addColorStop(0,'transparent'); dg.addColorStop(0.5,mood.desk_c+'40'); dg.addColorStop(1,'transparent');
+  ctx.fillStyle=dg; ctx.fillRect(deskX, deskY-8, deskW, 8);
+
+  // Desk label
+  ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('DESK + MONITORS', deskX+deskW/2, deskY+deskH/2+4);
+
+  // Floating shelf above desk (zone 4)
+  var shX=deskX, shY=deskY-90, shW=deskW, shH=8;
+  ctx.fillStyle='rgba(40,25,10,0.8)'; ctx.fillRect(shX,shY,shW,shH);
+  // Shelf glow
+  var shg = ctx.createLinearGradient(shX,shY+shH,shX,shY+shH+30);
+  shg.addColorStop(0,mood.desk_c+'30'); shg.addColorStop(1,'transparent');
+  ctx.fillStyle=shg; ctx.fillRect(shX,shY+shH,shW,30);
+  ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('FLOATING SHELF', shX+shW/2, shY-4);
+
+  // PC tower (zone 6)
+  var pcX=rx+26, pcY=ry+rh-90, pcW=35, pcH=55;
+  ctx.fillStyle='rgba(15,15,18,0.9)'; ctx.fillRect(pcX,pcY,pcW,pcH);
+  ctx.strokeStyle=mood.pc_c+'80'; ctx.lineWidth=1.5; ctx.strokeRect(pcX,pcY,pcW,pcH);
+  // PC glow
+  var pcg=ctx.createRadialGradient(pcX+pcW/2,pcY+pcH/2,5,pcX+pcW/2,pcY+pcH/2,40);
+  pcg.addColorStop(0,mood.pc_c+'30'); pcg.addColorStop(1,'transparent');
+  ctx.fillStyle=pcg; ctx.fillRect(pcX-10,pcY-10,pcW+20,pcH+20);
+  ctx.fillStyle=mood.pc_c; ctx.font='7px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('PC', pcX+pcW/2, pcY+pcH/2+3);
+
+  // ── MURPHY BED (south wall) ──
+  var mbX=rx+100, mbY=ry+rh-80, mbW=300, mbH=60;
+  ctx.fillStyle='rgba(20,10,5,0.8)'; ctx.fillRect(mbX,mbY,mbW,mbH);
+  ctx.strokeStyle='rgba(60,40,20,0.5)'; ctx.lineWidth=1; ctx.strokeRect(mbX,mbY,mbW,mbH);
+  // Bedding color hint
+  ctx.fillStyle='rgba(22,42,22,0.5)'; ctx.fillRect(mbX+4,mbY+4,mbW-8,mbH-8);
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('MURPHY BED (deployed)', mbX+mbW/2, mbY+mbH/2+3);
+
+  // ── DRAGON SHELVES (east wall) ──
+  var shelfX = rx+rw-80;
+  var shelves = [{y:ry+130,label:'SHELF 3 · 60"'},{y:ry+230,label:'SHELF 2 · 44"'},{y:ry+330,label:'SHELF 1 · 28"'}];
+  shelves.forEach(function(s,i){
+    ctx.fillStyle='rgba(30,18,8,0.9)'; ctx.fillRect(shelfX, s.y, 60, 8);
+    // Shelf RGB glow
+    var sg2 = ctx.createLinearGradient(shelfX,s.y+8,shelfX,s.y+45);
+    sg2.addColorStop(0,mood.shelf_c+'50'); sg2.addColorStop(1,'transparent');
+    ctx.fillStyle=sg2; ctx.fillRect(shelfX,s.y+8,60,45);
+    ctx.fillStyle=mood.shelf_c+'90'; ctx.font='7px Cinzel,serif'; ctx.textAlign='center';
+    ctx.fillText(s.label, shelfX+30, s.y-4);
+    // Dragon figure silhouette
+    if(i===0){ // shrine
+      ctx.fillStyle=mood.shelf_c+'dd';
+      ctx.fillRect(shelfX+22,s.y-18,16,18);
+      // spotlight
+      var spot=ctx.createRadialGradient(shelfX+30,s.y-9,2,shelfX+30,s.y-9,20);
+      spot.addColorStop(0,mood.shelf_c+'60'); spot.addColorStop(1,'transparent');
+      ctx.fillStyle=spot; ctx.fillRect(shelfX+10,s.y-30,40,40);
+    }
+  });
+
+  // ── A-FRAME BEAMS (overhead) ──
+  var beamYs = [ry+80, ry+160, ry+240];
+  beamYs.forEach(function(by){
+    // Beam line
+    ctx.strokeStyle='rgba(90,60,20,0.7)'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(rx+18,by); ctx.lineTo(rx+rw-18,by); ctx.stroke();
+    // Beam RGB glow
+    var bg=ctx.createLinearGradient(rx+18,by-2,rx+18,by+20);
+    bg.addColorStop(0,mood.beam_c+'50'); bg.addColorStop(1,'transparent');
+    ctx.fillStyle=bg; ctx.fillRect(rx+18,by,rw-36,20);
+  });
+  ctx.fillStyle='rgba(140,100,40,0.5)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='left';
+  ctx.fillText('← EXPOSED BEAM · Govee RGBIC strip on underside', rx+24, beamYs[0]-8);
+
+  // ── PENDANT LIGHT (zone 1) ──
+  var pendX=W/2, pendY=ry+30;
+  // Drop cord
+  ctx.strokeStyle='rgba(100,70,30,0.6)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(pendX,pendY); ctx.lineTo(pendX,pendY+50); ctx.stroke();
+  // Pendant
+  ctx.fillStyle='rgba(30,20,10,0.9)'; ctx.beginPath(); ctx.arc(pendX,pendY+58,14,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=mood.pendant_c+'80'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(pendX,pendY+58,14,0,Math.PI*2); ctx.stroke();
+  // Pendant glow
+  var pg=ctx.createRadialGradient(pendX,pendY+58,5,pendX,pendY+58,120);
+  pg.addColorStop(0,mood.pendant_c+'40'); pg.addColorStop(0.4,mood.pendant_c+'15'); pg.addColorStop(1,'transparent');
+  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(pendX,pendY+58,120,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=mood.pendant_c; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('PENDANT', pendX, pendY+80);
+  ctx.fillText('Zone 1', pendX, pendY+90);
+
+  // ── GALAXY PROJECTOR (zone 5) ──
+  var gpX = deskX+deskW-20, gpY=deskY-10;
+  ctx.fillStyle=mood.ambient; ctx.beginPath(); ctx.arc(gpX,gpY,8,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=MOODS.arcane.pc_c+'80'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(gpX,gpY,8,0,Math.PI*2); ctx.stroke();
+  // Projection beam to ceiling
+  ctx.strokeStyle=MOODS.arcane.pc_c+'20'; ctx.lineWidth=30;
+  ctx.beginPath(); ctx.moveTo(gpX,gpY); ctx.lineTo(W*0.6,ry+25); ctx.stroke();
+  ctx.fillStyle=MOODS.arcane.pc_c+'60'; ctx.font='7px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('GALAXY', gpX, gpY+18);
+  ctx.fillText('PROJ.', gpX, gpY+27);
+
+  // ── ZONE LABELS OVERLAY ──
+  var zones=[
+    {x:W/2,y:ry+100,label:'Z2 BEAMS',c:mood.beam_c},
+    {x:shelfX+30,y:ry+400,label:'Z3 SHELVES',c:mood.shelf_c},
+    {x:deskX+deskW/2,y:deskY+deskH+18,label:'Z4 DESK RGB',c:mood.desk_c},
+  ];
+  zones.forEach(function(z){
+    ctx.fillStyle=z.c+'cc'; ctx.font='bold 8px Cinzel,serif'; ctx.textAlign='center';
+    ctx.fillText(z.label,z.x,z.y);
+  });
+
+  // ── DIMENSION LABELS ──
+  ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.font='10px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText("13'6\"", W/2, H-18);
+  ctx.save(); ctx.translate(16, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText("10'4\"",0,0); ctx.restore();
+}
+
+// ── BATHROOM CANVAS ───────────────────────────────────────────
+function drawBathroom(){
+  var canvas=document.getElementById('bath-canvas');
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  ctx.fillStyle='#050c0c'; ctx.fillRect(0,0,W,H);
+
+  var rx=60,ry=40,rw=W-120,rh=H-80;
+  ctx.fillStyle='rgba(30,50,55,0.4)'; ctx.fillRect(rx,ry,rw,rh);
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1.5; ctx.strokeRect(rx,ry,rw,rh);
+
+  // Vanity / mirror area (north wall)
+  var mirrorX=rx+60,mirrorY=ry+20,mirrorW=200,mirrorH=100;
+  ctx.fillStyle='rgba(40,55,60,0.7)'; ctx.fillRect(mirrorX,mirrorY,mirrorW,mirrorH);
+  ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.strokeRect(mirrorX,mirrorY,mirrorW,mirrorH);
+  // Mirror RGB glow
+  var mg=ctx.createRadialGradient(mirrorX+mirrorW/2,mirrorY+mirrorH/2,10,mirrorX+mirrorW/2,mirrorY+mirrorH/2,120);
+  mg.addColorStop(0,'rgba(201,147,58,0.25)'); mg.addColorStop(1,'transparent');
+  ctx.fillStyle=mg; ctx.fillRect(mirrorX-20,mirrorY-20,mirrorW+40,mirrorH+40);
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='10px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('MIRROR + RGB STRIP', mirrorX+mirrorW/2, mirrorY+mirrorH/2+4);
+
+  // Vanity bar (light)
+  var barX=mirrorX+20,barY=mirrorY-16,barW=160,barH=10;
+  ctx.fillStyle='rgba(30,20,10,0.9)'; ctx.fillRect(barX,barY,barW,barH);
+  var blg=ctx.createLinearGradient(barX,barY+barH,barX,barY+barH+60);
+  blg.addColorStop(0,'rgba(201,147,58,0.4)'); blg.addColorStop(1,'transparent');
+  ctx.fillStyle=blg; ctx.fillRect(barX,barY+barH,barW,60);
+  ctx.fillStyle='rgba(201,147,58,0.8)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('MATTE BLACK LIGHT BAR · 2700K', barX+barW/2, barY-6);
+
+  // Sink
+  ctx.fillStyle='rgba(60,80,85,0.6)'; ctx.fillRect(rx+60,ry+120,120,60);
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.strokeRect(rx+60,ry+120,120,60);
+  ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('SINK', rx+120, ry+155);
+
+  // Toilet
+  ctx.fillStyle='rgba(60,80,85,0.5)'; ctx.fillRect(rx+rw-130,ry+80,70,90);
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.strokeRect(rx+rw-130,ry+80,70,90);
+  ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('TOILET', rx+rw-95, ry+130);
+  // LED candle on toilet tank
+  var cg2=ctx.createRadialGradient(rx+rw-95,ry+85,2,rx+rw-95,ry+85,30);
+  cg2.addColorStop(0,'rgba(201,147,58,0.5)'); cg2.addColorStop(1,'transparent');
+  ctx.fillStyle=cg2; ctx.beginPath(); ctx.arc(rx+rw-95,ry+85,30,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(201,147,58,0.8)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('🕯 LED CANDLE', rx+rw-95, ry+72);
+
+  // Shower
+  ctx.fillStyle='rgba(30,50,55,0.7)'; ctx.fillRect(rx+rw-160,ry+200,140,130);
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.strokeRect(rx+rw-160,ry+200,140,130);
+  ctx.fillStyle='rgba(100,180,160,0.15)'; ctx.fillRect(rx+rw-160,ry+200,140,130);
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('SHOWER', rx+rw-90, ry+262);
+  // Eucalyptus note
+  ctx.fillStyle='rgba(61,122,74,0.7)'; ctx.font='8px Cinzel,serif';
+  ctx.fillText('🌿 Eucalyptus bundle', rx+rw-90, ry+280);
+
+  // Skincare tray
+  var trayX=mirrorX+220, trayY=ry+130;
+  ctx.fillStyle='rgba(40,25,10,0.8)'; ctx.fillRect(trayX,trayY,120,50);
+  ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1; ctx.strokeRect(trayX,trayY,120,50);
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('SKINCARE TRAY', trayX+60, trayY+20);
+  ctx.fillText('+ LED candle', trayX+60, trayY+36);
+
+  // Reed diffuser
+  ctx.fillStyle='rgba(61,122,74,0.6)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('REED DIFFUSER', rx+rw-95, ry+185);
+
+  // Dimension
+  ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.font='10px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText("9'5\" × 5'0\"  ·  Mineral Deposit SW9670", W/2, H-18);
+}
+
+// ── LOFT CANVAS ───────────────────────────────────────────────
+function drawLoft(){
+  var canvas=document.getElementById('loft-canvas');
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#060a07'; ctx.fillRect(0,0,W,H);
+
+  var rx=40,ry=40,rw=W-80,rh=H-80;
+  ctx.fillStyle='rgba(15,22,15,0.5)'; ctx.fillRect(rx,ry,rw,rh);
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1.5; ctx.strokeRect(rx,ry,rw,rh);
+
+  // READING NOOK — left end
+  var nookW=220;
+  ctx.fillStyle='rgba(10,18,10,0.6)'; ctx.fillRect(rx,ry,nookW,rh);
+  ctx.strokeStyle='rgba(61,122,74,0.2)'; ctx.lineWidth=1;
+  ctx.strokeRect(rx,ry,nookW,rh);
+  ctx.fillStyle='rgba(61,122,74,0.4)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('READING NOOK', rx+nookW/2, ry+15);
+
+  // Bookshelf (left nook, north wall)
+  ctx.fillStyle='rgba(30,18,8,0.9)'; ctx.fillRect(rx+10,ry+18,nookW-20,40);
+  ctx.strokeStyle='rgba(60,40,20,0.5)'; ctx.lineWidth=0.5; ctx.strokeRect(rx+10,ry+18,nookW-20,40);
+  var bsg=ctx.createLinearGradient(rx+10,ry+58,rx+10,ry+100);
+  bsg.addColorStop(0,'rgba(201,147,58,0.35)'); bsg.addColorStop(1,'transparent');
+  ctx.fillStyle=bsg; ctx.fillRect(rx+10,ry+58,nookW-20,40);
+  ctx.fillStyle='rgba(201,147,58,0.6)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('BOOKSHELF + LED strip', rx+nookW/2, ry+40);
+
+  // Armchair
+  ctx.fillStyle='rgba(22,36,22,0.8)'; ctx.fillRect(rx+40,ry+120,100,80);
+  ctx.strokeStyle='rgba(61,122,74,0.3)'; ctx.lineWidth=1; ctx.strokeRect(rx+40,ry+120,100,80);
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('ARMCHAIR', rx+90, ry+164);
+
+  // Arc lamp glow
+  var alg=ctx.createRadialGradient(rx+nookW-20,ry+120,5,rx+nookW-20,ry+120,80);
+  alg.addColorStop(0,'rgba(201,147,58,0.3)'); alg.addColorStop(1,'transparent');
+  ctx.fillStyle=alg; ctx.beginPath(); ctx.arc(rx+nookW-20,ry+120,80,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(201,147,58,0.6)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('ARC LAMP', rx+nookW-20, ry+108);
+
+  // DND ZONE — right end
+  var dndX = rx+rw-280;
+  ctx.fillStyle='rgba(12,10,8,0.5)'; ctx.fillRect(dndX,ry,280,rh);
+  ctx.strokeStyle='rgba(200,64,26,0.2)'; ctx.lineWidth=1; ctx.strokeRect(dndX,ry,280,rh);
+  ctx.fillStyle='rgba(200,64,26,0.4)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('DnD GATHERING ZONE', dndX+140, ry+15);
+
+  // Triangle window (south end, right)
+  var winX=dndX+50, winY=ry+20, winW=180, winH=100;
+  ctx.fillStyle='rgba(40,80,50,0.2)'; ctx.fillRect(winX,winY,winW,winH);
+  ctx.strokeStyle='rgba(100,200,120,0.3)'; ctx.lineWidth=1.5; ctx.strokeRect(winX,winY,winW,winH);
+  // Triangle shape hint
+  ctx.strokeStyle='rgba(100,200,120,0.5)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(winX+winW/2,winY+5); ctx.lineTo(winX+winW-5,winY+winH-5); ctx.lineTo(winX+5,winY+winH-5); ctx.closePath(); ctx.stroke();
+  ctx.fillStyle='rgba(100,200,120,0.5)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('TRIANGLE WINDOW', winX+winW/2, winY+winH/2);
+  ctx.fillText('(forest view)', winX+winW/2, winY+winH/2+14);
+
+  // DnD Table
+  var tableX=dndX+60, tableY=ry+150, tableW=160, tableH=110;
+  ctx.fillStyle='rgba(30,18,8,0.9)'; ctx.fillRect(tableX,tableY,tableW,tableH);
+  ctx.strokeStyle='rgba(80,50,20,0.6)'; ctx.lineWidth=1; ctx.strokeRect(tableX,tableY,tableW,tableH);
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='9px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('DnD TABLE', tableX+tableW/2, tableY+tableH/2);
+  ctx.fillText('seats 5–6', tableX+tableW/2, tableY+tableH/2+14);
+
+  // Pendant above table
+  var pendX2=tableX+tableW/2, pendY2=ry+30;
+  ctx.strokeStyle='rgba(100,70,30,0.5)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(pendX2,pendY2); ctx.lineTo(pendX2,pendY2+45); ctx.stroke();
+  ctx.fillStyle='rgba(25,15,5,0.9)'; ctx.beginPath(); ctx.arc(pendX2,pendY2+52,12,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(201,147,58,0.7)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(pendX2,pendY2+52,12,0,Math.PI*2); ctx.stroke();
+  var pg2=ctx.createRadialGradient(pendX2,pendY2+52,5,pendX2,pendY2+52,140);
+  pg2.addColorStop(0,'rgba(201,147,58,0.35)'); pg2.addColorStop(0.5,'rgba(201,147,58,0.1)'); pg2.addColorStop(1,'transparent');
+  ctx.fillStyle=pg2; ctx.beginPath(); ctx.arc(pendX2,pendY2+52,140,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(201,147,58,0.7)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('PENDANT', pendX2, pendY2+72);
+
+  // String lights (beam overhead — spans full width)
+  ctx.strokeStyle='rgba(201,147,58,0.25)'; ctx.lineWidth=12;
+  ctx.beginPath(); ctx.moveTo(rx+nookW-10,ry+20); ctx.lineTo(dndX+280,ry+20); ctx.stroke();
+  ctx.fillStyle='rgba(201,147,58,0.5)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText('← STRING LIGHTS ALONG BEAM — warm globe style, spans both zones →', W/2, ry+12);
+
+  // Threshold indicator
+  var thX=rx+nookW;
+  ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(thX,ry); ctx.lineTo(thX,ry+rh); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.font='8px Cinzel,serif'; ctx.textAlign='center';
+  ctx.save(); ctx.translate(thX,H/2); ctx.rotate(Math.PI/2);
+  ctx.fillText('THRESHOLD — rug change + low shelf', 0,0); ctx.restore();
+
+  // Dimensions
+  ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.font='10px Cinzel,serif'; ctx.textAlign='center';
+  ctx.fillText("27'0\" × 11'10\"", W/2, H-18);
+}
+
+// ── MOOD TABLE ─────────────────────────────────────────────────
+function drawMoodTable(){
+  var tbody=document.getElementById('mood-table');
+  var rows='';
+  Object.keys(MOODS).forEach(function(key){
+    var m=MOODS[key];
+    var isActive=key===currentMood;
+    rows+='<tr class="item-row" style="'+(isActive?'background:rgba(61,122,74,0.06)':'')+'">';
+    rows+='<td><div class="item-name" style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:'+m.pendant_c+';flex-shrink:0"></div>'+m.name+(isActive?' <span style="font-family:Cinzel,serif;font-size:0.55rem;color:var(--jade);letter-spacing:0.2em">ACTIVE</span>':'')+'</div></td>';
+    rows+='<td style="font-size:0.82rem;color:var(--stone)">'+m.pendant+'</td>';
+    rows+='<td style="font-size:0.82rem;color:var(--stone)">'+m.beams+'</td>';
+    rows+='<td style="font-size:0.82rem;color:var(--stone)">'+m.shelves+'</td>';
+    rows+='<td style="font-size:0.82rem;color:var(--stone)">'+m.desk+'</td>';
+    rows+='<td style="font-size:0.82rem;color:var(--stone)">'+m.galaxy+'</td>';
+    rows+='</tr>';
+  });
+  tbody.innerHTML=rows;
+}
+
+// ── INSTALL STEPS ─────────────────────────────────────────────
+var installSteps=[
+  {step:1, task:'Temporarily tape Govee strip behind desk monitors', when:'Sunday night (Day 1)', note:'No permanent mounting yet — just get one zone glowing'},
+  {step:2, task:'Mount curtain rod on west wall window', when:'Sunday (Day 1)', note:'Into studs — 4–6" above frame, 6" past each side'},
+  {step:3, task:'Paint bedroom walls — prime, Shade-Grown north, Tricorn Black rest', when:'Monday–Tuesday (Week 1)', note:'All paint before any permanent lighting mounting'},
+  {step:4, task:'Paint bathroom — prime, Mineral Deposit satin', when:'Wednesday (Week 1)', note:'Keep window open, let cure 7 days before getting walls wet'},
+  {step:5, task:'Permanently mount beam RGB strips (Zone 2)', when:'Thursday (Week 1)', note:'Staple gun to beam undersides after paint is fully dry'},
+  {step:6, task:'Install peak pendant — screw hook into ridge beam', when:'Thursday (Week 1)', note:'Run cord along beam to outlet, tack with clips every 12"'},
+  {step:7, task:'Mount floating desk shelf (Zone 4 — shelf strip)', when:'Thursday (Week 1)', note:'Into studs at 18" above desk surface — 3 brackets minimum'},
+  {step:8, task:'Mount dragon display shelves (Zone 3)', when:'Friday (Week 1)', note:'28", 44", 60" heights — into studs, heavy duty brackets'},
+  {step:9, task:'Install all Govee strips permanently + controller setup', when:'Friday (Week 1)', note:'Set up Govee app, name zones, create 5 mood scenes'},
+  {step:10,task:'Install galaxy projector + aim at sloped ceiling (Zone 5)', when:'Week 2', note:'On desk shelf or small stand — angle toward A-frame slope'},
+  {step:11,task:'Install bathroom mirror RGB strip', when:'Week 2', note:'3M tape on mirror back, plug into outlet under sink'},
+  {step:12,task:'Set up loft pendant above DnD table', when:'Month 1', note:'Cup hook into loft beam — once table is in position'},
+  {step:13,task:'Run loft string lights along beam', when:'Month 1', note:'Staple clips every 18" — smart plug for scheduling'},
+];
+
+function renderInstall(){
+  var el=document.getElementById('install-rows');
+  var html='';
+  installSteps.forEach(function(s){
+    html+='<div style="display:grid;grid-template-columns:40px 1fr 140px;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.03);align-items:start">';
+    html+='<div style="font-family:Cinzel,serif;font-size:0.7rem;color:var(--jade);font-weight:600">'+s.step+'</div>';
+    html+='<div><div style="font-size:0.86rem;color:var(--cream);line-height:1.4">'+s.task+'</div><div style="font-size:0.78rem;color:var(--stone);font-style:italic;margin-top:3px">'+s.note+'</div></div>';
+    html+='<div style="font-family:Cinzel,serif;font-size:0.6rem;color:var(--gold);letter-spacing:0.08em">'+s.when+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+drawBedroom();
+drawBathroom();
+drawLoft();
+drawMoodTable();
+renderInstall();
+
+window.addEventListener('resize', function(){
+  drawBedroom(); drawBathroom(); drawLoft();
+});
+</script>
+</body>
+</html>

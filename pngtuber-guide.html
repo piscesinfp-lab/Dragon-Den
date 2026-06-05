@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNGtuber Guide — Dark Forest Dragon</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--void:#07090a;--deep:#0c1210;--jade:#3d7a4a;--stone:#7a7060;--cream:#e8dcc8;--ember:#c8401a;--gold:#c9933a;--purple:#6a5acc;--mist:rgba(255,255,255,0.04);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--void);color:var(--cream);font-family:'Crimson Pro',Georgia,serif;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(7,9,10,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.05);padding:0 20px;display:flex;align-items:center;overflow-x:auto;}
+.nav-brand{font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.3em;color:var(--jade);text-transform:uppercase;white-space:nowrap;padding:14px 16px 14px 0;border-right:1px solid rgba(255,255,255,0.06);margin-right:4px;flex-shrink:0;}
+nav a{font-family:'Cinzel',serif;font-size:0.56rem;letter-spacing:0.18em;color:var(--stone);text-transform:uppercase;text-decoration:none;padding:14px 12px;white-space:nowrap;transition:color 0.2s;flex-shrink:0;cursor:pointer;}
+nav a:hover{color:var(--cream);}
+.hero{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 20% 75%,rgba(106,90,204,0.15) 0%,transparent 55%),radial-gradient(ellipse 45% 45% at 80% 25%,rgba(200,64,26,0.1) 0%,transparent 50%);}
+.hero-tag{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.5em;color:var(--purple);text-transform:uppercase;margin-bottom:14px;position:relative;}
+.hero-title{font-family:'Cinzel',serif;font-size:clamp(2rem,7vw,4.5rem);font-weight:900;line-height:1.0;background:linear-gradient(135deg,var(--cream) 0%,var(--purple) 45%,var(--ember) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;}
+.hero-sub{font-style:italic;color:var(--stone);font-size:1rem;margin-top:12px;position:relative;}
+.hero-divider{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent);margin:22px auto;position:relative;}
+.hero-specs{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;position:relative;}
+.spec{text-align:center;}
+.spec-num{font-family:'Cinzel',serif;font-size:1.2rem;color:var(--gold);}
+.spec-label{font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:0.3em;color:var(--stone);text-transform:uppercase;margin-top:3px;}
+section{max-width:900px;margin:0 auto;padding:70px 24px;}
+.section-tag{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.45em;color:var(--jade);text-transform:uppercase;margin-bottom:8px;}
+.section-tag.ember{color:var(--ember);}.section-tag.gold{color:var(--gold);}.section-tag.purple{color:var(--purple);}
+h2{font-family:'Cinzel',serif;font-size:clamp(1.6rem,4vw,2.5rem);font-weight:600;color:var(--cream);margin-bottom:10px;line-height:1.15;}
+.intro{font-style:italic;color:var(--stone);font-size:1rem;line-height:1.75;margin-bottom:32px;max-width:640px;}
+
+/* NAME CARDS */
+.name-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px;}
+.name-card{background:var(--deep);border:1px solid rgba(255,255,255,0.06);border-radius:3px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.3s;cursor:pointer;}
+.name-card:hover{border-color:rgba(106,90,204,0.4);}
+.name-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),transparent);}
+.name-card.featured::before{background:linear-gradient(90deg,var(--ember),var(--gold));}
+.name-card.featured{border-color:rgba(200,64,26,0.25);}
+.name-main{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--cream);font-weight:600;margin-bottom:6px;}
+.name-tag{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.2em;color:var(--purple);text-transform:uppercase;margin-bottom:8px;}
+.name-card.featured .name-tag{color:var(--gold);}
+.name-meaning{font-size:0.86rem;color:var(--stone);line-height:1.6;font-style:italic;}
+.name-handle{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:rgba(255,255,255,0.2);margin-top:8px;}
+
+/* EXPRESSION STATES */
+.states-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+.state-card{background:var(--deep);border:1px solid rgba(255,255,255,0.06);border-radius:3px;padding:16px;text-align:center;}
+.state-emoji{font-size:2rem;margin-bottom:8px;display:block;}
+.state-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;color:var(--cream);text-transform:uppercase;margin-bottom:6px;}
+.state-desc{font-size:0.8rem;color:var(--stone);line-height:1.5;font-style:italic;}
+.state-trigger{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.1em;color:var(--jade);margin-top:6px;}
+
+/* SOFTWARE COMPARE */
+.sw-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+.sw-card{background:var(--deep);border:1px solid rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.sw-header{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.sw-name{font-family:'Cinzel',serif;font-size:0.82rem;letter-spacing:0.12em;color:var(--cream);font-weight:600;margin-bottom:3px;}
+.sw-sub{font-size:0.8rem;color:var(--stone);font-style:italic;}
+.sw-rec{display:inline-block;margin-top:6px;padding:2px 9px;border-radius:20px;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.1em;}
+.sw-yes{background:rgba(61,122,74,0.2);color:var(--jade);}
+.sw-maybe{background:rgba(201,147,58,0.2);color:var(--gold);}
+.sw-body{padding:16px 18px;}
+.sw-body ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.sw-body li{font-size:0.84rem;color:var(--stone);padding-left:14px;position:relative;line-height:1.5;}
+.sw-body li::before{content:'·';position:absolute;left:2px;color:var(--jade);font-size:1.1rem;line-height:1;}
+.sw-body li strong{color:var(--cream);font-weight:400;}
+
+/* DESIGN SHEET */
+.design-sheet{background:var(--deep);border:1px solid rgba(106,90,204,0.2);border-radius:3px;padding:32px;position:relative;overflow:hidden;}
+.design-sheet::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 100% 0%,rgba(106,90,204,0.06),transparent);}
+.ds-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;position:relative;}
+.ds-col h4{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.2em;color:var(--purple);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(106,90,204,0.15);}
+.ds-item{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.ds-item:last-child{border-bottom:none;}
+.ds-label{font-size:0.84rem;color:var(--stone);}
+.ds-val{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.06em;color:var(--cream);text-align:right;max-width:55%;}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+.card{background:var(--deep);border:1px solid rgba(255,255,255,0.06);border-radius:3px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.card:hover{border-color:rgba(61,122,74,0.3);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--jade),transparent);}
+.card.ember::before{background:linear-gradient(90deg,var(--ember),transparent);}
+.card.gold::before{background:linear-gradient(90deg,var(--gold),transparent);}
+.card.purple::before{background:linear-gradient(90deg,var(--purple),transparent);}
+.card-icon{font-size:1.3rem;margin-bottom:10px;}
+.card h4{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.12em;color:var(--cream);margin-bottom:10px;font-weight:600;}
+.card p{font-size:0.86rem;color:var(--stone);line-height:1.65;font-style:italic;margin-bottom:8px;}
+.card ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.card li{font-size:0.83rem;color:var(--stone);padding-left:13px;position:relative;line-height:1.5;}
+.card li::before{content:'·';position:absolute;left:2px;color:var(--jade);font-size:1.1rem;line-height:1;}
+.card.ember li::before{color:var(--ember);}.card.gold li::before{color:var(--gold);}.card.purple li::before{color:var(--purple);}
+.card li strong{color:var(--cream);font-weight:400;}
+
+/* BRAND PALETTE */
+.brand-pal{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.bp{text-align:center;}
+.bp-circle{width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,0.08);margin-bottom:6px;}
+.bp-name{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.1em;color:var(--stone);text-transform:uppercase;}
+.bp-use{font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:2px;}
+
+/* STREAM SCHEDULE */
+.schedule{background:var(--deep);border:1px solid rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.schedule table{width:100%;border-collapse:collapse;}
+.schedule th{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.25em;color:var(--jade);text-transform:uppercase;text-align:left;padding:11px 14px;border-bottom:1px solid #2a4530;background:#0a0e0c;}
+.schedule td{padding:10px 14px;font-size:0.85rem;color:var(--stone);border-bottom:1px solid rgba(255,255,255,0.03);line-height:1.5;vertical-align:top;}
+.schedule tr:hover td{background:var(--mist);}
+.schedule td:first-child{color:var(--cream);}
+
+/* CHECKLIST */
+.checklist{background:var(--deep);border:1px solid rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.cl-section{border-bottom:1px solid rgba(255,255,255,0.05);}
+.cl-section:last-child{border-bottom:none;}
+.cl-header{padding:10px 14px;background:rgba(255,255,255,0.02);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple);}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:background 0.15s;}
+.cl-item:last-child{border-bottom:none;}
+.cl-item:hover{background:var(--mist);}
+.cl-box{width:17px;height:17px;border:1px solid rgba(255,255,255,0.14);border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.cl-item.done .cl-box{background:var(--purple);border-color:var(--purple);}
+.cl-item.done .cl-box::after{content:'✓';font-size:0.6rem;color:white;}
+.cl-item.done .cl-text{opacity:0.35;text-decoration:line-through;}
+.cl-text{font-size:0.85rem;color:var(--cream);line-height:1.4;}
+.cl-sub{font-size:0.77rem;color:var(--stone);font-style:italic;margin-top:2px;}
+
+.callout{padding:18px 22px;border-radius:3px;margin:20px 0;border-left:2px solid var(--jade);background:rgba(61,122,74,0.07);}
+.callout.ember{border-left-color:var(--ember);background:rgba(200,64,26,0.06);}
+.callout.gold{border-left-color:var(--gold);background:rgba(201,147,58,0.06);}
+.callout.purple{border-left-color:var(--purple);background:rgba(106,90,204,0.06);}
+.callout h5{font-family:'Cinzel',serif;font-size:0.63rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--jade);margin-bottom:8px;}
+.callout.ember h5{color:var(--ember);}.callout.gold h5{color:var(--gold);}.callout.purple h5{color:var(--purple);}
+.callout p{font-size:0.9rem;color:var(--stone);line-height:1.7;font-style:italic;}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(106,90,204,0.2),transparent);}
+footer{text-align:center;padding:60px 24px;border-top:1px solid rgba(255,255,255,0.04);}
+footer p{font-size:0.75rem;font-style:italic;color:rgba(106,90,204,0.2);letter-spacing:0.2em;}
+
+@media(max-width:600px){.ds-grid,.cards,.sw-compare,.name-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">PNGtuber</div>
+  <a onclick="nav('names')">Names</a>
+  <a onclick="nav('design')">Character Design</a>
+  <a onclick="nav('expressions')">Expressions</a>
+  <a onclick="nav('software')">Software</a>
+  <a onclick="nav('obs')">OBS Setup</a>
+  <a onclick="nav('brand')">Twitch Brand</a>
+  <a onclick="nav('launch')">Launch Checklist</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">PNGtuber Guide · Dark Forest Dragon</div>
+  <h1 class="hero-title">Enter the<br>Stream</h1>
+  <p class="hero-sub">Character design · Software · OBS setup · Twitch brand · Launch checklist</p>
+  <div class="hero-divider"></div>
+  <div class="hero-specs">
+    <div class="spec"><div class="spec-num">She/Her</div><div class="spec-label">Character</div></div>
+    <div class="spec"><div class="spec-num">8+</div><div class="spec-label">Expression States</div></div>
+    <div class="spec"><div class="spec-num">Twitch</div><div class="spec-label">Platform</div></div>
+    <div class="spec"><div class="spec-num">Free</div><div class="spec-label">Software</div></div>
+  </div>
+</div>
+
+<!-- NAMES -->
+<div class="divider"></div>
+<section id="names">
+  <div class="section-tag purple">Character Name</div>
+  <h2>Name Suggestions</h2>
+  <p class="intro">She's you — dark fantasy, dragon energy, forest aesthetic, queer, collector, gamer. The name should feel like a title she was born with, not one she chose.</p>
+
+  <div class="name-grid">
+    <div class="name-card featured">
+      <div class="name-tag">⭐ Top Pick</div>
+      <div class="name-main">Vaelith</div>
+      <div class="name-meaning">Invented — sounds ancient, draconic, and feminine. Short enough to be a clean handle. No existing IP conflicts. Feels like a name from Fracterra.</div>
+      <div class="name-handle">@vaelith · vaelith.tv</div>
+    </div>
+    <div class="name-card featured">
+      <div class="name-tag">⭐ Top Pick</div>
+      <div class="name-main">Soryth</div>
+      <div class="name-meaning">Draconic-sounding invented name. The "sor" root suggests shadow or ember in fantasy linguistics. Unique, memorable, works as a solo word.</div>
+      <div class="name-handle">@soryth · soryth</div>
+    </div>
+    <div class="name-card">
+      <div class="name-tag">Strong Option</div>
+      <div class="name-main">Emberveil</div>
+      <div class="name-meaning">Two meaningful words — ember (dragon fire) and veil (mystery, forest mist). Poetic and visual. Slightly longer but very distinctive.</div>
+      <div class="name-handle">@emberveil</div>
+    </div>
+    <div class="name-card">
+      <div class="name-tag">Strong Option</div>
+      <div class="name-main">Draeven</div>
+      <div class="name-meaning">Dragon + haven. A place of refuge that's also a dragon. Fits the forest sanctuary vibe of the whole aesthetic perfectly.</div>
+      <div class="name-handle">@draeven</div>
+    </div>
+    <div class="name-card">
+      <div class="name-tag">Consider</div>
+      <div class="name-main">Nyxara</div>
+      <div class="name-meaning">Nyx (night, darkness) + ara suffix common in fantasy names. Dark, feminine, mysterious — leans more into the goth-glam side.</div>
+      <div class="name-handle">@nyxara</div>
+    </div>
+    <div class="name-card">
+      <div class="name-tag">Consider</div>
+      <div class="name-main">Thornveil</div>
+      <div class="name-meaning">Forest + mystery. More nature-forward than dragon-forward, but fits the dark forest world completely. Unusual and visual.</div>
+      <div class="name-handle">@thornveil</div>
+    </div>
+  </div>
+
+  <div class="callout purple">
+    <h5>Before You Decide</h5>
+    <p>Check Twitch, Twitter/X, and Instagram for handle availability before falling in love with a name. Short names (5–8 characters) are dramatically easier to build brand recognition around — viewers type them in chat constantly. Vaelith and Soryth both hit that sweet spot.</p>
+  </div>
+</section>
+
+<!-- CHARACTER DESIGN -->
+<div class="divider"></div>
+<section id="design">
+  <div class="section-tag purple">Character Design</div>
+  <h2>Design Sheet</h2>
+  <p class="intro">Everything you need to draw her consistently across all expression states. Lock these down before you start drawing so every state reads as the same character.</p>
+
+  <div class="design-sheet">
+    <div class="ds-grid">
+      <div class="ds-col">
+        <h4>Physical Design</h4>
+        <div class="ds-item"><span class="ds-label">Body type</span><span class="ds-val">Your body — draw yourself</span></div>
+        <div class="ds-item"><span class="ds-label">Hair color</span><span class="ds-val">Fantasy — deep teal, jade green, or ember red with dark roots</span></div>
+        <div class="ds-item"><span class="ds-label">Hair style</span><span class="ds-val">Loose, slightly messy — not styled. Real energy.</span></div>
+        <div class="ds-item"><span class="ds-label">Eyes</span><span class="ds-val">Slit pupils — dragon eyes. Gold, amber, or ember iris</span></div>
+        <div class="ds-item"><span class="ds-label">Horns</span><span class="ds-val">Dark curved horns — not huge, elegant. Scale-textured at base</span></div>
+        <div class="ds-item"><span class="ds-label">Scales</span><span class="ds-val">Scattered on cheeks, collarbone, wrists — not covering, accenting</span></div>
+        <div class="ds-item"><span class="ds-label">Tail</span><span class="ds-val">Visible at edge of frame when relevant — dark with ember tip</span></div>
+        <div class="ds-item"><span class="ds-label">Ears</span><span class="ds-val">Slightly pointed — subtle, not elf-level</span></div>
+      </div>
+      <div class="ds-col">
+        <h4>Outfit + Aesthetic</h4>
+        <div class="ds-item"><span class="ds-label">Base outfit</span><span class="ds-val">Dark oversized hoodie — forest green or near-black</span></div>
+        <div class="ds-item"><span class="ds-label">Hoodie detail</span><span class="ds-val">Small dragon emblem or scale pattern on chest</span></div>
+        <div class="ds-item"><span class="ds-label">Accessories</span><span class="ds-val">One dark crystal or claw pendant necklace</span></div>
+        <div class="ds-item"><span class="ds-label">Hands visible?</span><span class="ds-val">Optional — claw-tipped fingers if shown</span></div>
+        <div class="ds-item"><span class="ds-label">Skin tone</span><span class="ds-val">Your skin tone — this is you</span></div>
+        <div class="ds-item"><span class="ds-label">Overall palette</span><span class="ds-val">Tricorn Black · Forest Green · Ember · Gold — your room palette</span></div>
+        <div class="ds-item"><span class="ds-label">Line style</span><span class="ds-val">Clean lines with soft shading — readable at small overlay size</span></div>
+        <div class="ds-item"><span class="ds-label">Frame crop</span><span class="ds-val">Bust/chest up — standard PNGtuber framing</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout gold" style="margin-top:20px;">
+    <h5>PNG Tuber Art Technical Specs</h5>
+    <p>Draw each expression state as a separate PNG file with a transparent background. Recommended size: 1000×1000px minimum, 2000×2000px ideal — Veadotube scales it down. Keep your line art on a separate layer from shading so you can reuse the base drawing across states. Export each state as PNG with transparency (not JPG).</p>
+  </div>
+
+  <div class="callout purple">
+    <h5>The Silhouette Test</h5>
+    <p>Fill your character with solid black and look at the shape. If you can immediately tell it's her from the silhouette alone — horns, hair shape, hoodie — the design works at small sizes. This matters because your PNGtuber overlay will be maybe 300px wide on a 1080p stream. The horns and distinctive hair are what viewers will recognize instantly.</p>
+  </div>
+</section>
+
+<!-- EXPRESSIONS -->
+<div class="divider"></div>
+<section id="expressions">
+  <div class="section-tag ember">Expression States</div>
+  <h2>The Eight States</h2>
+  <p class="intro">Veadotube triggers states based on mic input and hotkeys. Draw these eight and you'll have full emotional range for any streaming situation.</p>
+
+  <div class="states-grid">
+    <div class="state-card">
+      <span class="state-emoji">😌</span>
+      <div class="state-name">Idle — Closed</div>
+      <div class="state-desc">Neutral, calm, mouth closed. Slight soft expression — not blank. This is the default when you're not speaking.</div>
+      <div class="state-trigger">Trigger: silence / no mic</div>
+    </div>
+    <div class="state-card">
+      <span class="state-emoji">🗣️</span>
+      <div class="state-name">Talking</div>
+      <div class="state-desc">Mouth open mid-speech. Engaged, present expression. Same as idle but with open mouth — can be the same art with swapped mouth layer.</div>
+      <div class="state-trigger">Trigger: mic input detected</div>
+    </div>
+    <div class="state-card">
+      <span class="state-emoji">😄</span>
+      <div class="state-name">Happy / Laughing</div>
+      <div class="state-desc">Big smile, eyes slightly squinted. The "that's hilarious" face. Essential for gaming wins and chat interactions.</div>
+      <div class="state-trigger">Trigger: hotkey (F1 or similar)</div>
+    </div>
+    <div class="state-card">
+      <span class="state-emoji">😤</span>
+      <div class="state-name">Annoyed / Focused</div>
+      <div class="state-desc">Slight frown, narrowed eyes. The "this game is testing me" face. Dragon energy — contained irritation, not rage.</div>
+      <div class="state-trigger">Trigger: hotkey</div>
+    </div>
+    <div class="state-card">
+      <span class="state-emoji">😱</span>
+      <div class="state-name">Screaming / Shocked</div>
+      <div class="state-desc">Wide eyes, mouth open wide. Jump scare face, hype moment face. This one gets clipped constantly — make it dramatic.</div>
+      <div class="state-trigger">Trigger: loud mic or hotkey</div>
+    </div>
+    <div class="state-card">
+      <span class="state-emoji">😏</span>
+      <div class="state-name">Smug / Scheming</div>
+      <div class="state-desc">Half-smile, one raised brow, slightly narrowed eyes. The "I know exactly what I'm doing" face. Very on-brand for a dragon character.</div>
+      <div class="state-trigger">Trigger: hotkey</div>
+    </div>
+    <div class="state-card">
+      <span class="state-emoji">🥺</span>
+      <div class="state-name">Sad / Tired</div>
+      <div class="state-desc">Drooped eyes, soft frown. For emotional game moments, late-night streams, or "chat why did you do that to me" energy.</div>
+      <div class="state-trigger">Trigger: hotkey</div>
+    </div>
+    <div class="state-card">
+      <span class="state-emoji">🐉</span>
+      <div class="state-name">Dragon Mode</div>
+      <div class="state-desc">Full dragon expression — glowing eyes, bared fangs, scales more prominent. The hype state. Use for wins, raids, big moments.</div>
+      <div class="state-trigger">Trigger: hotkey (save it for moments)</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h5>Drawing Order</h5>
+    <p>Draw Idle Closed first — get the design locked in. Then draw Talking as the same drawing with a swapped mouth. Then Happy and Screaming — these get used most. Then fill in the rest. You can launch with just Idle + Talking + Happy + Screaming and add states over time. Don't let perfectionism delay your launch.</p>
+  </div>
+</section>
+
+<!-- SOFTWARE -->
+<div class="divider"></div>
+<section id="software">
+  <div class="section-tag">Software</div>
+  <h2>What to Use</h2>
+  <p class="intro">Three real options. One clear winner for where you're starting.</p>
+
+  <div class="sw-compare">
+    <div class="sw-card">
+      <div class="sw-header">
+        <div class="sw-name">Veadotube Mini</div>
+        <div class="sw-sub">The PNGtuber standard</div>
+        <span class="sw-rec sw-yes">⭐ Recommended</span>
+      </div>
+      <div class="sw-body"><ul>
+        <li><strong>Free</strong> — pay-what-you-want, works fully for free</li>
+        <li>Mic-reactive mouth movement built in — talks when you talk</li>
+        <li>Multiple states with hotkey triggers</li>
+        <li>Bouncing animation when speaking — gives life to a static image</li>
+        <li>Drag and drop PNG import — incredibly easy setup</li>
+        <li>Outputs as a window you capture in OBS</li>
+        <li>Used by the majority of active PNGtubers on Twitch</li>
+        <li>Download: veado.tube</li>
+      </ul></div>
+    </div>
+    <div class="sw-card">
+      <div class="sw-header">
+        <div class="sw-name">VTube Studio</div>
+        <div class="sw-sub">More for Live2D but has PNG support</div>
+        <span class="sw-rec sw-maybe">Later option</span>
+      </div>
+      <div class="sw-body"><ul>
+        <li>Primarily designed for Live2D models</li>
+        <li>Does support PNG mode but it's less intuitive</li>
+        <li>Worth knowing for when you want to upgrade to Live2D eventually</li>
+        <li>Free with limitations — paid features for advanced use</li>
+        <li>More setup complexity than Veadotube for PNG</li>
+        <li>Skip this for now — come back when you go Live2D</li>
+      </ul></div>
+    </div>
+    <div class="sw-card">
+      <div class="sw-header">
+        <div class="sw-name">OBS Image Switcher</div>
+        <div class="sw-sub">Manual, no software needed</div>
+        <span class="sw-rec sw-maybe">Backup option</span>
+      </div>
+      <div class="sw-body"><ul>
+        <li>Use OBS hotkeys to manually swap between expression PNG images</li>
+        <li>No extra software needed</li>
+        <li>No automatic mic-reactive movement</li>
+        <li>Works but feels more static — no bounce or life</li>
+        <li>Good if Veadotube has issues but not ideal long term</li>
+        <li>Setup: Scene Collection → Image sources with hotkeys</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- OBS SETUP -->
+<div class="divider"></div>
+<section id="obs">
+  <div class="section-tag gold">OBS Setup</div>
+  <h2>Stream Layout</h2>
+  <p class="intro">You already have the three-monitor setup designed. Here's exactly how the stream layout works with your existing gaming rig.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🖥️</div>
+      <h4>Monitor Assignment for Streaming</h4>
+      <ul>
+        <li><strong>Center AOC 1440p:</strong> Your game — always the primary capture source in OBS</li>
+        <li><strong>Left VA2247:</strong> OBS Studio running — scene switcher, stream health, chat visible</li>
+        <li><strong>Right VA2247:</strong> Veadotube Mini window + browser for chat interaction</li>
+        <li>This is the exact three-monitor streaming setup — you designed it perfectly already</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎬</div>
+      <h4>OBS Scene Structure</h4>
+      <ul>
+        <li><strong>Scene 1 — Gameplay:</strong> Game capture full screen + PNGtuber overlay bottom left or right</li>
+        <li><strong>Scene 2 — Just Chatting:</strong> Dark forest background + PNGtuber centered, larger</li>
+        <li><strong>Scene 3 — Starting Soon:</strong> Animated overlay, no PNGtuber yet</li>
+        <li><strong>Scene 4 — BRB:</strong> Forest ambience, looping animation</li>
+        <li><strong>Scene 5 — End Screen:</strong> Thank you screen with socials</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <div class="card-icon">🐉</div>
+      <h4>PNGtuber Overlay Placement</h4>
+      <ul>
+        <li>Veadotube runs as a separate window — add it as a Window Capture source in OBS</li>
+        <li>Set Veadotube background to transparent or chroma key green</li>
+        <li>In OBS: right-click source → Filters → Chroma Key to remove background</li>
+        <li>Position: bottom-left corner during gameplay — standard PNGtuber placement</li>
+        <li>Size: ~280–320px wide on a 1080p canvas — visible but not distracting</li>
+        <li>Just Chatting scene: centered, larger — she's the focus</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🎨</div>
+      <h4>Stream Background — Just Chatting</h4>
+      <ul>
+        <li>Your actual bedroom with the RGB lighting IS your background — most authentic option</li>
+        <li>Dragon shelf wall visible over your shoulder on webcam (if ever used)</li>
+        <li>OR: a drawn/illustrated version of your Dragon Den as a static background image</li>
+        <li>OR: a dark forest illustration — Lofi Girl energy but darker and more dragon</li>
+        <li>Overlay elements should match the room palette: jade · ember · gold on black</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <h5>Veadotube in OBS — Step by Step</h5>
+    <p>1. Open Veadotube Mini, import your PNG states, set up mic sensitivity. 2. In OBS, add a new source: Window Capture → select the Veadotube window. 3. Right-click the source → Filters → Add → Chroma Key (if using green BG) or Luma Key (if using black). 4. Resize and position in your scene. 5. Lock the source so you don't accidentally move it mid-stream.</p>
+  </div>
+</section>
+
+<!-- TWITCH BRAND -->
+<div class="divider"></div>
+<section id="brand">
+  <div class="section-tag purple">Twitch Brand</div>
+  <h2>Stream Identity</h2>
+  <p class="intro">Your stream brand is already built — you've been designing it for weeks without knowing it. Dark Forest Dragon is the world, the room, and now the channel.</p>
+
+  <div class="brand-pal">
+    <div class="bp"><div class="bp-circle" style="background:#07090a"></div><div class="bp-name">Stream BG</div><div class="bp-use">Overlays</div></div>
+    <div class="bp"><div class="bp-circle" style="background:#2d4a2a"></div><div class="bp-name">Forest</div><div class="bp-use">Panels</div></div>
+    <div class="bp"><div class="bp-circle" style="background:#3d7a4a"></div><div class="bp-name">Jade</div><div class="bp-use">Accents</div></div>
+    <div class="bp"><div class="bp-circle" style="background:#6a5acc"></div><div class="bp-name">Purple</div><div class="bp-use">Alerts</div></div>
+    <div class="bp"><div class="bp-circle" style="background:#c8401a"></div><div class="bp-name">Ember</div><div class="bp-use">Highlights</div></div>
+    <div class="bp"><div class="bp-circle" style="background:#c9933a"></div><div class="bp-name">Gold</div><div class="bp-use">Subs/bits</div></div>
+    <div class="bp"><div class="bp-circle" style="background:#e8dcc8"></div><div class="bp-name">Cream</div><div class="bp-use">Text</div></div>
+  </div>
+
+  <div class="cards">
+    <div class="card purple">
+      <div class="card-icon">🎨</div>
+      <h4>Overlay Design</h4>
+      <ul>
+        <li>Dark near-black base (#07090a) — everything readable, nothing distracting</li>
+        <li>Thin jade or ember border elements — not chunky gaming overlays</li>
+        <li>Minimal text — stream title, social handle, maybe a subtle dragon watermark</li>
+        <li>Get overlays from Etsy — search "dark fantasy twitch overlay" for premade sets (~$10–25) or make your own in Canva</li>
+        <li>Font: Cinzel or a similar serif fantasy font — matches your whole aesthetic</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔔</div>
+      <h4>Alerts + Notifications</h4>
+      <ul>
+        <li>Follower alert: brief dragon animation or ember particle burst</li>
+        <li>Sub alert: more dramatic — ember glow, dragon roar sound</li>
+        <li>Raid alert: Dragon Mode state triggers on the PNGtuber simultaneously</li>
+        <li>Use Streamelements or Streamlabs for alert boxes — both free</li>
+        <li>Keep sounds short — under 3 seconds. Nothing kills stream flow like long alert sounds</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">📋</div>
+      <h4>Channel Panels</h4>
+      <ul>
+        <li><strong>About Me:</strong> Dark forest / dragon aesthetic, who you are, what you stream</li>
+        <li><strong>Schedule:</strong> Even a loose one builds expectation</li>
+        <li><strong>PC Specs:</strong> Gamers want to know</li>
+        <li><strong>Commands:</strong> List your chat commands (!discord, !socials, etc)</li>
+        <li><strong>Rules:</strong> Keep it short — be kind, no hate speech, have fun</li>
+        <li>Design panels in Canva — dark background, jade/ember accents, Cinzel font</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🎮</div>
+      <h4>What to Stream</h4>
+      <ul>
+        <li>Steam library — you already play it, start there</li>
+        <li>DnD sessions if your group is comfortable being streamed</li>
+        <li>Just Chatting — cozy aesthetic streams do well with the right personality</li>
+        <li>Avoid: starting with huge games (Minecraft, Fortnite) — impossible to be discovered. Start with smaller games or niche titles</li>
+        <li>Your personality + your aesthetic IS the content — the game is secondary</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout purple">
+    <h5>Channel Bio — Draft</h5>
+    <p>"Dragon who games, reads, and occasionally rolls dice. Dark forest energy. She/her. Come warm yourself by the ember." — Short, personality-forward, tells you everything about the vibe in four sentences. Adjust with your chosen name and any specific games you're playing.</p>
+  </div>
+</section>
+
+<!-- LAUNCH CHECKLIST -->
+<div class="divider"></div>
+<section id="launch">
+  <div class="section-tag ember">Launch Checklist</div>
+  <h2>Before You Go Live</h2>
+  <p class="intro">In order. Don't go live until the first group is done — the rest can be filled in over your first month.</p>
+
+  <div class="checklist">
+    <div class="cl-section">
+      <div class="cl-header">🎨 Art — Minimum Viable Launch</div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Draw Idle (mouth closed) expression state</div><div class="cl-sub">This is your base — get the design locked in first</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Draw Talking expression state</div><div class="cl-sub">Same as idle with open mouth — can reuse base layers</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Draw Happy / Laughing expression</div><div class="cl-sub">Most used expression after idle and talking</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Draw Screaming / Shocked expression</div><div class="cl-sub">Gets clipped the most — make it dramatic</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Export all as PNG with transparent background</div><div class="cl-sub">Minimum 1000×1000px, transparent BG, not JPG</div></div></div>
+    </div>
+    <div class="cl-section">
+      <div class="cl-header">⚙️ Technical Setup</div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Download and set up Veadotube Mini (veado.tube)</div><div class="cl-sub">Free — import your PNGs, set mic sensitivity</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Add Veadotube as Window Capture source in OBS</div><div class="cl-sub">Chroma or luma key out the background</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Build 5 OBS scenes: Gameplay · Just Chatting · Starting Soon · BRB · End Screen</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Set OBS output to 1080p60 — test stream to confirm no frame drops</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Set up audio: game audio, mic, and separate tracks in OBS</div><div class="cl-sub">Mic on track 1, game on track 2 — DMCA safe VODs</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Test mic levels — voice should peak around -12db, not clipping</div></div></div>
+    </div>
+    <div class="cl-section">
+      <div class="cl-header">📺 Twitch Channel</div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Create Twitch account with your chosen name — check availability first</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Set profile picture — your PNGtuber character or a version of it</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Write channel bio — dark, personality-forward, short</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Connect OBS to Twitch with stream key</div><div class="cl-sub">Settings → Stream → Twitch → paste stream key from Twitch dashboard</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Set up StreamElements for alerts and chat commands</div><div class="cl-sub">Free — streamelements.com, connect to Twitch</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Do a private test stream — go live, watch the VOD back, check everything</div></div></div>
+    </div>
+    <div class="cl-section">
+      <div class="cl-header">🚀 Launch + Beyond</div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Go live for the first time — even if no one watches. The first stream is just for you.</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Create a Twitter/X and TikTok with the same handle — post clips</div><div class="cl-sub">Twitch discovery is hard. Social clips drive new viewers.</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Draw the remaining 4 expression states over your first month</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Design channel panels (Canva is free — dark theme, jade/ember accents)</div></div></div>
+      <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div><div class="cl-text">Find 3–5 other small streamers with similar vibe — support each other, raid each other</div><div class="cl-sub">Community is how small streamers grow. Go be someone's regular viewer first.</div></div></div>
+    </div>
+  </div>
+
+  <div class="callout ember" style="margin-top:20px;">
+    <h5>The Most Important Thing</h5>
+    <p>Stream consistently even when the viewer count is zero. The VODs get indexed. The clips get shared. The algorithm notices consistency before it notices quality. Your first ten streams are practice — they are not your debut. The debut is whenever you decide it is. Start messy, start now, get better in public.</p>
+  </div>
+</section>
+
+<footer>
+  <p>PNGtuber Guide · Dark Forest Dragon · Stream your world</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">🐉</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el) window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-52,behavior:'smooth'});
+}
+function toggleCL(el){
+  el.classList.toggle('done');
+  var items=document.querySelectorAll('.cl-item');
+  var done=document.querySelectorAll('.cl-item.done');
+  try{
+    var states=[];
+    items.forEach(function(i){states.push(i.classList.contains('done')?1:0);});
+    localStorage.setItem('png_checklist',JSON.stringify(states));
+  }catch(e){}
+}
+(function(){
+  try{
+    var states=JSON.parse(localStorage.getItem('png_checklist')||'[]');
+    document.querySelectorAll('.cl-item').forEach(function(el,i){if(states[i])el.classList.add('done');});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

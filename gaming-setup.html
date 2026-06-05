@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaming Setup — Dragon Den Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #07090a; --deep: #0c1210; --moss: #2a4530; --jade: #3d7a4a;
+    --bark: #5c3d1e; --stone: #7a7060; --cream: #e8dcc8;
+    --ember: #c8401a; --gold: #c9933a; --mist: rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.95); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  .hero { min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 50% at 30% 80%,rgba(61,122,74,0.15) 0%,transparent 55%), radial-gradient(ellipse 50% 50% at 70% 20%,rgba(200,64,26,0.12) 0%,transparent 50%); }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--jade); text-transform:uppercase; margin-bottom:14px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,4.5rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--gold) 50%,var(--ember) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:1rem; margin-top:12px; position:relative; }
+  .hero-divider { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--jade),transparent); margin:24px auto; position:relative; }
+  .hero-specs { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; position:relative; }
+  .spec { text-align:center; }
+  .spec-num { font-family:'Cinzel',serif; font-size:1.2rem; color:var(--gold); }
+  .spec-label { font-family:'Cinzel',serif; font-size:0.48rem; letter-spacing:0.3em; color:var(--stone); text-transform:uppercase; margin-top:3px; }
+
+  section { max-width:900px; margin:0 auto; padding:70px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.ember { color:var(--ember); }
+  .section-tag.gold { color:var(--gold); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.6rem,4vw,2.6rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:1rem; line-height:1.75; margin-bottom:32px; max-width:640px; }
+
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+  .card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:22px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .card:hover { border-color:rgba(61,122,74,0.35); }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--jade),transparent); }
+  .card.ember::before { background:linear-gradient(90deg,var(--ember),transparent); }
+  .card.gold::before { background:linear-gradient(90deg,var(--gold),transparent); }
+  .card.stone::before { background:linear-gradient(90deg,var(--stone),transparent); }
+  .card-icon { font-size:1.4rem; margin-bottom:10px; }
+  .card h4 { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:10px; font-weight:600; }
+  .card p { font-size:0.88rem; color:var(--stone); line-height:1.65; font-style:italic; margin-bottom:10px; }
+  .card ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .card li { font-size:0.85rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .card li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.2rem; line-height:1; }
+  .card.ember li::before { color:var(--ember); }
+  .card.gold li::before { color:var(--gold); }
+  .card li strong { color:var(--cream); font-weight:400; }
+
+  /* DESK DIAGRAM */
+  .desk-diagram { background:#060808; border:1px solid rgba(61,122,74,0.2); border-radius:3px; padding:28px 24px; font-family:monospace; font-size:0.7rem; line-height:2; overflow-x:auto; white-space:pre; }
+  .dh { color:var(--gold); }
+  .de { color:var(--ember); }
+  .dg { color:var(--jade); }
+  .ds { color:rgba(255,255,255,0.2); }
+
+  /* SPEC TABLE */
+  .spec-table { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-bottom:20px; }
+  .spec-table table { width:100%; border-collapse:collapse; }
+  .spec-table th { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss); background:#0a0e0c; }
+  .spec-table td { padding:11px 16px; font-size:0.85rem; color:var(--stone); border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.5; vertical-align:top; }
+  .spec-table tr:hover td { background:var(--mist); }
+  .spec-table td:first-child { color:var(--cream); font-weight:400; width:35%; }
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-family:'Cinzel',serif; font-size:0.63rem; }
+  .b-low { background:rgba(61,122,74,0.2); color:var(--jade); }
+  .b-mid { background:rgba(201,147,58,0.2); color:var(--gold); }
+  .b-hi  { background:rgba(200,64,26,0.2); color:var(--ember); }
+  .b-own { background:rgba(255,255,255,0.08); color:var(--stone); }
+
+  .callout { padding:20px 24px; border-radius:3px; margin:24px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout.ember { border-left-color:var(--ember); background:rgba(200,64,26,0.06); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:8px; }
+  .callout.ember h5 { color:var(--ember); }
+  .callout.gold h5 { color:var(--gold); }
+  .callout p { font-size:0.9rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  /* UPGRADE PATH */
+  .upgrade-path { display:flex; flex-direction:column; gap:0; }
+  .upgrade-step { display:grid; grid-template-columns:60px 1fr; gap:0; position:relative; }
+  .upgrade-step::before { content:''; position:absolute; left:29px; top:44px; bottom:-1px; width:1px; background:rgba(61,122,74,0.2); }
+  .upgrade-step:last-child::before { display:none; }
+  .step-marker { display:flex; flex-direction:column; align-items:center; padding-top:20px; }
+  .step-dot { width:12px; height:12px; border-radius:50%; border:1px solid var(--jade); background:var(--void); flex-shrink:0; }
+  .upgrade-step.active .step-dot { background:var(--jade); }
+  .upgrade-step.future .step-dot { border-color:rgba(255,255,255,0.1); }
+  .step-body { padding:16px 0 28px 16px; }
+  .step-label { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:5px; }
+  .upgrade-step.future .step-label { color:var(--stone); }
+  .step-title { font-family:'Cinzel',serif; font-size:0.82rem; color:var(--cream); margin-bottom:6px; font-weight:600; }
+  .step-desc { font-size:0.88rem; color:var(--stone); line-height:1.65; font-style:italic; }
+
+  /* CABLE MAP */
+  .cable-map { background:#060808; border:1px solid rgba(61,122,74,0.15); border-radius:3px; padding:24px; }
+  .cable-row { display:flex; align-items:baseline; gap:12px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.03); }
+  .cable-row:last-child { border-bottom:none; }
+  .cable-name { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.1em; color:var(--cream); min-width:180px; flex-shrink:0; }
+  .cable-path { font-size:0.84rem; color:var(--stone); font-style:italic; line-height:1.5; }
+  .cable-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.25),transparent); }
+  footer { text-align:center; padding:60px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.2); letter-spacing:0.2em; }
+
+  @media(max-width:600px){ .cards { grid-template-columns:1fr; } .cable-name { min-width:120px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Command Center</div>
+  <a onclick="nav('monitors')">Monitors</a>
+  <a onclick="nav('layout')">Desk Layout</a>
+  <a onclick="nav('pc')">PC Setup</a>
+  <a onclick="nav('audio')">Audio</a>
+  <a onclick="nav('streaming')">Streaming</a>
+  <a onclick="nav('rgb')">RGB Sync</a>
+  <a onclick="nav('cables')">Cable Plan</a>
+  <a onclick="nav('chair')">Chair</a>
+  <a onclick="nav('vr')">VR Future</a>
+  <a onclick="nav('shopping')">Shopping</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Gaming Setup · Dragon Den Command Center</div>
+  <h1 class="hero-title">The Command<br>Center</h1>
+  <p class="hero-sub">3 monitors · Full tower · Streaming · Work from home · Future VR</p>
+  <div class="hero-divider"></div>
+  <div class="hero-specs">
+    <div class="spec"><div class="spec-num">3</div><div class="spec-label">Monitors</div></div>
+    <div class="spec"><div class="spec-num">1440p</div><div class="spec-label">Main Display</div></div>
+    <div class="spec"><div class="spec-num">5</div><div class="spec-label">RGB Zones</div></div>
+    <div class="spec"><div class="spec-num">WFH+</div><div class="spec-label">Multi-use</div></div>
+  </div>
+</div>
+
+<!-- MONITORS -->
+<div class="divider"></div>
+<section id="monitors">
+  <div class="section-tag">Monitor Setup</div>
+  <h2>Three-Screen Command</h2>
+  <p class="intro">Two ViewSonic VA2247 (1080p/100hz) flanking one AOC (1440p/60hz) center. The resolution difference is actually fine — your main gaming and work happens center, the flankers are reference screens.</p>
+
+  <div class="callout gold">
+    <h5>The Mixed Resolution Strategy</h5>
+    <p>Put the AOC 1440p dead center — this is your primary gaming, streaming, and work monitor. Left VA2247: communication apps, Discord, OBS dashboard, reference material. Right VA2247: browser, Spotify, secondary content, or a vertical flip for code/docs. You'll never need to move your primary gaze off the 1440p center.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🖥️</div>
+      <h4>Triple Monitor Arm — The Key Purchase</h4>
+      <p>A single arm that holds all three and articulates independently. This frees your entire desk surface and lets you adjust each screen independently for gaming vs work mode.</p>
+      <ul>
+        <li><strong>Recommended:</strong> VIVO STAND-V003T — triple monitor arm, handles mixed sizes, full articulation per screen</li>
+        <li><strong>Alternatively:</strong> Ergotron LX Triple — premium, buttery smooth, worth the extra cost</li>
+        <li>Clamp mounts to desk edge — no drilling required</li>
+        <li>Make sure your desk is at least 1.5" thick for the clamp to bite — if not, use a grommet mount</li>
+        <li>Weight limit: check your AOC specs — most 27" monitors are under 15lbs, within arm limits</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">📐</div>
+      <h4>Monitor Positioning</h4>
+      <ul>
+        <li><strong>Center AOC:</strong> Eye level, arm's reach — top of screen at or just below eye height</li>
+        <li><strong>Left VA2247:</strong> Slight inward angle (15–20°), same height as center or slightly lower</li>
+        <li><strong>Right VA2247:</strong> Mirror the left — slight inward angle</li>
+        <li>Total spread: ~55–60 inches — fits your desk with room for keyboard and peripherals in front</li>
+        <li>All three pushed back toward the wall — maximize desk depth in front of you</li>
+        <li>Bias lighting strip runs along the back of all three as one continuous strip</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">⚡</div>
+      <h4>Display Settings to Dial In</h4>
+      <ul>
+        <li>AOC center: set as primary display, native 2560×1440, max refresh</li>
+        <li>VA2247 left + right: 1920×1080, 100hz — enable in Windows Display Settings</li>
+        <li>Match brightness across all three — start with the 1440p and calibrate the 1080p screens to match</li>
+        <li>Night light/warm mode on VA2247s if they read slightly cooler than the AOC</li>
+        <li>In Windows: set "Extend these displays" — drag screens in Settings to match physical layout</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- DESK LAYOUT -->
+<div class="divider"></div>
+<section id="layout">
+  <div class="section-tag">Physical Layout</div>
+  <h2>Desk Zone Map</h2>
+  <p class="intro">Every object on and around the desk has an assigned zone. ADHD brain needs clear homes for everything — if it doesn't have a spot, it becomes clutter.</p>
+
+  <div class="desk-diagram"><span class="ds">┌─ WEST WALL (Tricorn Black) ──────────────────────────────────────────┐</span>
+<span class="ds">│</span>  <span class="dg">[ floating shelf — dragon figure · plant · small speaker · ambient light ]</span>  <span class="ds">│</span>
+<span class="ds">│</span>  <span class="dg">▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</span>          <span class="ds">│</span>
+<span class="ds">│</span>                                                                      <span class="ds">│</span>
+<span class="ds">│</span>  <span class="de">[ VA2247 left ]</span>    <span class="dh">[ AOC 1440p CENTER ]</span>    <span class="de">[ VA2247 right ]</span>       <span class="ds">│</span>
+<span class="ds">│</span>  Discord/OBS       primary gaming/work        browser/Spotify        <span class="ds">│</span>
+<span class="ds">│</span>                                                                      <span class="ds">│</span>
+<span class="ds">│</span>  <span class="dg">[ bias RGB strip behind all 3 monitors — continuous ]</span>               <span class="ds">│</span>
+<span class="ds">│</span>                                                                      <span class="ds">│</span>
+<span class="ds">├──────────────────────────────────────────────────────────────────────┤</span>
+<span class="ds">│</span>  <span class="dh">[ mic arm L ]</span>  <span class="dh">[ keyboard ]</span>  <span class="dh">[ mouse pad ]</span>  <span class="dh">[ headset stand R ]</span>    <span class="ds">│</span>
+<span class="ds">│</span>  left edge     center-left   center-right   right of mouse          <span class="ds">│</span>
+<span class="ds">│</span>                                                                      <span class="ds">│</span>
+<span class="ds">│</span>  <span class="dg">[ cable raceway under desk lip — all cables hidden ]</span>                <span class="ds">│</span>
+<span class="ds">└──────────────────────────────────────────────────────────────────────┘</span>
+<span class="dg">         [ PC tower — floor left, on riser, RGB side panel facing out ]</span>
+<span class="ds">         [ surge protector — floor, behind PC, cable managed up wall ]</span></div>
+
+  <div class="callout">
+    <h5>ADHD Desk Rule</h5>
+    <p>Everything that lives on this desk has one spot and goes back there. Keyboard center-left, mouse pad center-right, headset on a stand right of mouse pad, mic arm at the left edge when not in use. Nothing sits loose. A desk tray or small organizer at the back-left corner catches anything that doesn't have a home yet — empties weekly.</p>
+  </div>
+</section>
+
+<!-- PC SETUP -->
+<div class="divider"></div>
+<section id="pc">
+  <div class="section-tag">PC Placement</div>
+  <h2>Full Tower Position</h2>
+  <p class="intro">Floor left of the desk, elevated on a PC stand, RGB side panel facing into the room. Visible, protected, ventilated, and becomes part of the aesthetic.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🖥️</div>
+      <h4>PC Stand / Riser</h4>
+      <ul>
+        <li>Elevates the tower 3–5" off the floor — protects from dust, vacuuming accidents, and carpet static</li>
+        <li>Look for a riser with wheels (casters) — easy to pull out for maintenance without scratching the floor</li>
+        <li><strong>Recommended:</strong> OMOTON PC Tower Stand with casters — ~$25</li>
+        <li>Position it so the tempered glass RGB side panel faces into the room, not the wall</li>
+        <li>Leave 6"+ clearance behind for exhaust airflow — don't push it flat against the wall</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌡️</div>
+      <h4>Airflow + Thermals</h4>
+      <ul>
+        <li>A-frame rooms can get warm in summer — the ceiling fan in the loft helps, but your room has its own consideration</li>
+        <li>Don't block the PC's intake (usually front/bottom) with cables or the wall</li>
+        <li>A small USB desk fan pointed at the PC side panel during heavy gaming sessions costs $10 and saves thermals</li>
+        <li>Cable raceway keeps the floor area under the desk clear — hot air needs somewhere to go</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">✨</div>
+      <h4>PC as Aesthetic Object</h4>
+      <ul>
+        <li>The RGB inside the tower becomes Zone 5 of your lighting system — it glows against the Tricorn Black wall</li>
+        <li>If your tower RGB is iCUE (Corsair) or Razer Synapse — sync it to match your desk mood scene</li>
+        <li>A dark matte cable sleeve for the power cable from PC to surge protector finishes the look</li>
+        <li>If you ever upgrade: a case with a large tempered glass side panel maximizes the RGB display effect</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIO -->
+<div class="divider"></div>
+<section id="audio">
+  <div class="section-tag gold">Audio</div>
+  <h2>Sound System</h2>
+  <p class="intro">You have both a headset and speakers already. The goal is getting them working together cleanly — right output for the right context — without a rats nest of audio cables.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🔊</div>
+      <h4>Speaker Placement</h4>
+      <ul>
+        <li>Speakers go on the floating shelf above the desk, one each side — angled slightly downward toward your seated ear level</li>
+        <li>This keeps them off the desk surface (frees space) and puts them at a better listening height</li>
+        <li>If speakers are bookshelf-style, small isolation pads under them prevent the shelf from resonating</li>
+        <li>The dark Tricorn Black wall behind actually helps with acoustics — absorbs some reflection</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎧</div>
+      <h4>Headset Management</h4>
+      <ul>
+        <li>Headset stand on the right side of the desk — keeps it off the surface and within reach</li>
+        <li>A stand with a built-in USB hub is worth the $5 extra — charges the headset and adds ports</li>
+        <li>If wireless: receiver USB dongle goes directly into the back of the PC, not a hub (cleaner signal)</li>
+        <li>Headset cable (if wired): routed through the cable raceway with the rest, loops up to the right side of the desk</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🎙️</div>
+      <h4>Microphone — For Streaming</h4>
+      <ul>
+        <li>A boom arm mic mount is the move for a 3-monitor setup — keeps the mic out of the way when not streaming, swings into position when you are</li>
+        <li><strong>If upgrading:</strong> Blue Yeti on a boom arm is the classic starter — ~$100 used. Elgato Wave:3 is cleaner for streaming</li>
+        <li>Mount the boom arm at the left edge of the desk — swing over center when streaming, park to the side when gaming</li>
+        <li>A small acoustic foam panel on the wall behind you helps with streaming audio in a hard-walled room</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🔌</div>
+      <h4>Audio Routing</h4>
+      <ul>
+        <li>A simple USB audio interface (Focusrite Scarlett Solo ~$120) lets you switch between speakers and headset cleanly with one knob</li>
+        <li>Alternatively: Windows Sound settings → set speakers as default, headset as communications device — system auto-routes game audio to speakers, Discord/calls to headset</li>
+        <li>For streaming: OBS can route different audio sources to different tracks — game audio, mic, Discord all separate</li>
+        <li>Voicemeeter Banana (free app) gives you a full virtual mixer if you want granular control without hardware</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- STREAMING -->
+<div class="divider"></div>
+<section id="streaming">
+  <div class="section-tag ember">Streaming + Content</div>
+  <h2>Planning to Stream</h2>
+  <p class="intro">You're not streaming yet, so let's set you up right from the start rather than retrofit later. The good news: your 3-monitor setup is already the right foundation.</p>
+
+  <div class="cards">
+    <div class="card ember">
+      <div class="card-icon">📡</div>
+      <h4>The Streaming Monitor Setup</h4>
+      <ul>
+        <li><strong>Center AOC 1440p:</strong> Your game — always</li>
+        <li><strong>Left VA2247:</strong> OBS Studio open at all times when streaming — scene switcher, stream health, chat</li>
+        <li><strong>Right VA2247:</strong> Browser for chat interaction, alerts, or a second game reference</li>
+        <li>This is the exact layout pro streamers use — you're already configured for it</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">📷</div>
+      <h4>Camera Position</h4>
+      <ul>
+        <li>Webcam or capture camera mounts on top of the center AOC monitor — center frame</li>
+        <li>Your background when streaming: the dragon shelf wall (east wall) — RGB-lit dragon collection visible over your shoulder = instant channel identity</li>
+        <li>The Tricorn Black walls behind you read clean and dark on camera — no distracting clutter</li>
+        <li>An Elgato Key Light or ring light slightly to your left front illuminates your face evenly</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🎬</div>
+      <h4>Stream Scene Identity</h4>
+      <ul>
+        <li>Your brand is already built: Dark Forest Dragon. Stream overlays in dark green + ember tones with dragon motifs</li>
+        <li>StreamElements or Streamlabs for overlays — search "dark fantasy stream overlay" on Etsy for cheap pre-made sets</li>
+        <li>Starting soon / BRB screens: a looping dragon animation or forest scene on a dark background</li>
+        <li>Your RGB lighting mood syncs to your stream mood — Dragon mode when raiding, Forest when chill gaming</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">⚙️</div>
+      <h4>Software Stack to Set Up</h4>
+      <ul>
+        <li><strong>OBS Studio</strong> (free) — industry standard, runs on your left monitor</li>
+        <li><strong>StreamElements</strong> — overlays, alerts, chat bot, all free</li>
+        <li><strong>Voicemeeter Banana</strong> (free) — virtual audio mixer, route game/mic/Discord separately</li>
+        <li><strong>Discord</strong> on left monitor during streams — your community home base</li>
+        <li>All free. Set these up before your first stream so you're not configuring mid-session</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- RGB SYNC -->
+<div class="divider"></div>
+<section id="rgb">
+  <div class="section-tag">RGB Gaming Sync</div>
+  <h2>Full Ecosystem Sync</h2>
+  <p class="intro">Five RGB zones unified into one system. Gaming mode activates everything at once — no fiddling with individual controllers mid-session.</p>
+
+  <div class="cards">
+    <div class="card ember">
+      <div class="card-icon">🌈</div>
+      <h4>Zone Map</h4>
+      <ul>
+        <li><strong>Zone 1 — Monitor bias:</strong> Govee strip behind all 3 monitors, screen-reactive</li>
+        <li><strong>Zone 2 — Desk shelf:</strong> Govee strip under floating shelf above desk</li>
+        <li><strong>Zone 3 — Dragon shelves:</strong> Govee strips under each display shelf + puck spotlight</li>
+        <li><strong>Zone 4 — Beam underlighting:</strong> Govee strips on A-frame beams</li>
+        <li><strong>Zone 5 — PC internals:</strong> iCUE / Razer Synapse / ARGB depending on your build</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🔗</div>
+      <h4>Sync System</h4>
+      <ul>
+        <li><strong>Govee Home app</strong> controls zones 1–4 — one app, scenes, schedules, music react</li>
+        <li><strong>Govee Sync Box</strong> (~$50) plugs into PC via USB, reads screen color and pushes to the bias lighting strip in real time</li>
+        <li>Zone 5 (PC internals) syncs separately in iCUE or Synapse — set it to match your active Govee scene color</li>
+        <li>5 saved scenes in Govee: Forest · Dragon · Arcane · Candlelight · Focus — activate any with one tap or voice</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎮</div>
+      <h4>Gaming Scene — Dragon Mode</h4>
+      <ul>
+        <li>Bias light: reactive to screen — explosions and fire will pulse red/orange behind monitors</li>
+        <li>Desk shelf: deep red static</li>
+        <li>Dragon shelves: ember red, shrine piece spotlit</li>
+        <li>Beams: slow ember pulse — like torchlight overhead</li>
+        <li>PC internals: red to match</li>
+        <li>Net effect: you're sitting inside a dragon's lair while you play</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CABLE PLAN -->
+<div class="divider"></div>
+<section id="cables">
+  <div class="section-tag">Cable Management</div>
+  <h2>Zero Visible Cable Plan</h2>
+  <p class="intro">Three monitors, a full tower, speakers, peripherals, and RGB strips generate a lot of cable. Here's exactly how every cable disappears.</p>
+
+  <div class="cable-map">
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#3d7a4a"></div>
+      <div class="cable-name">Monitor cables × 3</div>
+      <div class="cable-path">DisplayPort/HDMI runs behind monitor arm post → down into desk grommet hole or over back edge → into cable raceway under desk → to PC ports. Velcro tie each at the arm.</div>
+    </div>
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#c9933a"></div>
+      <div class="cable-name">PC power cable</div>
+      <div class="cable-path">Dark cable sleeve from PC to surge protector. Surge protector sits directly behind and slightly left of PC tower, against the wall. One cable up the wall raceway to the outlet.</div>
+    </div>
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#c8401a"></div>
+      <div class="cable-name">Govee bias strip (USB)</div>
+      <div class="cable-path">USB-A into back of PC or powered USB hub. Strip cable routes behind monitors, tacked with adhesive cable clips every 12".</div>
+    </div>
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#3d7a4a"></div>
+      <div class="cable-name">Speaker cables</div>
+      <div class="cable-path">Run from shelf down the wall inside the cable raceway. 3.5mm or RCA into audio interface or PC rear audio out. No cable visible on desk surface.</div>
+    </div>
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#7a7060"></div>
+      <div class="cable-name">Headset (if wired)</div>
+      <div class="cable-path">Loop through cable raceway under desk, emerge at right side where headset stand sits. No loose cable on desk surface.</div>
+    </div>
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#5a6acc"></div>
+      <div class="cable-name">USB hub</div>
+      <div class="cable-path">Mounted under desk surface with adhesive velcro. USB-A into PC. All peripherals plug into the hub — one cable to PC. Hub lives under desk, invisible.</div>
+    </div>
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#c9933a"></div>
+      <div class="cable-name">Keyboard + Mouse</div>
+      <div class="cable-path">Wireless strongly recommended — eliminates 2 cables entirely. If wired: route through desk grommet, velcro tie under desk surface to the USB hub.</div>
+    </div>
+    <div class="cable-row">
+      <div class="cable-dot" style="background:#3d7a4a"></div>
+      <div class="cable-name">Shelf RGB strips</div>
+      <div class="cable-path">Each Govee strip's power brick mounts under the shelf with velcro. USB cable tacked along shelf underside to the nearest outlet or smart power strip above the desk.</div>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <h5>The Cable Management Kit</h5>
+    <p>You need: one paintable cable raceway (paint it Tricorn Black) · adhesive cable clips · velcro ties (reusable, not zip ties) · a short USB hub mounted under the desk · one cable sleeve for the PC power cable. Total cost: ~$25–35. This is the single most ADHD-friendly upgrade on the list — a clean desk surface means a clear mind.</p>
+  </div>
+</section>
+
+<!-- CHAIR -->
+<div class="divider"></div>
+<section id="chair">
+  <div class="section-tag">Seating</div>
+  <h2>The Throne Upgrade Path</h2>
+  <p class="intro">Your white chair is the placeholder. Here's the upgrade path that fits the aesthetic and your body — for long WFH + gaming sessions, this matters more than any peripheral.</p>
+
+  <div class="upgrade-path">
+    <div class="upgrade-step active">
+      <div class="step-marker"><div class="step-dot"></div></div>
+      <div class="step-body">
+        <div class="step-label">Now — Use What You Have</div>
+        <div class="step-title">White Chair + Dark Throw</div>
+        <div class="step-desc">Drape a dark charcoal or forest green throw over the back and seat. Adds a black cushion cover if it's fabric. It'll read darker in photos and in person until you upgrade. Costs $0.</div>
+      </div>
+    </div>
+    <div class="upgrade-step future">
+      <div class="step-marker"><div class="step-dot"></div></div>
+      <div class="step-body">
+        <div class="step-label">Phase 2 — Mid Range (~$200–350)</div>
+        <div class="step-title">Ergonomic Mesh Chair — Dark Colorway</div>
+        <div class="step-desc">Humanscale Freedom, Sihoo M57, or Branch Ergonomic Chair in all-black or dark grey. Mesh breathes during long sessions. Far better for your back than a gaming chair for WFH hours. Avoid: most RGB gaming chairs — they're gimmicky and uncomfortable for long sits.</div>
+      </div>
+    </div>
+    <div class="upgrade-step future">
+      <div class="step-marker"><div class="step-dot"></div></div>
+      <div class="step-body">
+        <div class="step-label">Phase 3 — The Dream (~$500+)</div>
+        <div class="step-title">Herman Miller Aeron or Secretlab Titan</div>
+        <div class="step-desc">If you stream professionally or WFH full time, this pays for itself in posture and focus. The Secretlab Titan fits the dragon aesthetic — they have limited edition fantasy colorways. Check Facebook Marketplace for used Aerons — they come up regularly for $200–300 and last 20 years.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VR FUTURE -->
+<div class="divider"></div>
+<section id="vr">
+  <div class="section-tag gold">Future Planning</div>
+  <h2>Steam VR Readiness</h2>
+  <p class="intro">You're planning for Steam VR and a Steam Machine for the loft. Here's how to design your bedroom setup now so VR fits without chaos later.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🥽</div>
+      <h4>VR Space in Your Bedroom</h4>
+      <ul>
+        <li>The Murphy bed is your secret weapon — fold it up and you have ~10×10ft of clear floor space</li>
+        <li>That's enough for room-scale VR (Valve Index, Meta Quest, Vive all need ~6.5×6.5ft minimum)</li>
+        <li>The dark rug under your desk zone defines where VR is NOT — play in the center open zone</li>
+        <li>Base stations or sensors mount on the wall or beam with small screws — your nail access makes this easy</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🎮</div>
+      <h4>Steam Machine — Loft Plan</h4>
+      <ul>
+        <li>A Steam Machine (or a small form-factor PC running SteamOS) in the loft connects to a TV above the DnD table or on an adjacent wall</li>
+        <li>This separates couch gaming from desk gaming — loft becomes the chill/social gaming zone</li>
+        <li>A 43–55" TV mounted on the loft wall above or beside the DnD table does double duty: gaming + DnD map projection</li>
+        <li>Steam Link app lets you stream from your bedroom PC to the loft TV wirelessly — free, zero extra hardware needed right now</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">📡</div>
+      <h4>Internet + Router Placement</h4>
+      <ul>
+        <li>Router should be as close to your PC as possible — ideally in your bedroom or just outside it</li>
+        <li>If the router is downstairs: a TP-Link Powerline adapter (~$40) runs ethernet through the house wiring — no drilling, stable connection</li>
+        <li>Wired ethernet to your PC always beats WiFi for gaming and streaming — run a flat ethernet cable along the baseboard if needed</li>
+        <li>For the loft Steam setup: a WiFi 6 router handles streaming from bedroom PC to loft TV wirelessly without lag</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SHOPPING -->
+<div class="divider"></div>
+<section id="shopping">
+  <div class="section-tag">Shopping List</div>
+  <h2>Gaming Setup Budget</h2>
+  <p class="intro">Prioritized by impact. The monitor arm and cable management give you the most transformation per dollar.</p>
+
+  <div class="spec-table">
+    <table>
+      <thead><tr><th>Item</th><th>Recommendation</th><th>Budget</th></tr></thead>
+      <tbody>
+        <tr><td>Triple Monitor Arm</td><td>VIVO STAND-V003T or Ergotron LX Triple</td><td><span class="badge b-mid">$60–180</span></td></tr>
+        <tr><td>AOC + ViewSonic — you own</td><td>Already have</td><td><span class="badge b-own">✓ Owned</span></td></tr>
+        <tr><td>Govee Sync Box (screen reactive)</td><td>Govee PC Sync Box</td><td><span class="badge b-mid">$45–60</span></td></tr>
+        <tr><td>Govee Bias Light Strip (behind monitors)</td><td>Govee TV Backlight T2 — cut to fit</td><td><span class="badge b-low">$25–40</span></td></tr>
+        <tr><td>PC Tower Stand with casters</td><td>OMOTON or similar</td><td><span class="badge b-low">$20–35</span></td></tr>
+        <tr><td>Under-desk USB Hub</td><td>Anker 10-port powered USB hub</td><td><span class="badge b-low">$30–45</span></td></tr>
+        <tr><td>Cable Raceway (paintable)</td><td>Wiremold or Datacomm — paint Tricorn Black</td><td><span class="badge b-low">$15–25</span></td></tr>
+        <tr><td>Velcro Cable Ties (50 pack)</td><td>Amazon — reusable</td><td><span class="badge b-low">$8–12</span></td></tr>
+        <tr><td>Adhesive Cable Clips (100 pack)</td><td>Amazon</td><td><span class="badge b-low">$8–12</span></td></tr>
+        <tr><td>Headset Stand with USB hub</td><td>Corsair ST100 or Razer Base Station</td><td><span class="badge b-low">$25–50</span></td></tr>
+        <tr><td>Mic Boom Arm</td><td>Rode PSA1 (premium) or Neewer (budget)</td><td><span class="badge b-mid">$20–100</span></td></tr>
+        <tr><td>Keyboard — dark/backlit</td><td>Keychron K2 or Q series — dark colorway</td><td><span class="badge b-mid">$80–170</span></td></tr>
+        <tr><td>Mouse — dark</td><td>Logitech G502 X or Razer DeathAdder V3</td><td><span class="badge b-mid">$50–90</span></td></tr>
+        <tr><td>Large Desk Mat (dark)</td><td>Extended dark mousepad — covers full desk width</td><td><span class="badge b-low">$20–40</span></td></tr>
+        <tr><td>Elgato Key Light (streaming)</td><td>Elgato Key Light or Key Light Air</td><td><span class="badge b-mid">$60–100</span></td></tr>
+        <tr><td>Webcam (streaming)</td><td>Logitech C920 (budget) or Elgato Facecam</td><td><span class="badge b-mid">$70–150</span></td></tr>
+        <tr><td>PC Cable Sleeve (power cable)</td><td>Amazon — dark braided sleeve</td><td><span class="badge b-low">$8–15</span></td></tr>
+        <tr><td>Chair upgrade — Phase 2</td><td>Sihoo M57 or Branch Ergonomic</td><td><span class="badge b-mid">$200–350</span></td></tr>
+        <tr><td>TP-Link Powerline Adapter (ethernet)</td><td>TP-Link AV2000 if router is far away</td><td><span class="badge b-low">$35–55</span></td></tr>
+        <tr><td>Steam Link (loft streaming)</td><td>Free app on any smart TV — $0 to start</td><td><span class="badge b-low">Free</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout gold">
+    <h5>Priority Order</h5>
+    <p>
+      1. <strong style="color:var(--cream)">Triple monitor arm</strong> — biggest immediate transformation, frees your entire desk<br>
+      2. <strong style="color:var(--cream)">Cable management kit</strong> — raceway + velcro + clips + USB hub mount<br>
+      3. <strong style="color:var(--cream)">Govee bias lighting</strong> — monitor backlight + Sync Box<br>
+      4. <strong style="color:var(--cream)">PC riser with casters</strong> — protect the tower, show off the RGB<br>
+      5. <strong style="color:var(--cream)">Extended dark desk mat</strong> — ties the whole surface together visually<br><br>
+      Everything else is an upgrade layer. Steps 1–5 cost roughly <strong style="color:var(--gold)">$130–220</strong> and transform the setup completely.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <p>Gaming Setup · Command Center · Dark Forest Dragon Den</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">🖥️</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){
+    var top=el.getBoundingClientRect().top+window.pageYOffset-52;
+    window.scrollTo({top:top,behavior:'smooth'});
+  }
+}
+</script>
+</body>
+</html>

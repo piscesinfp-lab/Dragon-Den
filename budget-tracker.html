@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker — Dragon Den</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void:#07090a; --deep:#0c1210; --moss:#2a4530; --jade:#3d7a4a;
+    --stone:#7a7060; --cream:#e8dcc8; --ember:#c8401a; --gold:#c9933a;
+    --mist:rgba(255,255,255,0.04); --danger:#c8401a; --warn:#c9933a; --ok:#3d7a4a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; padding-top:60px; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.97); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  /* HERO BUDGET BAR */
+  .budget-hero {
+    background:var(--deep); border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:32px 24px; max-width:100%;
+  }
+  .budget-hero-inner { max-width:900px; margin:0 auto; }
+  .budget-title { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.4em; color:var(--jade); text-transform:uppercase; margin-bottom:12px; }
+  .budget-numbers { display:flex; gap:32px; flex-wrap:wrap; margin-bottom:20px; }
+  .budget-num { text-align:left; }
+  .budget-num-val { font-family:'Cinzel',serif; font-size:1.6rem; line-height:1; }
+  .budget-num-val.spent { color:var(--ember); }
+  .budget-num-val.remaining { color:var(--jade); }
+  .budget-num-val.total { color:var(--gold); }
+  .budget-num-val.estimated { color:var(--stone); }
+  .budget-num-label { font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--stone); text-transform:uppercase; margin-top:4px; }
+  .budget-bar-wrap { position:relative; height:8px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; }
+  .budget-bar-spent { height:100%; background:var(--ember); border-radius:4px; transition:width 0.5s ease; }
+  .budget-bar-estimated { position:absolute; top:0; height:100%; background:rgba(201,147,58,0.3); border-radius:4px; transition:width 0.5s ease; }
+  .budget-bar-labels { display:flex; justify-content:space-between; margin-top:6px; }
+  .budget-bar-label { font-family:'Cinzel',serif; font-size:0.48rem; letter-spacing:0.15em; color:var(--stone); }
+
+  /* PHASE TABS */
+  .phase-tabs { display:flex; gap:0; border-bottom:1px solid rgba(255,255,255,0.06); overflow-x:auto; max-width:900px; margin:0 auto; }
+  .phase-tab { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.2em; color:var(--stone); text-transform:uppercase; padding:14px 18px; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; white-space:nowrap; flex-shrink:0; }
+  .phase-tab:hover { color:var(--cream); }
+  .phase-tab.active { color:var(--jade); border-bottom-color:var(--jade); }
+
+  /* MAIN CONTENT */
+  .main { max-width:900px; margin:0 auto; padding:24px; }
+
+  /* PHASE PANEL */
+  .phase-panel { display:none; }
+  .phase-panel.active { display:block; }
+  .phase-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+  .phase-header-row h2 { font-family:'Cinzel',serif; font-size:1.3rem; color:var(--cream); font-weight:600; }
+  .phase-total { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.15em; }
+
+  /* ITEM TABLE */
+  .item-table { width:100%; border-collapse:collapse; background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-bottom:20px; }
+  .item-table thead tr { background:#0a0e0c; }
+  .item-table th { font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 14px; border-bottom:1px solid var(--moss); }
+  .item-table th.right { text-align:right; }
+  .item-table th.center { text-align:center; }
+  .item-row td { padding:11px 14px; font-size:0.86rem; color:var(--stone); border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; }
+  .item-row:last-child td { border-bottom:none; }
+  .item-row.purchased td { background:rgba(61,122,74,0.05); }
+  .item-row.purchased .item-name { color:var(--jade); }
+  .item-name { color:var(--cream); font-size:0.88rem; line-height:1.3; }
+  .item-note { font-size:0.76rem; color:var(--stone); font-style:italic; margin-top:2px; }
+  .item-est { font-family:'Cinzel',serif; font-size:0.75rem; color:var(--stone); text-align:right; white-space:nowrap; }
+  .item-actual-wrap { display:flex; align-items:center; gap:6px; justify-content:flex-end; }
+  .item-actual { font-family:'Cinzel',serif; font-size:0.75rem; color:var(--gold); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:2px; padding:4px 8px; width:80px; text-align:right; outline:none; transition:border-color 0.2s; }
+  .item-actual:focus { border-color:var(--jade); color:var(--cream); }
+  .item-actual::placeholder { color:rgba(255,255,255,0.15); font-style:italic; }
+  .purchase-btn { width:28px; height:28px; border-radius:2px; border:1px solid rgba(255,255,255,0.1); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:var(--stone); transition:all 0.2s; flex-shrink:0; }
+  .purchase-btn:hover { border-color:var(--jade); color:var(--jade); }
+  .item-row.purchased .purchase-btn { background:rgba(61,122,74,0.2); border-color:var(--jade); color:var(--jade); }
+  .priority-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .pd-urgent { background:var(--ember); }
+  .pd-soon { background:var(--gold); }
+  .pd-later { background:var(--jade); }
+  .pd-optional { background:var(--stone); }
+
+  /* ADD ITEM */
+  .add-item-row { display:flex; gap:8px; align-items:center; padding:12px 14px; background:rgba(255,255,255,0.02); border-top:1px solid rgba(255,255,255,0.05); flex-wrap:wrap; }
+  .add-input { flex:1; min-width:140px; font-family:'Crimson Pro',serif; font-size:0.86rem; color:var(--cream); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:2px; padding:7px 10px; outline:none; }
+  .add-input:focus { border-color:var(--jade); }
+  .add-input::placeholder { color:rgba(255,255,255,0.2); font-style:italic; }
+  .add-btn { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.2em; color:var(--jade); text-transform:uppercase; background:rgba(61,122,74,0.1); border:1px solid rgba(61,122,74,0.3); border-radius:2px; padding:8px 14px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .add-btn:hover { background:rgba(61,122,74,0.2); }
+
+  /* SUMMARY */
+  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:24px; }
+  .summary-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:16px; }
+  .summary-card-label { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.25em; color:var(--stone); text-transform:uppercase; margin-bottom:8px; }
+  .summary-card-val { font-family:'Cinzel',serif; font-size:1.3rem; line-height:1; }
+  .scv-spent { color:var(--ember); }
+  .scv-est { color:var(--stone); }
+  .scv-remain { color:var(--jade); }
+  .scv-saved { color:var(--gold); }
+
+  /* SETTINGS */
+  .settings-row { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .settings-label { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--stone); text-transform:uppercase; white-space:nowrap; }
+  .budget-input { font-family:'Cinzel',serif; font-size:1rem; color:var(--gold); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:2px; padding:6px 12px; width:120px; outline:none; }
+  .budget-input:focus { border-color:var(--jade); }
+
+  .callout { padding:16px 20px; border-radius:3px; margin:16px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout p { font-size:0.88rem; color:var(--stone); line-height:1.65; font-style:italic; }
+
+  @media(max-width:600px){
+    .budget-numbers { gap:20px; }
+    .item-actual { width:65px; }
+    .add-item-row { gap:6px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Budget</div>
+  <a onclick="showPanel('summary')">Summary</a>
+  <a onclick="showPanel('day1')">Day 1</a>
+  <a onclick="showPanel('week1')">Week 1</a>
+  <a onclick="showPanel('week2')">Week 2</a>
+  <a onclick="showPanel('month1')">Month 1+</a>
+  <a onclick="showPanel('settings')">Settings</a>
+</nav>
+
+<!-- BUDGET HERO -->
+<div class="budget-hero">
+  <div class="budget-hero-inner">
+    <div class="budget-title">Dragon Den — Master Budget Tracker</div>
+    <div class="budget-numbers">
+      <div class="budget-num"><div class="budget-num-val spent" id="hero-spent">$0</div><div class="budget-num-label">Spent</div></div>
+      <div class="budget-num"><div class="budget-num-val estimated" id="hero-est">$0</div><div class="budget-num-label">Estimated Remaining</div></div>
+      <div class="budget-num"><div class="budget-num-val remaining" id="hero-remain">$750</div><div class="budget-num-label">Budget Left</div></div>
+      <div class="budget-num"><div class="budget-num-val total" id="hero-total">$750</div><div class="budget-num-label">Total Budget</div></div>
+    </div>
+    <div class="budget-bar-wrap">
+      <div class="budget-bar-estimated" id="bar-est"></div>
+      <div class="budget-bar-spent" id="bar-spent"></div>
+    </div>
+    <div class="budget-bar-labels">
+      <span class="budget-bar-label" style="color:var(--ember)">■ Spent</span>
+      <span class="budget-bar-label" style="color:rgba(201,147,58,0.5)">■ Estimated remaining spend</span>
+      <span class="budget-bar-label" id="bar-pct" style="color:var(--jade)">0% used</span>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE TABS -->
+<div style="background:var(--deep); border-bottom:1px solid rgba(255,255,255,0.05);">
+  <div class="phase-tabs">
+    <div class="phase-tab active" onclick="showPanel('summary')">Summary</div>
+    <div class="phase-tab" onclick="showPanel('day1')">Day 1</div>
+    <div class="phase-tab" onclick="showPanel('week1')">Week 1</div>
+    <div class="phase-tab" onclick="showPanel('week2')">Week 2</div>
+    <div class="phase-tab" onclick="showPanel('month1')">Month 1+</div>
+    <div class="phase-tab" onclick="showPanel('settings')">⚙ Settings</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SUMMARY -->
+  <div class="phase-panel active" id="panel-summary">
+    <div style="margin-bottom:20px; padding-top:8px;">
+      <h2 style="font-family:'Cinzel',serif; font-size:1.4rem; color:var(--cream); margin-bottom:6px;">Budget Overview</h2>
+      <p style="font-style:italic; color:var(--stone); font-size:0.92rem; line-height:1.7;">Track what you've spent, what's estimated, and what's left. Click ✓ on any item to mark it purchased. Enter actual cost to track real spend.</p>
+    </div>
+    <div class="summary-grid" id="summary-grid"></div>
+    <div id="summary-phase-totals"></div>
+  </div>
+
+  <!-- DAY 1 -->
+  <div class="phase-panel" id="panel-day1">
+    <div class="phase-header-row">
+      <h2>Day 1 — Sunday</h2>
+      <div class="phase-total" id="total-day1" style="color:var(--ember)"></div>
+    </div>
+    <div class="callout"><p>These are things you need to function on move-in day. Order what you can before Sunday — Prime delivers fast. Buy the rest at Target/HomeGoods on the way.</p></div>
+    <table class="item-table" id="table-day1"></table>
+  </div>
+
+  <!-- WEEK 1 -->
+  <div class="phase-panel" id="panel-week1">
+    <div class="phase-header-row">
+      <h2>Week 1 — The Transformation</h2>
+      <div class="phase-total" id="total-week1" style="color:var(--gold)"></div>
+    </div>
+    <div class="callout"><p>Paint is the single highest-leverage spend of the entire project. Do this before furniture arrives — empty room is exponentially easier to paint.</p></div>
+    <table class="item-table" id="table-week1"></table>
+  </div>
+
+  <!-- WEEK 2 -->
+  <div class="phase-panel" id="panel-week2">
+    <div class="phase-header-row">
+      <h2>Week 2 — Structure + Storage</h2>
+      <div class="phase-total" id="total-week2" style="color:var(--jade)"></div>
+    </div>
+    <table class="item-table" id="table-week2"></table>
+  </div>
+
+  <!-- MONTH 1+ -->
+  <div class="phase-panel" id="panel-month1">
+    <div class="phase-header-row">
+      <h2>Month 1+ — Loft + Finishing</h2>
+      <div class="phase-total" id="total-month1" style="color:var(--stone)"></div>
+    </div>
+    <div class="callout"><p>These items get added as budget allows. Hit Facebook Marketplace hard for the sofa and DnD table — best thrift opportunities in the whole project.</p></div>
+    <table class="item-table" id="table-month1"></table>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="phase-panel" id="panel-settings">
+    <div style="padding-top:8px; margin-bottom:24px;">
+      <h2 style="font-family:'Cinzel',serif; font-size:1.3rem; color:var(--cream); margin-bottom:16px;">Settings</h2>
+      <div class="settings-row">
+        <div class="settings-label">Total Budget</div>
+        <input class="budget-input" type="number" id="budget-total-input" value="750" oninput="updateBudget(this.value)" placeholder="750">
+        <span style="font-style:italic; color:var(--stone); font-size:0.86rem;">Set your overall budget ceiling</span>
+      </div>
+    </div>
+    <div class="callout">
+      <p>Your progress saves automatically in this browser. If you open this file in a different browser or after clearing cache, you'll start fresh. Export tip: take a screenshot of the summary view to keep a record.</p>
+    </div>
+    <div style="margin-top:20px;">
+      <button onclick="clearAll()" style="font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.2em; color:var(--ember); text-transform:uppercase; background:rgba(200,64,26,0.08); border:1px solid rgba(200,64,26,0.2); border-radius:2px; padding:10px 18px; cursor:pointer;">Reset All Data</button>
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+var ITEMS = {
+  day1: [
+    {id:'d1_curtains',  name:'Blackout Curtains + Matte Black Rod', note:'NICETOWN on Amazon — order now, arrives before Sunday', est:55, priority:'urgent'},
+    {id:'d1_govee',     name:'Govee RGBIC Strips × 2 packs',        note:'govee.com or Amazon Prime',                              est:40, priority:'urgent'},
+    {id:'d1_hangers',   name:'Velvet Slim Hangers × 50 pack',        note:'Dark grey or black — Amazon',                           est:20, priority:'urgent'},
+    {id:'d1_monarm',    name:'Dual Monitor Arm Mount',               note:'VIVO brand on Amazon',                                  est:45, priority:'urgent'},
+    {id:'d1_toiletries',name:'First Night Toiletries',               note:'Toothbrush, basics — if not already packed',            est:15, priority:'soon'},
+    {id:'d1_shower',    name:'Shower Curtain + Liner (if needed)',   note:'Target — check if one is already installed first',      est:18, priority:'soon'},
+    {id:'d1_studfinder',name:'Stud Finder + Basic Tool Kit',         note:'Home Depot or Amazon',                                  est:30, priority:'urgent'},
+    {id:'d1_trashbags', name:'Trash Bags + Cleaning Supplies',       note:'Any grocery or dollar store',                           est:12, priority:'urgent'},
+    {id:'d1_airmattress',name:'Air Mattress (temporary bed)',        note:'Until Murphy bed — Walmart or Amazon',                  est:35, priority:'urgent'},
+  ],
+  week1: [
+    {id:'w1_paint_black', name:'SW Tricorn Black — 1 gallon',        note:'Sherwin-Williams store — Emerald Interior eggshell',    est:70, priority:'urgent'},
+    {id:'w1_paint_green', name:'SW Shade-Grown — 1 quart',           note:'Sherwin-Williams — north accent wall only',             est:30, priority:'urgent'},
+    {id:'w1_paint_bath',  name:'SW Mineral Deposit — 1 gallon',      note:'Sherwin-Williams — bathroom, satin finish',             est:70, priority:'urgent'},
+    {id:'w1_primer',      name:'Gray Tinted Primer — 1 gallon',      note:'Zinsser Bulls Eye 1-2-3 or SW primer',                  est:35, priority:'urgent'},
+    {id:'w1_painttools',  name:'Paint Roller + Tray + Drop Cloth',   note:'Home Depot — get quality roller for dark paint',        est:28, priority:'urgent'},
+    {id:'w1_bathhardware',name:'Matte Black Bathroom Hardware Set',  note:'Amazon — towel ring, bar, TP holder, robe hook',        est:50, priority:'soon'},
+    {id:'w1_cablerace',   name:'Cable Raceway — paintable',          note:'Wiremold or Datacomm — paint Tricorn Black',            est:18, priority:'soon'},
+    {id:'w1_artprint',    name:'Dragon / Fantasy Art Print × 1',     note:'Etsy or Redbubble — dark frame from Amazon/Craig Frames',est:35, priority:'soon'},
+  ],
+  week2: [
+    {id:'w2_murphy',      name:'Murphy Bed Kit — Full/Queen',        note:'FB Marketplace first — Murphy Bed Depot or Wayfair',    est:450, priority:'soon'},
+    {id:'w2_shelves',     name:'Floating Shelves × 3 + Brackets',   note:'IKEA LACK + FLEXIMOUNTS heavy duty brackets',            est:65, priority:'soon'},
+    {id:'w2_ledstrips',   name:'Govee RGBIC Strips × 2 more packs', note:'Beam underlighting + dragon shelf strips',               est:40, priority:'soon'},
+    {id:'w2_bedding',     name:'Forest Green Velvet Bedding Set',    note:'Amazon, Target or TJ Maxx',                             est:65, priority:'soon'},
+    {id:'w2_rug',         name:'Dark Rug 5×7 or 6×9',               note:'Rugs USA, Wayfair, or FB Marketplace',                  est:120, priority:'soon'},
+    {id:'w2_closetcurtain',name:'IKEA VIDGA Track + Dark Curtain',   note:'Closet door replacement',                               est:50, priority:'later'},
+    {id:'w2_drawerunit',  name:'3-Drawer Unit for Closet',          note:'IKEA ALEX or MALM',                                     est:90, priority:'later'},
+    {id:'w2_velvethangers',name:'Velvet Hangers Extra × 25',        note:'If first pack runs out',                                 est:12, priority:'later'},
+    {id:'w2_plants',      name:'Snake Plant + Pothos',               note:'IKEA, Trader Joe\'s, or local nursery',                 est:22, priority:'later'},
+    {id:'w2_diffuser',    name:'Ultrasonic Diffuser — Bedroom',      note:'URPOWER or InnoGear — dark wood finish',                est:22, priority:'later'},
+    {id:'w2_essentials',  name:'Essential Oils Starter Kit',         note:'Plant Therapy — cedarwood, eucalyptus, lavender, peppermint', est:45, priority:'later'},
+    {id:'w2_reediff',     name:'Reed Diffuser — Bathroom',           note:'Eucalyptus/mint scent — HomeGoods or Amazon',           est:18, priority:'later'},
+    {id:'w2_eucalyptus',  name:'Eucalyptus Shower Bundle',           note:'Trader Joe\'s — $5, refresh monthly',                   est:5, priority:'later'},
+    {id:'w2_bamboomat',   name:'Bamboo Bath Mat',                    note:'Amazon or HomeGoods',                                   est:22, priority:'later'},
+    {id:'w2_darktowels',  name:'Dark Towel Set — charcoal or green', note:'TJ Maxx or Amazon',                                    est:28, priority:'later'},
+  ],
+  month1: [
+    {id:'m1_sofa',        name:'Dark Sofa or Sectional — Loft',     note:'FB Marketplace first — IKEA KIVIK as backup',           est:300, priority:'later'},
+    {id:'m1_dndtable',    name:'DnD / Dining Table — Loft',         note:'FB Marketplace or IKEA — seats 5–6, dark wood',         est:200, priority:'later'},
+    {id:'m1_armchair',    name:'Reading Armchair — Velvet/Dark',     note:'TJ Maxx, Amazon, or Wayfair',                          est:200, priority:'later'},
+    {id:'m1_poufs',       name:'Moroccan Poufs × 3',                note:'World Market or Amazon',                                est:90, priority:'later'},
+    {id:'m1_arclamp',     name:'Arc Floor Lamp — Loft Nook',        note:'Amazon, IKEA, or Target',                               est:65, priority:'later'},
+    {id:'m1_raskog',      name:'IKEA RÅSKOG Rolling Cart',           note:'IKEA — $40 flat, loft DnD bar cart',                   est:40, priority:'later'},
+    {id:'m1_loftrug',     name:'Large Loft Rug 6×9 or 8×10',        note:'Rugs USA or Wayfair',                                   est:150, priority:'later'},
+    {id:'m1_pendant',     name:'Pendant Light — Loft Above Table',  note:'Amazon or IKEA — rattan or dark metal',                 est:45, priority:'later'},
+    {id:'m1_stringlights',name:'Warm String Lights — Loft Beams',   note:'Amazon or Target',                                      est:22, priority:'later'},
+    {id:'m1_galaxy',      name:'Galaxy Projector',                   note:'BlissLights Ark — aimed at A-frame ceiling',           est:45, priority:'later'},
+    {id:'m1_monpendant',  name:'Bedroom Pendant Light',              note:'Amazon or IKEA — rattan cage or dark metal',           est:45, priority:'later'},
+    {id:'m1_loftdiffuser',name:'Ultrasonic Diffuser — Loft 500ml+', note:'Amazon — larger capacity for 27ft space',              est:35, priority:'later'},
+    {id:'m1_goveesynx',   name:'Govee Immersion TV Backlight',      note:'Camera-based screen reactive — behind monitors',        est:38, priority:'optional'},
+    {id:'m1_pcstand',     name:'PC Tower Stand with Casters',        note:'OMOTON or similar — Amazon',                           est:25, priority:'optional'},
+    {id:'m1_dragonpiece', name:'First Dragon / Collection Piece',    note:'One intentional shrine piece — take your time',        est:40, priority:'optional'},
+    {id:'m1_laundry',     name:'Slim Laundry Bags × 2',             note:'Amazon or IKEA — darks + lights, hang in closet',      est:18, priority:'optional'},
+    {id:'m1_cederblocks', name:'Cedar Blocks for Closet × 8',       note:'Amazon — scent + moth deterrent',                      est:12, priority:'optional'},
+    {id:'m1_labelmaker',  name:'Dymo LabelManager 160',             note:'Amazon or Staples — label every bin and drawer',       est:22, priority:'optional'},
+    {id:'m1_shoerack',    name:'3-Tier Adjustable Shoe Rack',        note:'SONGMICS — dark finish, holds under 10 pairs',         est:25, priority:'optional'},
+  ]
+};
+
+var state = {
+  budget: 750,
+  purchased: {},
+  actuals: {},
+  customItems: {}
+};
+
+// ── LOAD / SAVE ───────────────────────────────────────────────
+function save(){
+  try{ localStorage.setItem('dragon_budget', JSON.stringify(state)); }catch(e){}
+}
+function load(){
+  try{
+    var s = JSON.parse(localStorage.getItem('dragon_budget')||'null');
+    if(s){ state = s; }
+  }catch(e){}
+}
+
+// ── CALCULATIONS ──────────────────────────────────────────────
+function getActual(id){ return parseFloat(state.actuals[id]||0)||0; }
+function getEst(id, phase){
+  var items = ITEMS[phase]||[];
+  for(var i=0;i<items.length;i++){ if(items[i].id===id) return items[i].est; }
+  // check custom
+  var custom = state.customItems[phase]||[];
+  for(var i=0;i<custom.length;i++){ if(custom[i].id===id) return custom[i].est; }
+  return 0;
+}
+function isPurchased(id){ return !!state.purchased[id]; }
+
+function calcPhase(phase){
+  var allItems = (ITEMS[phase]||[]).concat(state.customItems[phase]||[]);
+  var spent=0, estRemain=0;
+  allItems.forEach(function(item){
+    if(isPurchased(item.id)){
+      var a = getActual(item.id);
+      spent += a>0 ? a : item.est;
+    } else {
+      estRemain += item.est;
+    }
+  });
+  return {spent:spent, estRemain:estRemain, total:spent+estRemain, count:allItems.length, purchasedCount: allItems.filter(function(i){return isPurchased(i.id);}).length};
+}
+
+function calcAll(){
+  var phases = ['day1','week1','week2','month1'];
+  var totalSpent=0, totalEst=0;
+  phases.forEach(function(p){
+    var c = calcPhase(p);
+    totalSpent += c.spent;
+    totalEst += c.estRemain;
+  });
+  return {spent:totalSpent, estRemain:totalEst};
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderTable(phase){
+  var table = document.getElementById('table-'+phase);
+  if(!table) return;
+  var allItems = (ITEMS[phase]||[]).concat(state.customItems[phase]||[]);
+
+  var html = '<thead><tr>';
+  html += '<th style="width:14px"></th>';
+  html += '<th>Item</th>';
+  html += '<th class="right" style="width:80px">Estimated</th>';
+  html += '<th class="right" style="width:110px">Actual Paid</th>';
+  html += '<th class="center" style="width:44px">Got It</th>';
+  html += '</tr></thead><tbody>';
+
+  allItems.forEach(function(item){
+    var purchased = isPurchased(item.id);
+    var actual = state.actuals[item.id]||'';
+    var pd = item.priority==='urgent'?'pd-urgent':item.priority==='soon'?'pd-soon':item.priority==='later'?'pd-later':'pd-optional';
+    html += '<tr class="item-row'+(purchased?' purchased':'')+'" id="row-'+item.id+'">';
+    html += '<td><div class="priority-dot '+pd+'"></div></td>';
+    html += '<td><div class="item-name">'+item.name+'</div><div class="item-note">'+item.note+'</div></td>';
+    html += '<td class="item-est">$'+item.est+'</td>';
+    html += '<td><div class="item-actual-wrap"><span style="color:var(--stone);font-size:0.8rem">$</span><input class="item-actual" type="number" placeholder="0.00" value="'+actual+'" oninput="setActual(\''+item.id+'\',\''+phase+'\',this.value)" onclick="this.select()"></div></td>';
+    html += '<td style="text-align:center"><button class="purchase-btn" onclick="togglePurchased(\''+item.id+'\',\''+phase+'\')">'+(purchased?'✓':'○')+'</button></td>';
+    html += '</tr>';
+  });
+
+  html += '</tbody>';
+
+  // Add item row
+  html += '<tfoot><tr><td colspan="5">';
+  html += '<div class="add-item-row">';
+  html += '<input class="add-input" type="text" id="add-name-'+phase+'" placeholder="Add custom item...">';
+  html += '<input class="add-input" type="number" id="add-est-'+phase+'" placeholder="Est. $" style="max-width:90px">';
+  html += '<button class="add-btn" onclick="addCustomItem(\''+phase+'\')">+ Add</button>';
+  html += '</div>';
+  html += '</td></tr></tfoot>';
+
+  table.innerHTML = html;
+  updatePhaseTotal(phase);
+}
+
+function updatePhaseTotal(phase){
+  var el = document.getElementById('total-'+phase);
+  if(!el) return;
+  var c = calcPhase(phase);
+  el.innerHTML = '<span style="color:var(--ember)">$'+c.spent.toFixed(0)+' spent</span> · <span style="color:var(--stone)">$'+c.estRemain.toFixed(0)+' estimated remaining</span> · <span style="color:var(--jade)">'+c.purchasedCount+'/'+c.count+' items</span>';
+}
+
+function renderSummary(){
+  var phases = [
+    {key:'day1',   label:'Day 1 — Sunday',        color:'var(--ember)'},
+    {key:'week1',  label:'Week 1 — Transformation',color:'var(--gold)'},
+    {key:'week2',  label:'Week 2 — Structure',     color:'var(--jade)'},
+    {key:'month1', label:'Month 1+ — Loft',        color:'var(--stone)'},
+  ];
+
+  var grid = document.getElementById('summary-grid');
+  var totals = document.getElementById('summary-phase-totals');
+  var all = calcAll();
+
+  // Summary cards
+  var budgetLeft = state.budget - all.spent;
+  var budgetAfterEst = state.budget - all.spent - all.estRemain;
+  var saved = all.estRemain - (all.estRemain); // placeholder
+
+  grid.innerHTML = [
+    {label:'Total Spent', val:'$'+all.spent.toFixed(0), cls:'scv-spent'},
+    {label:'Estimated Still Needed', val:'$'+all.estRemain.toFixed(0), cls:'scv-est'},
+    {label:'Budget Remaining', val:'$'+Math.max(0,budgetLeft).toFixed(0), cls:'scv-remain'},
+    {label:'After All Estimates', val: (budgetAfterEst>=0?'+':'')+budgetAfterEst.toFixed(0), cls: budgetAfterEst>=0?'scv-saved':'scv-spent'},
+  ].map(function(c){
+    return '<div class="summary-card"><div class="summary-card-label">'+c.label+'</div><div class="summary-card-val '+c.cls+'">'+c.val+'</div></div>';
+  }).join('');
+
+  // Phase breakdown table
+  var thtml = '<table class="item-table"><thead><tr><th>Phase</th><th class="right">Spent</th><th class="right">Est. Remaining</th><th class="right">Phase Total</th><th class="center">Progress</th></tr></thead><tbody>';
+  phases.forEach(function(p){
+    var c = calcPhase(p.key);
+    var pct = c.count>0 ? Math.round(c.purchasedCount/c.count*100) : 0;
+    thtml += '<tr class="item-row" onclick="showPanel(\''+p.key+'\')" style="cursor:pointer">';
+    thtml += '<td><div class="item-name" style="color:'+p.color+'">'+p.label+'</div></td>';
+    thtml += '<td class="item-est" style="color:var(--ember)">$'+c.spent.toFixed(0)+'</td>';
+    thtml += '<td class="item-est" style="color:var(--stone)">$'+c.estRemain.toFixed(0)+'</td>';
+    thtml += '<td class="item-est" style="color:'+p.color+'">$'+c.total.toFixed(0)+'</td>';
+    thtml += '<td style="text-align:center"><div style="font-family:Cinzel,serif;font-size:0.65rem;color:'+p.color+'">'+c.purchasedCount+'/'+c.count+'</div><div style="background:rgba(255,255,255,0.06);height:4px;border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+p.color+';border-radius:2px;transition:width 0.4s"></div></div></td>';
+    thtml += '</tr>';
+  });
+  thtml += '</tbody></table>';
+  totals.innerHTML = thtml;
+}
+
+function updateHero(){
+  var all = calcAll();
+  var pct = state.budget>0 ? Math.min(100,all.spent/state.budget*100) : 0;
+  var estPct = state.budget>0 ? Math.min(100,(all.spent+all.estRemain)/state.budget*100) : 0;
+  document.getElementById('hero-spent').textContent = '$'+all.spent.toFixed(0);
+  document.getElementById('hero-est').textContent = '$'+all.estRemain.toFixed(0);
+  document.getElementById('hero-remain').textContent = '$'+Math.max(0,state.budget-all.spent).toFixed(0);
+  document.getElementById('hero-total').textContent = '$'+state.budget;
+  document.getElementById('bar-spent').style.width = pct+'%';
+  document.getElementById('bar-est').style.width = estPct+'%';
+  document.getElementById('bar-pct').textContent = pct.toFixed(0)+'% used';
+  document.getElementById('bar-pct').style.color = pct>90?'var(--ember)':pct>70?'var(--gold)':'var(--jade)';
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────
+function togglePurchased(id, phase){
+  state.purchased[id] = !state.purchased[id];
+  save();
+  renderTable(phase);
+  renderSummary();
+  updateHero();
+}
+
+function setActual(id, phase, val){
+  state.actuals[id] = val;
+  save();
+  updatePhaseTotal(phase);
+  renderSummary();
+  updateHero();
+}
+
+function addCustomItem(phase){
+  var nameEl = document.getElementById('add-name-'+phase);
+  var estEl = document.getElementById('add-est-'+phase);
+  var name = nameEl.value.trim();
+  var est = parseFloat(estEl.value)||0;
+  if(!name) return;
+  if(!state.customItems[phase]) state.customItems[phase]=[];
+  var id = 'custom_'+Date.now();
+  state.customItems[phase].push({id:id, name:name, note:'Custom item', est:est, priority:'later'});
+  nameEl.value=''; estEl.value='';
+  save();
+  renderTable(phase);
+  renderSummary();
+  updateHero();
+}
+
+function updateBudget(val){
+  state.budget = parseFloat(val)||750;
+  save();
+  updateHero();
+  renderSummary();
+}
+
+function showPanel(name){
+  document.querySelectorAll('.phase-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.phase-tab').forEach(function(t){ t.classList.remove('active'); });
+  var panel = document.getElementById('panel-'+name);
+  if(panel) panel.classList.add('active');
+  document.querySelectorAll('.phase-tab').forEach(function(t){
+    if(t.textContent.toLowerCase().includes(name)||
+      (name==='day1'&&t.textContent.includes('Day'))||
+      (name==='week1'&&t.textContent.includes('Week 1'))||
+      (name==='week2'&&t.textContent.includes('Week 2'))||
+      (name==='month1'&&t.textContent.includes('Month'))||
+      (name==='settings'&&t.textContent.includes('Settings'))||
+      (name==='summary'&&t.textContent.includes('Summary'))
+    ) t.classList.add('active');
+  });
+}
+
+function clearAll(){
+  if(confirm('Reset all tracking data? This cannot be undone.')){
+    state.purchased={};state.actuals={};state.customItems={};
+    save(); init();
+  }
+}
+
+function init(){
+  load();
+  document.getElementById('budget-total-input').value = state.budget;
+  ['day1','week1','week2','month1'].forEach(function(p){ renderTable(p); });
+  renderSummary();
+  updateHero();
+}
+
+init();
+</script>
+</body>
+</html>

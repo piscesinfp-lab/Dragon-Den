@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collection Sourcing — Dragon Den</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void:#07090a; --deep:#0c1210; --moss:#2a4530; --jade:#3d7a4a;
+    --stone:#7a7060; --cream:#e8dcc8; --ember:#c8401a; --gold:#c9933a;
+    --mist:rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.97); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  .hero { min-height:55vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 55% 55% at 20% 75%,rgba(200,64,26,0.12) 0%,transparent 55%), radial-gradient(ellipse 45% 45% at 80% 25%,rgba(201,147,58,0.1) 0%,transparent 50%); }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--ember); text-transform:uppercase; margin-bottom:14px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,4.5rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--ember) 45%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:1rem; margin-top:12px; position:relative; }
+  .hero-divider { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--ember),transparent); margin:22px auto; position:relative; }
+
+  section { max-width:900px; margin:0 auto; padding:70px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.ember { color:var(--ember); }
+  .section-tag.gold { color:var(--gold); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.6rem,4vw,2.5rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:1rem; line-height:1.75; margin-bottom:32px; max-width:640px; }
+
+  /* PHILOSOPHY */
+  .philosophy-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-bottom:28px; }
+  .phil-card { padding:28px; position:relative; }
+  .phil-card.a { background:linear-gradient(135deg,rgba(200,64,26,0.08),rgba(12,18,16,0.8)); border:1px solid rgba(200,64,26,0.15); }
+  .phil-card.b { background:linear-gradient(135deg,rgba(61,122,74,0.08),rgba(12,18,16,0.8)); border:1px solid rgba(61,122,74,0.15); }
+  .phil-label { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:10px; }
+  .phil-card.a .phil-label { color:var(--ember); }
+  .phil-card.b .phil-label { color:var(--jade); }
+  .phil-card h3 { font-family:'Cinzel',serif; font-size:1.1rem; color:var(--cream); margin-bottom:12px; font-weight:600; line-height:1.2; }
+  .phil-card p { font-size:0.88rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  /* COLLECTOR TYPE */
+  .type-banner { background:var(--deep); border:1px solid rgba(201,147,58,0.25); border-radius:3px; padding:28px 32px; margin-bottom:28px; position:relative; overflow:hidden; }
+  .type-banner::after { content:'📚'; position:absolute; right:20px; top:50%; transform:translateY(-50%); font-size:60px; opacity:0.08; }
+  .type-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.35em; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
+  .type-banner h3 { font-family:'Cinzel',serif; font-size:1.3rem; color:var(--cream); margin-bottom:12px; font-weight:600; }
+  .type-banner p { font-size:0.92rem; color:var(--stone); line-height:1.75; font-style:italic; }
+
+  /* CATEGORY CARDS */
+  .cat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+  .cat-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .cat-header { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .cat-icon { font-size:1.4rem; margin-bottom:8px; }
+  .cat-name { font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:0.12em; color:var(--cream); font-weight:600; }
+  .cat-vibe { font-size:0.8rem; color:var(--stone); font-style:italic; margin-top:3px; }
+  .cat-body { padding:16px 20px; }
+  .cat-body ul { list-style:none; display:flex; flex-direction:column; gap:7px; }
+  .cat-body li { font-size:0.84rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .cat-body li::before { content:'▸'; position:absolute; left:0; color:var(--jade); font-size:0.6rem; top:4px; }
+  .cat-body li strong { color:var(--cream); font-weight:400; }
+  .cat-where { padding:12px 20px; background:rgba(255,255,255,0.02); border-top:1px solid rgba(255,255,255,0.04); font-size:0.78rem; color:var(--jade); font-family:'Cinzel',serif; letter-spacing:0.08em; }
+
+  /* SOURCE TABLE */
+  .source-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .source-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:20px; }
+  .source-name { font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:4px; font-weight:600; }
+  .source-type { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.2em; color:var(--jade); text-transform:uppercase; margin-bottom:10px; }
+  .source-card ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .source-card li { font-size:0.83rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .source-card li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.1rem; line-height:1; }
+  .source-card li strong { color:var(--cream); font-weight:400; }
+
+  /* EXISTING STUFF */
+  .existing-table { width:100%; border-collapse:collapse; background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .existing-table th { font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss); background:#0a0e0c; }
+  .existing-table td { padding:12px 16px; font-size:0.85rem; color:var(--stone); border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.5; vertical-align:top; }
+  .existing-table tr:hover td { background:var(--mist); }
+  .existing-table td:first-child { color:var(--cream); }
+  .verdict { display:inline-block; padding:2px 9px; border-radius:20px; font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.05em; }
+  .v-keep { background:rgba(61,122,74,0.2); color:var(--jade); }
+  .v-store { background:rgba(201,147,58,0.2); color:var(--gold); }
+  .v-donate { background:rgba(200,64,26,0.15); color:var(--ember); }
+  .v-decide { background:rgba(255,255,255,0.08); color:var(--stone); }
+
+  /* TRACKER */
+  .tracker { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .tracker-header { background:#0a0e0c; padding:12px 16px; display:grid; grid-template-columns:1fr 100px 100px 80px; gap:8px; border-bottom:1px solid rgba(255,255,255,0.05); }
+  .tracker-header span { font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.2em; color:var(--jade); text-transform:uppercase; }
+  .tracker-item { display:grid; grid-template-columns:1fr 100px 100px 80px; gap:8px; padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.03); align-items:center; cursor:pointer; transition:background 0.15s; }
+  .tracker-item:last-child { border-bottom:none; }
+  .tracker-item:hover { background:var(--mist); }
+  .tracker-item.owned { background:rgba(61,122,74,0.04); }
+  .tracker-item.owned .ti-name { color:var(--jade); }
+  .ti-name { font-size:0.86rem; color:var(--cream); line-height:1.3; }
+  .ti-note { font-size:0.74rem; color:var(--stone); font-style:italic; margin-top:2px; }
+  .ti-cat { font-family:'Cinzel',serif; font-size:0.62rem; color:var(--stone); letter-spacing:0.05em; }
+  .ti-price { font-family:'Cinzel',serif; font-size:0.7rem; color:var(--gold); }
+  .ti-status { display:flex; align-items:center; justify-content:center; }
+  .own-btn { width:26px; height:26px; border-radius:2px; border:1px solid rgba(255,255,255,0.1); background:transparent; cursor:pointer; font-size:0.65rem; color:var(--stone); transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+  .own-btn:hover { border-color:var(--jade); color:var(--jade); }
+  .tracker-item.owned .own-btn { background:rgba(61,122,74,0.2); border-color:var(--jade); color:var(--jade); }
+  .add-row { display:grid; grid-template-columns:1fr 100px 100px 80px; gap:8px; padding:10px 16px; border-top:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); align-items:center; }
+  .add-in { font-family:'Crimson Pro',serif; font-size:0.85rem; color:var(--cream); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:2px; padding:6px 10px; outline:none; width:100%; }
+  .add-in:focus { border-color:var(--jade); }
+  .add-in::placeholder { color:rgba(255,255,255,0.18); font-style:italic; }
+  .add-btn-sm { font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.15em; color:var(--jade); background:rgba(61,122,74,0.1); border:1px solid rgba(61,122,74,0.3); border-radius:2px; padding:6px 10px; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+  .add-btn-sm:hover { background:rgba(61,122,74,0.2); }
+
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:20px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .card:hover { border-color:rgba(61,122,74,0.3); }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--jade),transparent); }
+  .card.ember::before { background:linear-gradient(90deg,var(--ember),transparent); }
+  .card.gold::before { background:linear-gradient(90deg,var(--gold),transparent); }
+  .card-icon { font-size:1.3rem; margin-bottom:10px; }
+  .card h4 { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:10px; font-weight:600; }
+  .card p { font-size:0.86rem; color:var(--stone); line-height:1.65; font-style:italic; margin-bottom:10px; }
+  .card ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .card li { font-size:0.84rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .card li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.2rem; line-height:1; }
+  .card.ember li::before { color:var(--ember); }
+  .card.gold li::before { color:var(--gold); }
+  .card li strong { color:var(--cream); font-weight:400; }
+
+  .callout { padding:18px 22px; border-radius:3px; margin:20px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout.ember { border-left-color:var(--ember); background:rgba(200,64,26,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:8px; }
+  .callout.gold h5 { color:var(--gold); }
+  .callout.ember h5 { color:var(--ember); }
+  .callout p { font-size:0.9rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.25),transparent); }
+  footer { text-align:center; padding:50px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.18); letter-spacing:0.2em; }
+
+  @media(max-width:600px){ .philosophy-grid { grid-template-columns:1fr; } .tracker-header,.tracker-item,.add-row { grid-template-columns:1fr 70px 50px; } .tracker-header span:nth-child(3),.ti-cat { display:none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Collection</div>
+  <a onclick="nav('philosophy')">Philosophy</a>
+  <a onclick="nav('yourtype')">Your Type</a>
+  <a onclick="nav('categories')">Categories</a>
+  <a onclick="nav('existing')">Existing Stuff</a>
+  <a onclick="nav('sources')">Where to Find</a>
+  <a onclick="nav('tracker')">My Collection</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Collection + Sourcing · Dragon Den</div>
+  <h1 class="hero-title">The Art of<br>Collecting</h1>
+  <p class="hero-sub">Books · gadgets · one dragon at a time · intentional over abundant</p>
+  <div class="hero-divider"></div>
+</div>
+
+<!-- PHILOSOPHY -->
+<div class="divider"></div>
+<section id="philosophy">
+  <div class="section-tag ember">The Foundation</div>
+  <h2>Two Ways to Collect</h2>
+  <p class="intro">Understanding which kind of collector you are determines everything about how you source, display, and grow a collection that feels like yours — not like a store shelf.</p>
+
+  <div class="philosophy-grid">
+    <div class="phil-card a">
+      <div class="phil-label">✗ The Accumulator</div>
+      <h3>Quantity First</h3>
+      <p>Buys things because they're dragon-themed. Fills shelves to make them look "full." Ends up with dozens of mediocre pieces that dilute each other. The shelf looks busy but nothing stands out. You stop seeing any of it within a month.</p>
+    </div>
+    <div class="phil-card b">
+      <div class="phil-label">✓ The Curator</div>
+      <h3>Story First</h3>
+      <p>Buys things because they mean something — a book that changed how you think, a figure from a world you love, a gadget that's genuinely beautiful. The shelf is never "full." Each piece is visible. You know the story of every object on it.</p>
+    </div>
+  </div>
+
+  <div class="callout ember">
+    <h5>You're Already a Curator — You Just Don't Know It Yet</h5>
+    <p>You said you like collecting things generally — books, small gadgets. That's not "useless accumulation," that's the foundation of a real collection. The dragon aesthetic is the thread that runs through it, not the thing you're exclusively collecting. A shelf with three meaningful dragon pieces, two books with beautiful dark spines, and one interesting gadget tells a richer story than fifteen dragon figurines from Amazon.</p>
+  </div>
+</section>
+
+<!-- YOUR COLLECTOR TYPE -->
+<div class="divider"></div>
+<section id="yourtype">
+  <div class="section-tag gold">Your Collector Profile</div>
+  <h2>The Scholar-Hoarder</h2>
+  <p class="intro">Based on what you've shared — books, gadgets, starting minimal on dragons — you're a specific type of collector. Here's how to lean into it.</p>
+
+  <div class="type-banner">
+    <div class="type-tag">Your Collector Archetype</div>
+    <h3>The Scholar-Hoarder with Dragon Taste</h3>
+    <p>You collect knowledge (books), interesting objects (gadgets), and you have an aesthetic that runs toward dark fantasy and dragons. You don't need a lot of dragon figurines to make the Den feel like yours — you need your existing collections to be displayed as if they belong in this world. A row of dark-spined fantasy novels IS dragon aesthetic. A beautifully designed piece of tech IS dragon aesthetic. The dragon pieces you add over time accent a collection that already exists — they don't build it from scratch.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">📚</div>
+      <h4>Books as Display Objects</h4>
+      <p>Your existing books are shelf material. How you display them transforms them from storage into decor.</p>
+      <ul>
+        <li><strong>Spine-out display:</strong> Dark spines forward, light spines turned inward or removed — creates visual cohesion instantly</li>
+        <li><strong>Genre grouping:</strong> Fantasy + dark fiction together on the dragon shelf. Science + tech together on the desk shelf</li>
+        <li><strong>Horizontal stacking:</strong> Stack 3–4 books flat, place a small object on top — creates depth and visual interest</li>
+        <li><strong>One book always forward-facing</strong> — your current read, displayed cover-out like a small painting</li>
+        <li>Books in dark, jewel-toned, or textured covers read beautifully under warm amber LED underlighting</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚙️</div>
+      <h4>Gadgets as Artifacts</h4>
+      <p>The right gadgets displayed well look like artifacts from an advanced civilization — which is exactly the tech-fantasy crossover you're going for.</p>
+      <ul>
+        <li>A beautiful mechanical keyboard on a stand reads like a relic</li>
+        <li>A vintage or unusual clock — especially anything with exposed gears — is on-theme</li>
+        <li>A small desk globe, compass, or navigation instrument bridges fantasy and tech</li>
+        <li>Dark-finished tech (matte black, gunmetal) displays better than bright silver or white</li>
+        <li>Rule: if a gadget is beautiful enough to be out on a shelf, it earns shelf space. If it's purely functional, it lives in a drawer</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🐉</div>
+      <h4>Dragons as Accents</h4>
+      <p>Since you're starting minimal on actual dragon pieces, each one you add carries more weight — use that.</p>
+      <ul>
+        <li>One or two intentional pieces per year beats twelve impulse purchases</li>
+        <li>Look for dragons in materials that fit your palette: dark resin, bronze/copper metal, stone-look ceramic, black wood</li>
+        <li>Avoid: bright-colored dragons, plastic-looking dragons, anything that reads "gift shop souvenir"</li>
+        <li>The shrine piece on the top shelf should be something you genuinely love — not the first dragon you found</li>
+        <li>A dragon that looks like it was carved by someone who believed in dragons > a dragon that looks like it was made in a factory</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<div class="divider"></div>
+<section id="categories">
+  <div class="section-tag">Collection Categories</div>
+  <h2>What Goes on the Shelves</h2>
+  <p class="intro">Five categories that all belong in the Dragon Den world. Mix them across the three shelf tiers for a display that tells a layered story.</p>
+
+  <div class="cat-grid">
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon">📖</div>
+        <div class="cat-name">Dark Fantasy Books</div>
+        <div class="cat-vibe">The intellectual spine of the collection</div>
+      </div>
+      <div class="cat-body">
+        <ul>
+          <li>Brandon Sanderson's Stormlight Archive — enormous dark-spined hardcovers</li>
+          <li>The Name of the Wind (Kingkiller Chronicle) — Rothfuss</li>
+          <li>Cradle series by Will Wight — cultivation fantasy, Solo Leveling energy</li>
+          <li>The First Law trilogy by Joe Abercrombie — dark, morally complex</li>
+          <li>House of Salt and Sorrows, anything by Erin A. Craig — dark atmospheric covers</li>
+          <li>Art of books — The Art of Dragon Age, The Art of Dark Souls — gorgeous on shelves</li>
+          <li>Any book with a dark jewel-toned or black spine reads perfectly under amber lighting</li>
+        </ul>
+      </div>
+      <div class="cat-where">Find: Barnes & Noble, Thriftbooks, local used bookstores, eBay for art books</div>
+    </div>
+
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon">🐉</div>
+        <div class="cat-name">Dragon Figures</div>
+        <div class="cat-vibe">The heart of the shrine — slow and intentional</div>
+      </div>
+      <div class="cat-body">
+        <ul>
+          <li><strong>Resin/polystone:</strong> McFarlane Toys dragons — dark, detailed, affordable ($20–60)</li>
+          <li><strong>Metal-cast:</strong> Veronese or Summit Collection bronze-look dragons — feel ancient</li>
+          <li><strong>Ceramic/stone-look:</strong> Design Toscano — heavier, more sculptural feel</li>
+          <li><strong>High-end:</strong> Sideshow Collectibles, Statue.com — save for the shrine piece</li>
+          <li><strong>Handmade:</strong> Etsy sculptors — one-of-a-kind, often dark and detailed</li>
+          <li>Avoid: anything with bright rainbow coloring or a "cute" expression — go fierce or ancient</li>
+          <li>Material hierarchy: stone-look > metal > dark resin > plastic</li>
+        </ul>
+      </div>
+      <div class="cat-where">Find: Etsy, Amazon (McFarlane), Design Toscano website, local fantasy/game stores</div>
+    </div>
+
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon">⚙️</div>
+        <div class="cat-name">Interesting Gadgets</div>
+        <div class="cat-vibe">Tech-fantasy crossover artifacts</div>
+      </div>
+      <div class="cat-body">
+        <ul>
+          <li><strong>Mechanical things:</strong> Exposed-gear clocks, mechanical hourglasses, astrolabes</li>
+          <li><strong>Navigation instruments:</strong> Compass (matte black or brass), sextant, small globe</li>
+          <li><strong>Dice accessories:</strong> Beautiful dice towers, wooden dice trays, metal dice sets</li>
+          <li><strong>Desk tech:</strong> Matte black wireless charger, interesting USB hub, sculptural phone stand</li>
+          <li><strong>Writing instruments:</strong> A quality dark-finished pen displayed in a holder</li>
+          <li><strong>Curiosities:</strong> Geode, crystal cluster (black tourmaline, obsidian), fossil</li>
+          <li>Rule: if you'd use it AND display it, it earns shelf space. Pure display-only items need to be exceptional</li>
+        </ul>
+      </div>
+      <div class="cat-where">Find: Uncommon Goods, ThinkGeek/GameStop, Etsy, Amazon, local antique shops</div>
+    </div>
+
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon">🗺️</div>
+        <div class="cat-name">Maps + Art Prints</div>
+        <div class="cat-vibe">The walls of the world</div>
+      </div>
+      <div class="cat-body">
+        <ul>
+          <li><strong>Fantasy maps:</strong> Tolkien's Middle Earth, Westeros, custom world maps — dark aged-paper style</li>
+          <li><strong>Dragon art:</strong> Digital artists on Artstation — find one you genuinely love, print it</li>
+          <li><strong>Game art:</strong> Dark Souls, Elden Ring, Dragon Age official art — dark, atmospheric</li>
+          <li><strong>Anime art:</strong> Solo Leveling, Overlord, That Time I Got Reincarnated as a Slime — fits the isekai love</li>
+          <li>Frame consistently — matte black frames, same or coordinating sizes</li>
+          <li>Odd number of prints on a wall always reads better than even</li>
+          <li>One large print hits harder than three small ones</li>
+        </ul>
+      </div>
+      <div class="cat-where">Find: Etsy, Redbubble, Artstation (contact artist), Gaming store posters, local print shops</div>
+    </div>
+
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon">🌿</div>
+        <div class="cat-name">Natural Curiosities</div>
+        <div class="cat-vibe">The forest brought inside</div>
+      </div>
+      <div class="cat-body">
+        <ul>
+          <li><strong>Crystals + minerals:</strong> Black tourmaline, obsidian, labradorite, malachite — dark, natural, on-theme</li>
+          <li><strong>Fossils:</strong> Ammonite, shark tooth, small trilobite — ancient, tactile, conversation pieces</li>
+          <li><strong>Driftwood:</strong> A piece of interesting driftwood as a shelf prop — costs nothing</li>
+          <li><strong>Antlers:</strong> Shed deer antler (ethical — the deer dropped it) displayed on a shelf</li>
+          <li><strong>Stones:</strong> Interesting rocks from places you've been — free, meaningful, textural</li>
+          <li>Natural objects ground the fantasy aesthetic in something real and tactile</li>
+          <li>A beautiful rock from a meaningful place > any purchased trinket</li>
+        </ul>
+      </div>
+      <div class="cat-where">Find: Nature (free), rock/gem shows, Etsy, local crystal shops, natural history museum stores</div>
+    </div>
+
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon">🎲</div>
+        <div class="cat-name">Gaming Artifacts</div>
+        <div class="cat-vibe">The tools of the quest — displayed</div>
+      </div>
+      <div class="cat-body">
+        <ul>
+          <li><strong>Metal dice sets:</strong> A set of dark metal dice in a wooden box displayed open on the shelf</li>
+          <li><strong>DnD miniatures:</strong> A few painted minis on display — characters from your campaigns</li>
+          <li><strong>Game editions:</strong> Special edition game boxes — Collector's editions of games you love</li>
+          <li><strong>Controllers:</strong> A limited edition or custom dark controller on a stand</li>
+          <li><strong>Rulebooks:</strong> Nice hardcover DnD books displayed spine-out — they're beautiful objects</li>
+          <li>Gaming artifacts are the most "you" items on the shelf — they tell your specific story</li>
+          <li>Display things you actually use, not just things that look like you might</li>
+        </ul>
+      </div>
+      <div class="cat-where">Find: Local game store, Kickstarter for special editions, Etsy for custom dice, Amazon</div>
+    </div>
+  </div>
+</section>
+
+<!-- EXISTING STUFF -->
+<div class="divider"></div>
+<section id="existing">
+  <div class="section-tag gold">Your Existing Collection</div>
+  <h2>What to Do With What You Have</h2>
+  <p class="intro">You mentioned "a bunch of useless memento stuff." Here's a framework for sorting through it — keep what earns a place, store what has meaning but doesn't fit, donate the rest.</p>
+
+  <div class="callout gold">
+    <h5>The Three-Box Sort</h5>
+    <p>Get three boxes before you unpack any decorative objects. Label them: <strong style="color:var(--cream)">Display</strong> (earns shelf space in the Den), <strong style="color:var(--cream)">Store</strong> (meaningful but doesn't fit — goes in a labeled bin in the closet), <strong style="color:var(--cream)">Release</strong> (donate, gift, or discard). Do this before anything touches a shelf. It takes an hour and saves months of visual noise.</p>
+  </div>
+
+  <table class="existing-table">
+    <thead>
+      <tr>
+        <th>Object Type</th>
+        <th>Typical Verdict</th>
+        <th>Logic</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Dark-spined fantasy/sci-fi books</td><td><span class="verdict v-keep">Display</span></td><td>Spine-out on dragon shelves — they're already decor</td></tr>
+      <tr><td>Light-spined or mass-market paperbacks</td><td><span class="verdict v-store">Store</span></td><td>Spine-in or stored — they fight the dark palette visually</td></tr>
+      <tr><td>Interesting gadgets (dark or metal finish)</td><td><span class="verdict v-keep">Display</span></td><td>Artifacts — earn shelf space if they look interesting</td></tr>
+      <tr><td>Bright plastic gadgets or toys</td><td><span class="verdict v-store">Store</span></td><td>Don't fit the palette — store or donate unless truly meaningful</td></tr>
+      <tr><td>Sentimental gifts that don't fit aesthetic</td><td><span class="verdict v-store">Store</span></td><td>Memory shelf in closet — honored but not on display</td></tr>
+      <tr><td>Random trinkets and souvenirs</td><td><span class="verdict v-donate">Release</span></td><td>If you can't remember where it came from, let it go</td></tr>
+      <tr><td>Photos and personal keepsakes</td><td><span class="verdict v-decide">Decide</span></td><td>One framed photo in a dark frame can live on a shelf — more than one becomes a gallery, not a collection</td></tr>
+      <tr><td>Anime figures (dark palette)</td><td><span class="verdict v-keep">Display</span></td><td>Solo Leveling, dark fantasy, goth-adjacent characters — absolutely on-theme</td></tr>
+      <tr><td>Anime figures (bright palette)</td><td><span class="verdict v-store">Store</span></td><td>Store until you have a dedicated space for them or rotate with dark pieces</td></tr>
+      <tr><td>Crystals or natural objects</td><td><span class="verdict v-keep">Display</span></td><td>Dark crystals (obsidian, tourmaline, labradorite) — yes. Pink or pastel — store</td></tr>
+      <tr><td>Old gaming peripherals or boxes</td><td><span class="verdict v-donate">Release</span></td><td>Unless genuinely beautiful or meaningful, these are clutter</td></tr>
+      <tr><td>DnD books, rulebooks, campaign notes</td><td><span class="verdict v-keep">Display</span></td><td>Hardcover editions spine-out on the loft bookshelf — they look great</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- WHERE TO FIND -->
+<div class="divider"></div>
+<section id="sources">
+  <div class="section-tag">Sourcing Guide</div>
+  <h2>Where to Find the Right Things</h2>
+  <p class="intro">Sourced by category and budget. The best pieces almost never come from big-box stores.</p>
+
+  <div class="source-grid">
+    <div class="source-card">
+      <div class="source-name">Etsy</div>
+      <div class="source-type">Best for: unique + handmade</div>
+      <ul>
+        <li>Handmade dragon sculptures — search "dark dragon sculpture resin"</li>
+        <li>Fantasy art prints — search "dark fantasy art print" + your palette colors</li>
+        <li>Custom dice trays and wooden boxes</li>
+        <li>Fantasy map prints — search "aged fantasy map"</li>
+        <li>One-of-a-kind pieces that no one else has</li>
+        <li><strong>Budget:</strong> $15–150 for most pieces</li>
+      </ul>
+    </div>
+    <div class="source-card">
+      <div class="source-name">Local Game + Comic Stores</div>
+      <div class="source-type">Best for: browsing + discovery</div>
+      <ul>
+        <li>DnD miniatures and campaign accessories</li>
+        <li>Metal dice sets — handle them before buying</li>
+        <li>Game art prints and posters</li>
+        <li>Collectible figures from franchises you love</li>
+        <li>Staff recommendations lead to great finds</li>
+        <li><strong>Budget:</strong> $10–80 for most pieces</li>
+      </ul>
+    </div>
+    <div class="source-card">
+      <div class="source-name">Thrift Stores + Antique Shops</div>
+      <div class="source-type">Best for: unexpected finds</div>
+      <ul>
+        <li>Interesting old books with beautiful covers or spines</li>
+        <li>Brass or bronze decorative objects — compass, inkwell, figurine</li>
+        <li>Interesting rocks, crystals, natural curiosities</li>
+        <li>Small sculptures that happen to fit the aesthetic</li>
+        <li>Patience is required — go regularly, don't go looking for something specific</li>
+        <li><strong>Budget:</strong> $1–30 for most pieces</li>
+      </ul>
+    </div>
+    <div class="source-card">
+      <div class="source-name">Gem + Rock Shows</div>
+      <div class="source-type">Best for: natural curiosities</div>
+      <ul>
+        <li>Obsidian, black tourmaline, labradorite, malachite</li>
+        <li>Fossils — ammonites, shark teeth, trilobites</li>
+        <li>Raw crystal clusters — dramatic and natural</li>
+        <li>Massachusetts has regional gem shows — search "gem show Massachusetts 2024"</li>
+        <li>Prices are dramatically lower than crystal shops</li>
+        <li><strong>Budget:</strong> $5–40 for most pieces</li>
+      </ul>
+    </div>
+    <div class="source-card">
+      <div class="source-name">Thriftbooks + AbeBooks</div>
+      <div class="source-type">Best for: books cheap</div>
+      <ul>
+        <li>Hardcover fantasy novels for $4–8 that would be $30 new</li>
+        <li>Collector's editions and out-of-print books</li>
+        <li>Art books for games and films — often $10–20 used vs $50 new</li>
+        <li>Search by spine color — "dark spine fantasy hardcover" finds aesthetically cohesive sets</li>
+        <li><strong>Budget:</strong> $3–20 per book</li>
+      </ul>
+    </div>
+    <div class="source-card">
+      <div class="source-name">Design Toscano</div>
+      <div class="source-type">Best for: sculptural dragon pieces</div>
+      <ul>
+        <li>The best dedicated source for quality dragon sculptures at non-insane prices</li>
+        <li>Stone-look, bronze-look, and resin pieces — all designed to look ancient</li>
+        <li>Dragons specifically designed for display — not gift-shop aesthetic</li>
+        <li>Wait for their sales — they discount frequently, 20–40% off</li>
+        <li><strong>Budget:</strong> $30–120 for most pieces</li>
+      </ul>
+    </div>
+    <div class="source-card">
+      <div class="source-name">Kickstarter + BackerKit</div>
+      <div class="source-type">Best for: special editions + games</div>
+      <ul>
+        <li>Limited edition DnD campaigns — stunning books and dice sets</li>
+        <li>Indie game special editions with beautiful physical components</li>
+        <li>Custom dice campaigns — metal, stone, hand-carved</li>
+        <li>You back a project and it arrives months later — good for planned spending</li>
+        <li><strong>Budget:</strong> $25–100 per campaign</li>
+      </ul>
+    </div>
+    <div class="source-card">
+      <div class="source-name">Your Own Life</div>
+      <div class="source-type">Best for: meaningful objects</div>
+      <ul>
+        <li>A rock from somewhere that mattered to you</li>
+        <li>A book that changed how you think — displayed cover-out</li>
+        <li>Something you made, built, or fixed</li>
+        <li>These are the objects people ask about — the ones with a story</li>
+        <li>No source produces more meaningful shelf objects than your own experience</li>
+        <li><strong>Budget:</strong> Free</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION TRACKER -->
+<div class="divider"></div>
+<section id="tracker">
+  <div class="section-tag ember">My Collection</div>
+  <h2>Collection Tracker</h2>
+  <p class="intro">Track what you have, what you want, and what shelf it lives on. Click ✓ to mark something as owned. Add your own pieces below.</p>
+
+  <div class="tracker">
+    <div class="tracker-header">
+      <span>Item</span>
+      <span>Category</span>
+      <span>Est. Price</span>
+      <span>Owned</span>
+    </div>
+    <div id="tracker-body"></div>
+    <div class="add-row">
+      <input class="add-in" id="add-item-name" placeholder="Add to your wish list...">
+      <input class="add-in" id="add-item-cat" placeholder="Category">
+      <input class="add-in" id="add-item-price" placeholder="$" type="number">
+      <button class="add-btn-sm" onclick="addTrackerItem()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <h5>The One-Per-Month Rule</h5>
+    <p>Add one intentional piece per month maximum. This sounds slow — it isn't. In 6 months you have 6 meaningful objects. In a year you have 12. Each one was chosen with care and has earned its shelf space. Compare that to 50 impulse purchases that you stop seeing within two weeks. The restraint is the practice.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Collection + Sourcing · Dragon Den · Collect with intention</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">🐉</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){ window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-52,behavior:'smooth'}); }
+}
+
+var DEFAULT_ITEMS = [
+  {id:'t1', name:'First dragon figure — dark resin or stone-look', cat:'Dragon', price:'$35–60', note:'The shrine piece — take your time choosing', owned:false},
+  {id:'t2', name:'Stormlight Archive hardcover set', cat:'Books', price:'$60–90', note:'Dark spines, enormous presence on a shelf', owned:false},
+  {id:'t3', name:'Metal dice set in dark finish', cat:'Gaming', price:'$25–45', note:'Displayed open in a wooden box on the shelf', owned:false},
+  {id:'t4', name:'Fantasy art print — dragon or dark landscape', cat:'Art', price:'$15–30', note:'Etsy or Redbubble, matte black frame', owned:false},
+  {id:'t5', name:'Obsidian or labradorite crystal', cat:'Natural', price:'$10–25', note:'Gem show or local crystal shop', owned:false},
+  {id:'t6', name:'Interesting mechanical desk clock', cat:'Gadget', price:'$30–70', note:'Exposed gears preferred', owned:false},
+  {id:'t7', name:'Dark Souls or Elden Ring art book', cat:'Books', price:'$20–40', note:'Used on Thriftbooks — beautiful object', owned:false},
+  {id:'t8', name:'DnD hardcover — Player\'s Handbook or DMG', cat:'Gaming', price:'$30–50', note:'Spine-out on loft bookshelf', owned:false},
+  {id:'t9', name:'Vintage-style compass — matte black or brass', cat:'Gadget', price:'$15–35', note:'Navigation artifact energy', owned:false},
+  {id:'t10', name:'Solo Leveling manga volume set', cat:'Books', price:'$40–80', note:'Dark spines, on-theme, your world', owned:false},
+  {id:'t11', name:'Ammonite or trilobite fossil', cat:'Natural', price:'$10–30', note:'Ancient, tactile, conversation piece', owned:false},
+  {id:'t12', name:'Fantasy world map print — aged paper style', cat:'Art', price:'$12–25', note:'Etsy — "aged fantasy map" — loft wall', owned:false},
+];
+
+var trackerState = {items: [], owned: {}};
+
+function saveTracker(){
+  try{ localStorage.setItem('dragon_tracker', JSON.stringify(trackerState)); }catch(e){}
+}
+function loadTracker(){
+  try{
+    var s=JSON.parse(localStorage.getItem('dragon_tracker')||'null');
+    if(s){ trackerState=s; }
+    else { trackerState.items=DEFAULT_ITEMS.map(function(i){return Object.assign({},i);}); }
+  }catch(e){ trackerState.items=DEFAULT_ITEMS.map(function(i){return Object.assign({},i);}); }
+}
+
+function renderTracker(){
+  var body=document.getElementById('tracker-body');
+  var html='';
+  trackerState.items.forEach(function(item){
+    var owned=trackerState.owned[item.id];
+    html+='<div class="tracker-item'+(owned?' owned':'')+'" id="trow-'+item.id+'">';
+    html+='<div><div class="ti-name">'+item.name+'</div><div class="ti-note">'+item.note+'</div></div>';
+    html+='<div class="ti-cat">'+item.cat+'</div>';
+    html+='<div class="ti-price">'+item.price+'</div>';
+    html+='<div class="ti-status"><button class="own-btn" onclick="toggleOwned(\''+item.id+'\')">'+(owned?'✓':'○')+'</button></div>';
+    html+='</div>';
+  });
+  body.innerHTML=html;
+}
+
+function toggleOwned(id){
+  trackerState.owned[id]=!trackerState.owned[id];
+  saveTracker(); renderTracker();
+}
+
+function addTrackerItem(){
+  var name=document.getElementById('add-item-name').value.trim();
+  var cat=document.getElementById('add-item-cat').value.trim()||'Custom';
+  var price=document.getElementById('add-item-price').value;
+  if(!name)return;
+  var item={id:'custom_'+Date.now(), name:name, cat:cat, price:price?'$'+price:'—', note:'Added by you', owned:false};
+  trackerState.items.push(item);
+  document.getElementById('add-item-name').value='';
+  document.getElementById('add-item-cat').value='';
+  document.getElementById('add-item-price').value='';
+  saveTracker(); renderTracker();
+}
+
+loadTracker(); renderTracker();
+</script>
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Forest Dragon Den — Master Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #07090a;
+    --deep: #0c1210;
+    --forest: #172918;
+    --moss: #2a4530;
+    --jade: #3d7a4a;
+    --bark: #5c3d1e;
+    --walnut: #8a6030;
+    --stone: #7a7060;
+    --cream: #e8dcc8;
+    --ember: #c8401a;
+    --gold: #c9933a;
+    --mist: rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  /* NAV */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    background: rgba(7,9,10,0.92); backdrop-filter:blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 0; overflow-x:auto;
+  }
+  .nav-brand {
+    font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.3em;
+    color:var(--jade); text-transform:uppercase; white-space:nowrap;
+    padding: 14px 20px 14px 0; border-right: 1px solid rgba(255,255,255,0.06);
+    margin-right: 4px; flex-shrink:0;
+  }
+  nav a {
+    font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.2em;
+    color:var(--stone); text-transform:uppercase; text-decoration:none;
+    padding: 14px 14px; white-space:nowrap; transition:color 0.2s; flex-shrink:0;
+  }
+  nav a:hover { color:var(--cream); }
+
+  /* HERO */
+  .hero {
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    padding: 100px 24px 60px; position:relative; overflow:hidden;
+  }
+  .hero::before {
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(61,122,74,0.15) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 50% at 80% 20%, rgba(200,64,26,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse 70% 40% at 50% 100%, rgba(42,69,48,0.2) 0%, transparent 55%);
+  }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--jade); text-transform:uppercase; margin-bottom:18px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2.5rem,8vw,5.5rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--gold) 50%,var(--ember) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:1.05rem; margin-top:14px; position:relative; letter-spacing:0.04em; }
+  .hero-divider { width:100px; height:1px; background:linear-gradient(90deg,transparent,var(--jade),transparent); margin:28px auto; position:relative; }
+
+  .hero-specs {
+    display:flex; gap:40px; justify-content:center; flex-wrap:wrap;
+    position:relative; margin-top:8px;
+  }
+  .spec { text-align:center; }
+  .spec-num { font-family:'Cinzel',serif; font-size:1.5rem; color:var(--gold); }
+  .spec-label { font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.35em; color:var(--stone); text-transform:uppercase; margin-top:3px; }
+
+  /* SECTIONS */
+  section { max-width:900px; margin:0 auto; padding:80px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.ember { color:var(--ember); }
+  .section-tag.gold { color:var(--gold); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.7rem,4vw,2.8rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:1rem; line-height:1.75; margin-bottom:36px; max-width:640px; }
+
+  /* PALETTE */
+  .palette { display:flex; gap:10px; flex-wrap:wrap; }
+  .swatch { text-align:center; }
+  .swatch-circle { width:52px; height:52px; border-radius:50%; border:1px solid rgba(255,255,255,0.08); margin-bottom:6px; }
+  .swatch-name { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.1em; color:var(--stone); text-transform:uppercase; }
+  .swatch-hex { font-size:0.65rem; color:var(--moss); }
+
+  /* WALL PLANS */
+  .wall-plan {
+    background:var(--deep); border:1px solid rgba(61,122,74,0.2);
+    border-radius:3px; margin-bottom:20px; overflow:hidden;
+  }
+  .wall-plan-header {
+    padding:14px 20px; border-bottom:1px solid rgba(61,122,74,0.15);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .wall-plan-header h4 { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.2em; color:var(--cream); font-weight:600; }
+  .wall-plan-header span { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.2em; color:var(--jade); }
+  .wall-content { padding:20px; }
+  .wall-content p { font-size:0.92rem; color:var(--stone); line-height:1.7; margin-bottom:12px; }
+  .wall-content ul { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .wall-content li { font-size:0.9rem; color:var(--stone); padding-left:16px; position:relative; line-height:1.55; }
+  .wall-content li::before { content:'▸'; position:absolute; left:0; color:var(--jade); font-size:0.65rem; top:4px; }
+  .wall-content li strong { color:var(--cream); font-weight:400; }
+
+  .wall-diagram {
+    font-family:monospace; font-size:0.68rem; line-height:1.9;
+    background:#080c0a; padding:16px 20px; border-top:1px solid rgba(61,122,74,0.1);
+    overflow-x:auto; white-space:pre;
+    color:rgba(61,122,74,0.6);
+  }
+  .wd-hi { color:var(--gold); }
+  .wd-em { color:var(--ember); }
+  .wd-gr { color:var(--jade); }
+
+  /* CARDS */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+  .card {
+    background:var(--deep); border:1px solid rgba(255,255,255,0.06);
+    border-radius:3px; padding:22px; position:relative; overflow:hidden;
+    transition:border-color 0.3s;
+  }
+  .card:hover { border-color:rgba(61,122,74,0.35); }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--jade),transparent); }
+  .card.ember::before { background:linear-gradient(90deg,var(--ember),transparent); }
+  .card.gold::before { background:linear-gradient(90deg,var(--gold),transparent); }
+  .card.stone::before { background:linear-gradient(90deg,var(--stone),transparent); }
+  .card-icon { font-size:1.5rem; margin-bottom:10px; }
+  .card h4 { font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:10px; font-weight:600; }
+  .card p { font-size:0.88rem; color:var(--stone); line-height:1.65; font-style:italic; }
+  .card ul { list-style:none; display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+  .card li { font-size:0.85rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .card li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.2rem; line-height:1; }
+  .card.ember li::before { color:var(--ember); }
+  .card.gold li::before { color:var(--gold); }
+
+  /* CALLOUT BOXES */
+  .callout {
+    padding:22px 26px; border-radius:3px; margin:24px 0;
+    border-left:2px solid var(--jade);
+    background:rgba(61,122,74,0.07);
+  }
+  .callout.ember { border-left-color:var(--ember); background:rgba(200,64,26,0.06); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:8px; }
+  .callout.ember h5 { color:var(--ember); }
+  .callout.gold h5 { color:var(--gold); }
+  .callout p { font-size:0.9rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  /* LIGHTING MOODS */
+  .mood-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  .mood-chip { border-radius:3px; padding:16px; text-align:center; border:1px solid rgba(255,255,255,0.06); background:var(--deep); }
+  .mood-orb { width:40px; height:40px; border-radius:50%; margin:0 auto 10px; }
+  .mood-name { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--cream); text-transform:uppercase; margin-bottom:5px; }
+  .mood-desc { font-size:0.8rem; color:var(--stone); font-style:italic; }
+
+  /* SHOPPING TABLE */
+  .shop-wrap { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  th { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss); }
+  td { padding:12px 16px; font-size:0.86rem; color:var(--stone); border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:var(--mist); }
+  td:first-child { color:var(--cream); }
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-family:'Cinzel',serif; font-size:0.65rem; }
+  .b-low { background:rgba(61,122,74,0.2); color:var(--jade); }
+  .b-mid { background:rgba(201,147,58,0.2); color:var(--gold); }
+  .b-hi  { background:rgba(200,64,26,0.2); color:var(--ember); }
+
+  /* DIVIDER */
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.3),transparent); margin:0; }
+
+  /* PHASE LIST */
+  .phases { display:flex; flex-direction:column; gap:16px; }
+  .phase { display:grid; grid-template-columns:44px 1fr; gap:16px; align-items:start; padding:20px; background:var(--deep); border:1px solid rgba(255,255,255,0.05); border-radius:3px; }
+  .phase-num { font-family:'Cinzel',serif; font-size:1.6rem; font-weight:900; color:rgba(61,122,74,0.3); line-height:1; }
+  .phase h4 { font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:0.15em; color:var(--cream); margin-bottom:7px; font-weight:600; }
+  .phase p { font-size:0.88rem; color:var(--stone); line-height:1.65; font-style:italic; }
+
+  footer { text-align:center; padding:60px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.2); letter-spacing:0.2em; }
+
+  @media(max-width:600px){ .hero-specs { gap:24px; } .cards { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <div class="nav-brand">Dragon Den</div>
+  <a href="#" onclick="nav('bedroom');return false;">Bedroom</a>
+  <a href="#" onclick="nav('walls');return false;">Wall Plans</a>
+  <a href="#" onclick="nav('ceiling');return false;">A-Frame</a>
+  <a href="#" onclick="nav('wood');return false;">Wood Tones</a>
+  <a href="#" onclick="nav('lighting');return false;">Lighting</a>
+  <a href="#" onclick="nav('bathroom');return false;">Bathroom</a>
+  <a href="#" onclick="nav('loft');return false;">Loft</a>
+  <a href="#" onclick="nav('shopping');return false;">Shopping</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Master Design Guide · A-Frame Home</div>
+  <h1 class="hero-title">Dark Forest<br>Dragon Den</h1>
+  <p class="hero-sub">Bedroom · Bathroom · Loft — Complete Interior Concept</p>
+  <div class="hero-divider"></div>
+  <div class="hero-specs">
+    <div class="spec"><div class="spec-num">13'6"×10'4"</div><div class="spec-label">Bedroom</div></div>
+    <div class="spec"><div class="spec-num">9'5"×5'0"</div><div class="spec-label">Bathroom</div></div>
+    <div class="spec"><div class="spec-num">27'×11'10"</div><div class="spec-label">Loft</div></div>
+    <div class="spec"><div class="spec-num">A-Frame</div><div class="spec-label">Architecture</div></div>
+  </div>
+</div>
+
+<!-- PALETTE -->
+<div class="divider"></div>
+<section>
+  <div class="section-tag">Color System</div>
+  <h2>The Palette</h2>
+  <p class="intro">Built around the existing warm wood tones, forest views, and stone fireplace. Every color already exists in this house — we're deepening and directing it.</p>
+  <div class="palette">
+    <div class="swatch"><div class="swatch-circle" style="background:#07090a"></div><div class="swatch-name">Void</div><div class="swatch-hex">Wall base</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#172918"></div><div class="swatch-name">Forest</div><div class="swatch-hex">Accent wall</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#3d7a4a"></div><div class="swatch-name">Jade</div><div class="swatch-hex">RGB / plants</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#5c3d1e"></div><div class="swatch-name">Bark</div><div class="swatch-hex">Wood tones</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#8a6030"></div><div class="swatch-name">Walnut</div><div class="swatch-hex">Warm wood</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#7a7060"></div><div class="swatch-name">Stone</div><div class="swatch-hex">Neutrals</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#c8401a"></div><div class="swatch-name">Ember</div><div class="swatch-hex">Dragon accent</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#c9933a"></div><div class="swatch-name">Gold</div><div class="swatch-hex">Candlelight</div></div>
+    <div class="swatch"><div class="swatch-circle" style="background:#e8dcc8"></div><div class="swatch-name">Cream</div><div class="swatch-hex">A-frame walls</div></div>
+  </div>
+
+  <div class="callout gold" style="margin-top:28px;">
+    <h5>Working With What's There</h5>
+    <p>The A-frame has warm honey-toned wood floors, exposed beams, and existing cream/olive walls. Don't fight them — use them. The floors ARE the bark tone. The beams ARE your natural wood element. Your job is to darken the atmosphere through lighting, textiles, and decor — not necessarily paint.</p>
+  </div>
+</section>
+
+<!-- BEDROOM WALLS -->
+<div class="divider"></div>
+<section id="bedroom">
+  <div class="section-tag">Bedroom · 13'6" × 10'4"</div>
+  <h2>Wall-by-Wall Plan</h2>
+  <p class="intro">Four walls, each with a job. Every inch of this room is assigned a purpose before a single piece of furniture arrives.</p>
+</section>
+
+<section id="walls" style="padding-top:0;">
+  <!-- NORTH WALL -->
+  <div class="wall-plan">
+    <div class="wall-plan-header">
+      <h4>North Wall — The Anchor</h4>
+      <span>13'6" wide · full height</span>
+    </div>
+    <div class="wall-content">
+      <p>The wall your eyes land on when you look up from your desk. This becomes your primary statement wall — deep color or dark removable wallpaper if painting isn't allowed.</p>
+      <ul>
+        <li><strong>Treatment:</strong> Dark removable wallpaper — forest green, dark botanical, or subtle dragon scale texture (available on Etsy, Tempaper brand)</li>
+        <li><strong>Alternative if renting:</strong> Large dark tapestry or a gallery wall of fantasy/dragon art in dark frames — fills the wall without a single nail hole</li>
+        <li><strong>Nothing else on this wall</strong> — it's the backdrop, not storage</li>
+      </ul>
+    </div>
+    <div class="wall-diagram"><span class="wd-hi">╔═══════════════════════════════════════════╗</span>
+<span class="wd-hi">║</span>  <span class="wd-gr">[ DARK BOTANICAL WALLPAPER / TAPESTRY ]</span>   <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>                                           <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>   <span class="wd-em">dragon art print</span>    <span class="wd-em">dragon art print</span>   <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>                                           <span class="wd-hi">║</span>
+<span class="wd-hi">╚═══════════════════════════════════════════╝</span>
+ <span style="opacity:0.4">← 13'6" ————————————————————————————→</span></div>
+  </div>
+
+  <!-- SOUTH WALL -->
+  <div class="wall-plan">
+    <div class="wall-plan-header">
+      <h4>South Wall — Murphy Bed Command</h4>
+      <span>13'6" wide · flat interior wall = full height clearance</span>
+    </div>
+    <div class="wall-content">
+      <p>The south wall is your flat wall — no slope, full height. This is the ONLY correct wall for a Murphy bed in an A-frame. The sloped walls cannot accommodate a standard unit.</p>
+      <ul>
+        <li><strong>Murphy bed unit:</strong> Centered or offset left — 6ft wide unit fits with room to spare. Choose a unit with integrated side shelving that folds WITH the bed</li>
+        <li><strong>Left of bed unit:</strong> Small vertical shelf or floating side table — stays clear of the bed's swing path</li>
+        <li><strong>Right of bed unit:</strong> Access to bathroom — keep clear</li>
+        <li><strong>Bedding when closed:</strong> Deep forest green velvet duvet, black fitted sheet, ember-toned throw pillow</li>
+        <li><strong>Bed open:</strong> Headboard faces north — you wake up looking at your statement wall</li>
+      </ul>
+    </div>
+    <div class="wall-diagram"><span class="wd-hi">╔══════╦══════════════════════════╦══════╗</span>
+<span class="wd-hi">║</span> side <span class="wd-hi">║</span>  <span class="wd-em">MURPHY BED CABINET</span>       <span class="wd-hi">║</span> bath <span class="wd-hi">║</span>
+<span class="wd-hi">║</span> shelf<span class="wd-hi">║</span>  <span class="wd-gr">[ folds down → queen ]</span>   <span class="wd-hi">║</span>  →   <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>      <span class="wd-hi">║</span>  integrated side shelves  <span class="wd-hi">║</span>      <span class="wd-hi">║</span>
+<span class="wd-hi">╚══════╩══════════════════════════╩══════╝</span>
+ <span style="opacity:0.4">← 13'6" ————————————————————————————→</span></div>
+  </div>
+
+  <!-- WEST WALL -->
+  <div class="wall-plan">
+    <div class="wall-plan-header">
+      <h4>West Wall — Desk + Window Zone</h4>
+      <span>10'4" deep · window toward north end</span>
+    </div>
+    <div class="wall-content">
+      <p>Your window sits on this wall — natural light floods your desk during the day, your RGB glow takes over at night. The desk runs along this wall toward the window.</p>
+      <ul>
+        <li><strong>Desk placement:</strong> Your existing desk runs parallel to the west wall, perpendicular to the window — so you get side-lighting rather than glare in your face</li>
+        <li><strong>Window treatment:</strong> Blackout curtains in dark forest green or charcoal — thermal lined, floor to ceiling even if the window is smaller. Creates the illusion of a larger window and keeps the room dark for sleep</li>
+        <li><strong>Above desk:</strong> Your floating shelf with LED underlighting — holds small dragon pieces, a plant, speakers</li>
+        <li><strong>Monitor position:</strong> Dual arm mount, monitors face south into the room — your back is to the window (no backlight glare)</li>
+        <li><strong>Cable management:</strong> Cable spine down the wall, desk tray underneath. ADHD brain needs zero visible cables</li>
+      </ul>
+    </div>
+    <div class="wall-diagram"><span class="wd-hi">╔══════════════════════════════╗</span>
+<span class="wd-hi">║</span> <span class="wd-gr">[ WINDOW — blackout curtains ]</span><span class="wd-hi">║</span>
+<span class="wd-hi">║</span>                              <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  <span class="wd-em">[ floating shelf w/ LEDs ]</span>   <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  ─────────────────────────   <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  <span class="wd-hi">[ DESK — monitors, PC ]</span>      <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  ─────────────────────────   <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  <span class="wd-gr">[ white chair + throw ]</span>      <span class="wd-hi">║</span>
+<span class="wd-hi">╚══════════════════════════════╝</span>
+ <span style="opacity:0.4">↕ 10'4"</span></div>
+  </div>
+
+  <!-- EAST WALL -->
+  <div class="wall-plan">
+    <div class="wall-plan-header">
+      <h4>East Wall — Dragon Shrine</h4>
+      <span>10'4" deep · large closet at north end</span>
+    </div>
+    <div class="wall-content">
+      <p>The dragon wall. The first thing you see when you enter the room. Three staggered floating shelves, LED-underlit, housing your growing collection. The closet at the north end is boxed off — the remaining wall is yours.</p>
+      <ul>
+        <li><strong>Shelf layout:</strong> Three shelves at 28", 42", and 56" height — staggered in depth (deepest on bottom, shallowest on top)</li>
+        <li><strong>Shelf length:</strong> ~4ft each — sized to the wall space between door and closet</li>
+        <li><strong>LED strips:</strong> Warm amber OR RGB under each shelf — Govee RGBIC strips let you do both</li>
+        <li><strong>The shrine:</strong> Top shelf center gets your best piece, slightly elevated on a small wooden stand. Spotlight it with a small directional LED puck</li>
+        <li><strong>Closet treatment:</strong> Replace the louvered closet doors with a dark curtain rod + curtain — looks intentional, easier to access, hides clutter</li>
+      </ul>
+    </div>
+    <div class="wall-diagram"><span class="wd-hi">╔══════════════════╦═══════════╗</span>
+<span class="wd-hi">║</span>  <span class="wd-em">[ SHELF 3 — 56" ]</span> <span class="wd-hi">║</span>           <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  shrine · books   <span class="wd-hi">║</span>  CLOSET   <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  <span class="wd-em">[ SHELF 2 — 42" ]</span> <span class="wd-hi">║</span>           <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  figures · plant  <span class="wd-hi">║</span>  dark     <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  <span class="wd-em">[ SHELF 1 — 28" ]</span> <span class="wd-hi">║</span>  curtain  <span class="wd-hi">║</span>
+<span class="wd-hi">║</span>  large piece      <span class="wd-hi">║</span>           <span class="wd-hi">║</span>
+<span class="wd-hi">╚══════════════════╩═══════════╝</span>
+ <span style="opacity:0.4">↕ 10'4" ———————————→</span></div>
+  </div>
+</section>
+
+<!-- A-FRAME CEILING -->
+<div class="divider"></div>
+<section id="ceiling">
+  <div class="section-tag ember">A-Frame Architecture</div>
+  <h2>Working the Sloped Ceiling</h2>
+  <p class="intro">The sloped ceiling is your biggest design asset, not a limitation. No flat apartment has this. Lean into it completely.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🏔️</div>
+      <h4>What the Slope Gives You</h4>
+      <ul>
+        <li>Drama. Walking in feels like entering a forest cabin or a wizard's tower</li>
+        <li>The exposed beams are already your dark wood accent — don't cover them</li>
+        <li>Peak height at center gives you space for a pendant light that hangs dramatically low</li>
+        <li>Angled walls = cozy, cave-like energy on the lower sides</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">💡</div>
+      <h4>Lighting the Slope</h4>
+      <ul>
+        <li>Hang a single pendant from the peak — let it hang long (3–4ft drop). Rattan cage or dark metal</li>
+        <li>LED strips along the beam undersides — warm amber, runs the length of each beam</li>
+        <li>Avoid overhead flush lights — they kill the mood. Use the pendant + floor lamps only</li>
+        <li>Galaxy projector aimed at the slope = a forest canopy ceiling when in chill mode</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">📐</div>
+      <h4>Furniture + the Slope</h4>
+      <ul>
+        <li>Murphy bed ONLY on the south flat wall — never on a sloped wall</li>
+        <li>Keep tall furniture (shelves, closet) away from the lower angled edges — it'll fight the ceiling</li>
+        <li>Low-profile furniture under the slopes — a small bench, floor cushion, or plant cluster works perfectly where the ceiling meets the wall</li>
+        <li>The center of the room stays clear — let the height breathe</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌿</div>
+      <h4>Embracing the A-Frame</h4>
+      <ul>
+        <li>Hang a macramé or trailing plant from one of the beams near the peak</li>
+        <li>The angled walls can have small art — lean a framed piece against them rather than hanging</li>
+        <li>A single large dragon sculpture near the peak (on a high shelf) would be incredible — eye-level from the bed, lit from below</li>
+        <li>Dark paint/wallpaper on the triangular end walls deepens the forest-cave feel</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- WOOD TONES -->
+<div class="divider"></div>
+<section id="wood">
+  <div class="section-tag gold">Wood Tones</div>
+  <h2>Working With the Existing Wood</h2>
+  <p class="intro">The A-frame has warm honey/amber wood floors and beams. This is your biggest gift — real wood in a rental is rare. Here's exactly how to harmonize everything with it.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🪵</div>
+      <h4>The Floor (Warm Honey Wood)</h4>
+      <ul>
+        <li><strong>Don't fight it.</strong> Dark rugs in forest green, charcoal, or deep burgundy layer on top and create contrast without clashing</li>
+        <li>A 5×7 or 6×9 dark jute rug or vintage-style wool rug under the bed zone anchors the space</li>
+        <li>A smaller textured rug under the desk chair protects the floor and adds visual weight to the workzone</li>
+        <li>The wood floor peeking around rug edges keeps the room warm — don't cover it all</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">✨</div>
+      <h4>The Exposed Beams</h4>
+      <ul>
+        <li>Leave them completely natural — they're the hero of the room</li>
+        <li>Add LED strips to the underside of each beam (Govee or generic RGBIC, 3M tape back)</li>
+        <li>In amber/candlelight mode they look like firelight. In green they feel like bioluminescent forest. In red — dragon lair</li>
+        <li>You can drape very thin fairy lights along a beam casually — looks intentional</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🪑</div>
+      <h4>Your Furniture Choices</h4>
+      <ul>
+        <li><strong>Dark wood preferred</strong> — walnut, espresso, dark oak. Echoes the floor without matching exactly</li>
+        <li>Avoid: natural pine, light maple, or white furniture (clashes with the moody direction)</li>
+        <li>Your plain desk: wrap in dark wood contact paper (d-c-fix brand is excellent, ~$20) or dark matte spray paint</li>
+        <li>Matte black metal accents (lamp base, shelf brackets) bridge between the dark wood and the floor</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🎨</div>
+      <h4>Textiles + the Wood</h4>
+      <ul>
+        <li>Velvet and linen in forest green / deep charcoal / ember read luxe against warm wood</li>
+        <li>Avoid cool-toned fabrics (gray-blue, silver) — they fight the warm floor tone</li>
+        <li>Faux fur throw (white or cream) on the bed is a stunning contrast — the room Inspo had this and it works</li>
+        <li>Bamboo, rattan, and woven textures in decor tie the natural wood story together</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <h5>The Harmony Formula</h5>
+    <p>Warm honey wood floor + dark espresso/walnut furniture + forest green/charcoal textiles + ember RGB accent = a room that feels like a candlelit forest at night and a bright forest clearing by day. The warm and dark balance each other. Neither fights the other.</p>
+  </div>
+</section>
+
+<!-- LIGHTING -->
+<div class="divider"></div>
+<section id="lighting">
+  <div class="section-tag">Lighting System</div>
+  <h2>Layered Mood Lighting</h2>
+  <p class="intro">Five zones, one app, infinite moods. The A-frame beams and sloped ceiling make this room a lighting showcase — use it.</p>
+
+  <div class="cards" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="card-icon">💡</div>
+      <h4>Zone 1 — Beam Underlighting</h4>
+      <ul>
+        <li>Govee RGBIC strips adhered to underside of each exposed beam</li>
+        <li>Default: warm amber 2700K — looks like candlelight on wood</li>
+        <li>Syncs to gaming or mood via app</li>
+        <li>~$15–25 per 5m strip, 3M tape backing</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🕯️</div>
+      <h4>Zone 2 — Peak Pendant</h4>
+      <ul>
+        <li>Single pendant at the A-frame peak, hanging 3–4ft down</li>
+        <li>Rattan cage or dark metal style with Edison bulb</li>
+        <li>Smart bulb inside — dimmable, color temp adjustable</li>
+        <li>This is your "main" light — everything else is atmosphere</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🐉</div>
+      <h4>Zone 3 — Dragon Shelf RGB</h4>
+      <ul>
+        <li>Govee RGBIC under each floating shelf edge</li>
+        <li>Directional LED puck on shrine piece</li>
+        <li>Default: ember/amber warm tone</li>
+        <li>Dragon mode: deep red — makes figures look incredible</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🖥️</div>
+      <h4>Zone 4 — Desk RGB</h4>
+      <ul>
+        <li>Strip behind monitors (bias lighting — reduces eye strain)</li>
+        <li>Strip under desk edge facing room</li>
+        <li>Govee TV Backlight or Elgato Light Strip for monitor bias</li>
+        <li>Govee Sync Box if you want it reactive to on-screen content</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌌</div>
+      <h4>Zone 5 — Galaxy Projector</h4>
+      <ul>
+        <li>Aimed at the sloped ceiling — instant forest canopy or galaxy sky</li>
+        <li>BlissLights Ark or Encalife Atmosphere recommended</li>
+        <li>Pairs with the beam lighting for a fully layered ceiling effect</li>
+        <li>~$30–60, massive impact</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">📱</div>
+      <h4>Control System</h4>
+      <ul>
+        <li>All Govee products run on one app — set scenes, schedules, sync</li>
+        <li>Alexa/Google compatible for voice control</li>
+        <li>Set up 5 scenes: Focus, Forest, Dragon, Arcane, Sleep</li>
+        <li>Gaming sync: Govee PC app detects screen colors automatically</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mood-grid">
+    <div class="mood-chip"><div class="mood-orb" style="background:radial-gradient(circle,#3d7a4a,#1a2e1e)"></div><div class="mood-name">Forest</div><div class="mood-desc">Deep green · calm · reading</div></div>
+    <div class="mood-chip"><div class="mood-orb" style="background:radial-gradient(circle,#c8401a,#5a1008)"></div><div class="mood-name">Dragon</div><div class="mood-desc">Red ember · hype · gaming</div></div>
+    <div class="mood-chip"><div class="mood-orb" style="background:radial-gradient(circle,#5a6acc,#1a1a5a)"></div><div class="mood-name">Arcane</div><div class="mood-desc">Blue-purple · creative · late night</div></div>
+    <div class="mood-chip"><div class="mood-orb" style="background:radial-gradient(circle,#c9933a,#6b4a10)"></div><div class="mood-name">Candlelight</div><div class="mood-desc">Warm amber · wind down · cozy</div></div>
+    <div class="mood-chip"><div class="mood-orb" style="background:radial-gradient(circle,#e8e0d0,#8a8070)"></div><div class="mood-name">Focus</div><div class="mood-desc">Cool white · work · daylight</div></div>
+  </div>
+</section>
+
+<!-- BATHROOM -->
+<div class="divider"></div>
+<section id="bathroom">
+  <div class="section-tag">Bathroom · 9'5" × 5'0"</div>
+  <h2>Stone Forest Bath</h2>
+  <p class="intro">Already has the right bones — standing shower, medicine cabinet mirror, blue-grey walls. The existing color is actually close. Here's exactly what to change and what to keep.</p>
+
+  <div class="callout">
+    <h5>What's Already Working</h5>
+    <p>The blue-grey wall color is actually close to your palette — it reads cool-forest. The standing shower with glass panel is sleek. The medicine cabinet mirror gives you storage. Don't tear this apart, just layer on top.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔧</div>
+      <h4>Hardware Swap — Instant Impact</h4>
+      <ul>
+        <li>Replace all chrome hardware with <strong>matte black</strong> — towel ring, towel bar, toilet paper holder, robe hook</li>
+        <li>Takes under an hour with a screwdriver, zero damage</li>
+        <li>Amazon: matte black bathroom hardware set ~$35–60</li>
+        <li>The chrome in the photos is the main thing aging the space — this fixes it immediately</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">💡</div>
+      <h4>Lighting Upgrade</h4>
+      <ul>
+        <li>Replace the Hollywood-style bulb bar with a matte black bar fixture OR just swap bulbs to warm 2700K</li>
+        <li>Add a small RGB strip behind the mirror — plugs in, warm amber default, spa mode instantly</li>
+        <li>Battery LED candles on the counter — moisture-safe, real flicker</li>
+        <li>A Himalayan salt lamp on the back of the toilet tank = warm glow, on-theme, cheap</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🪨</div>
+      <h4>Texture + Surface</h4>
+      <ul>
+        <li>Peel-and-stick slate or stone tile on ONE wall — the wall behind the toilet is ideal (easy access, no steam damage)</li>
+        <li>Bamboo bath mat to replace the standard bath mat — ties to the Asian-forest theme</li>
+        <li>Dark hand towels + dark washcloths — charcoal or forest green replace the pale ones in the photos</li>
+        <li>A dark wooden tray on the counter to corral your skincare — looks luxe, keeps it organized</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🌿</div>
+      <h4>Plants + Nature</h4>
+      <ul>
+        <li>Eucalyptus bundle tied to shower head — lasts 2–3 weeks, smells incredible, looks stunning</li>
+        <li>Small snake plant or ZZ plant on back of toilet — handles humidity, low light</li>
+        <li>Bamboo stalks in a tall dark vase on the counter or floor corner</li>
+        <li>Keep it to 3 plants max — bathroom is small, overcrowding kills the calm</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧴</div>
+      <h4>Skincare Station</h4>
+      <ul>
+        <li>Large dark bamboo or acacia tray on counter — your SkinMedica, ZO, and Glow Recipe displayed neatly</li>
+        <li>Under-sink: clear organizer bins for backup products + supplies</li>
+        <li>A small LED ring light mirror on the wall beside the medicine cabinet — for precise skincare application</li>
+        <li>Your product collection displayed neatly IS decor — it looks intentional and spa-like</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🚿</div>
+      <h4>Shower Details</h4>
+      <ul>
+        <li>Dark shower curtain if there's a rod, OR a dark shower liner inside the glass — makes the shower read darker and more luxe</li>
+        <li>Black corner shower caddy — replace any chrome ones</li>
+        <li>A small waterproof Bluetooth speaker in the shower (JBL Clip) — your music/DnD ambience follows you</li>
+        <li>Dark pumice stone or wooden soap dish on the shelf — small but on-theme</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- LOFT -->
+<div class="divider"></div>
+<section id="loft">
+  <div class="section-tag gold">Loft · 27'0" × 11'10"</div>
+  <h2>The Communal Tavern</h2>
+  <p class="intro">Now that you've seen the actual space — the A-frame peak with the triangle window facing the forest — this is even better than planned. That window is the centerpiece of the whole loft.</p>
+
+  <div class="callout ember">
+    <h5>The Triangle Window Is Everything</h5>
+    <p>The gothic A-frame triangle window facing the tree line south is your loft's hero feature. Your DnD table goes directly in front of it. Whoever sits as Dungeon Master has a forest visible behind them through an arched window. This is free set dressing you cannot buy at any price.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card ember">
+      <div class="card-icon">🎲</div>
+      <h4>Zone A — DnD Table (South End)</h4>
+      <ul>
+        <li>Round or rectangular dark table seats 5–6, positioned directly before the triangle window</li>
+        <li>Mixed seating: 2–3 chairs + Moroccan poufs for overflow — fits the tavern aesthetic perfectly</li>
+        <li>Overhead pendant light directly above — hung from the A-frame beam, warm and dimmable</li>
+        <li>Small rolling IKEA RÅSKOG cart beside the table: dice, snacks, rulebooks, candles</li>
+        <li>Dark felt table runner for mini play — rolls away in seconds when it's dinner mode</li>
+        <li>Fantasy map print or dragon art on the adjacent wall — the visual backdrop when facing the DM</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">📖</div>
+      <h4>Zone B — Reading Nook (North End)</h4>
+      <ul>
+        <li>Deep armchair — velvet or textured, forest green or charcoal — near the railing where you look down into the living room</li>
+        <li>Tall bookshelf on the flat wall: dark wood, books + small decor + one dragon figure (your subtle loft presence)</li>
+        <li>Arc floor lamp over the chair — warm, dimmable, adjustable</li>
+        <li>Small side table: a candle, your drink, a dice tray</li>
+        <li>The railing running along the loft edge is already a design feature — a trailing plant along it reads like vines</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🌉</div>
+      <h4>The Threshold Between Zones</h4>
+      <ul>
+        <li>Two rugs define two zones — the gap between them IS the divider. No wall needed</li>
+        <li>A low console shelf or bench perpendicular to the wall between zones creates a soft visual break</li>
+        <li>The existing wood railing runs along one edge naturally — your loft already has built-in structure</li>
+        <li>String lights strung along the beam overhead unify both zones under one canopy</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🤝</div>
+      <h4>Communal Design Strategy</h4>
+      <ul>
+        <li>Dark forest tavern reads as universally sophisticated — roommates will love this, not feel invaded by it</li>
+        <li>Your dragon presence in the loft is subtle: one figure on the bookshelf, a fantasy art print. The bedroom is the full collection</li>
+        <li>The loft is shared investment territory — worth asking roommates to split the table and sofa cost</li>
+        <li>The existing A-frame character already does 70% of the work — you're just furnishing what's there</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SHOPPING -->
+<div class="divider"></div>
+<section id="shopping">
+  <div class="section-tag">Master Shopping List</div>
+  <h2>Phase-by-Phase Budget</h2>
+  <p class="intro">Prioritized by impact. Start with Phase 1, add the rest over time. Thrift and FB Marketplace aggressively for Phase 1.</p>
+
+  <div class="phases" style="margin-bottom:32px;">
+    <div class="phase">
+      <div class="phase-num">1</div>
+      <div>
+        <h4>Immediate Impact (~$400–700)</h4>
+        <p>Murphy bed kit · dark rug · bedding set · Govee RGB strips (2 packs) · blackout curtains · matte black bathroom hardware · bamboo bath mat · galaxy projector. These seven items transform both rooms before anything else arrives.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">2</div>
+      <div>
+        <h4>Furniture Layer (~$300–600)</h4>
+        <p>Floating shelves (3) with LED strips · desk wrap/upgrade · dual monitor arm mount · pendant light for bedroom · plants (3–4) · bathroom peel-and-stick tile · dark tray for skincare counter. This is where the aesthetic locks in.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">3</div>
+      <div>
+        <h4>Loft Foundation (~$500–900)</h4>
+        <p>Dark sofa or sectional · DnD table · reading armchair · two rugs · arc floor lamp · bar cart · Moroccan poufs · string lights · fantasy art prints. Hit FB Marketplace hard — loft furniture is the highest-value thrift opportunity.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">4</div>
+      <div>
+        <h4>Dragon Collection + Finishing (~ongoing)</h4>
+        <p>Dragon figures (collect slowly, rotate what's displayed) · additional RGB smart bulbs · Govee Sync Box for gaming · dark removable wallpaper for statement wall · pendant above DnD table · LED puck spotlights for shrine pieces.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-wrap">
+    <table>
+      <thead><tr><th>Item</th><th>Where</th><th>Budget</th></tr></thead>
+      <tbody>
+        <tr><td>Murphy Bed Kit (Full/Queen)</td><td>Murphy Bed Depot, Wayfair, FB Marketplace</td><td><span class="badge b-mid">$400–900</span></td></tr>
+        <tr><td>Govee RGBIC Strips (4 packs)</td><td>Govee.com, Amazon</td><td><span class="badge b-low">$60–100</span></td></tr>
+        <tr><td>Galaxy Projector</td><td>Amazon — BlissLights Ark</td><td><span class="badge b-low">$30–60</span></td></tr>
+        <tr><td>Blackout Curtains — dark, floor to ceiling</td><td>Amazon, Target, IKEA MAJGULL</td><td><span class="badge b-low">$30–70</span></td></tr>
+        <tr><td>Floating Shelves — 3 dark wood</td><td>IKEA LACK, Amazon</td><td><span class="badge b-low">$30–60</span></td></tr>
+        <tr><td>Dark Rug (5×7 bedroom + 6×9 loft)</td><td>Rugs USA, Wayfair, FB Marketplace</td><td><span class="badge b-mid">$100–250</span></td></tr>
+        <tr><td>Velvet Bedding Set — forest green</td><td>Amazon, Target, TJ Maxx</td><td><span class="badge b-low">$50–90</span></td></tr>
+        <tr><td>Dual Monitor Arm Mount</td><td>Amazon (VIVO brand)</td><td><span class="badge b-low">$35–60</span></td></tr>
+        <tr><td>Desk Wrap — dark wood contact paper</td><td>Amazon (d-c-fix brand)</td><td><span class="badge b-low">$18–25</span></td></tr>
+        <tr><td>Matte Black Bathroom Hardware Set</td><td>Amazon, Home Depot</td><td><span class="badge b-low">$35–65</span></td></tr>
+        <tr><td>Bamboo Bath Mat</td><td>Amazon, HomeGoods</td><td><span class="badge b-low">$18–35</span></td></tr>
+        <tr><td>Peel-and-Stick Stone Tile (bathroom)</td><td>Amazon, Home Depot</td><td><span class="badge b-low">$30–55</span></td></tr>
+        <tr><td>Plants — snake plant, pothos, bamboo</td><td>IKEA, Trader Joe's, nursery</td><td><span class="badge b-low">$25–50</span></td></tr>
+        <tr><td>Pendant Light (bedroom)</td><td>Amazon, IKEA — rattan or dark metal</td><td><span class="badge b-low">$30–75</span></td></tr>
+        <tr><td>Dark Sectional or Sofa (loft)</td><td>FB Marketplace, IKEA KIVIK</td><td><span class="badge b-mid">$200–600</span></td></tr>
+        <tr><td>DnD / Dining Table (loft)</td><td>IKEA, Amazon, FB Marketplace</td><td><span class="badge b-mid">$150–350</span></td></tr>
+        <tr><td>Reading Armchair — velvet, dark</td><td>TJ Maxx, Amazon, Wayfair</td><td><span class="badge b-mid">$120–280</span></td></tr>
+        <tr><td>Moroccan Poufs (3)</td><td>World Market, Amazon</td><td><span class="badge b-low">$60–120</span></td></tr>
+        <tr><td>Arc Floor Lamp (loft nook)</td><td>Amazon, IKEA, Target</td><td><span class="badge b-low">$40–90</span></td></tr>
+        <tr><td>IKEA RÅSKOG Cart (loft bar cart)</td><td>IKEA</td><td><span class="badge b-low">$40</span></td></tr>
+        <tr><td>Fantasy / Dragon Art Prints</td><td>Etsy, Redbubble — dark frame from Amazon</td><td><span class="badge b-low">$20–50</span></td></tr>
+        <tr><td>Cable Management Kit</td><td>Amazon</td><td><span class="badge b-low">$15–25</span></td></tr>
+        <tr><td>Eucalyptus Bundles (bathroom)</td><td>Trader Joe's, florist — refresh monthly</td><td><span class="badge b-low">$5–12</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout gold" style="margin-top:20px;">
+    <h5>Total Phase 1 + 2 Estimate</h5>
+    <p>If you hit FB Marketplace for the Murphy bed and rugs, and IKEA for shelves and the bar cart — <strong style="color:var(--gold)">$700–1,200</strong> gets both rooms transformed. The loft adds another <strong style="color:var(--gold)">$500–900</strong> depending on how hard you thrift the sofa and table. The house already gives you the architecture for free — you're just furnishing what's already extraordinary.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Dark Forest Dragon Den · Master Guide · Built for the A-Frame</p>
+  <br>
+  <p style="opacity:0.08; font-size:1.5rem;">🐉</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){
+    var top=el.getBoundingClientRect().top+window.pageYOffset-52;
+    window.scrollTo({top:top,behavior:"smooth"});
+  }
+}
+</script>
+</body>
+</html>

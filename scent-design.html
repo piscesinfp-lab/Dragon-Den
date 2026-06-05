@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scent Design — Dragon Den</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void:#07090a; --deep:#0c1210; --moss:#2a4530; --jade:#3d7a4a;
+    --stone:#7a7060; --cream:#e8dcc8; --ember:#c8401a; --gold:#c9933a;
+    --teal:#2a6a6a; --mist:rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.95); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  .hero { min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse 55% 50% at 20% 70%,rgba(61,122,74,0.15) 0%,transparent 55%),
+    radial-gradient(ellipse 45% 45% at 80% 30%,rgba(42,106,106,0.12) 0%,transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 100%,rgba(201,147,58,0.08) 0%,transparent 55%); }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--jade); text-transform:uppercase; margin-bottom:14px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,4.5rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--jade) 45%,var(--teal) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:1rem; margin-top:12px; position:relative; }
+  .hero-divider { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--jade),transparent); margin:22px auto; position:relative; }
+  .hero-specs { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; position:relative; }
+  .spec { text-align:center; }
+  .spec-num { font-family:'Cinzel',serif; font-size:1.2rem; color:var(--gold); }
+  .spec-label { font-family:'Cinzel',serif; font-size:0.48rem; letter-spacing:0.3em; color:var(--stone); text-transform:uppercase; margin-top:3px; }
+
+  section { max-width:900px; margin:0 auto; padding:70px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.ember { color:var(--ember); }
+  .section-tag.gold { color:var(--gold); }
+  .section-tag.teal { color:var(--teal); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.6rem,4vw,2.6rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:1rem; line-height:1.75; margin-bottom:32px; max-width:640px; }
+
+  /* SAFETY BANNER */
+  .safety-banner { background:rgba(200,64,26,0.08); border:1px solid rgba(200,64,26,0.25); border-radius:3px; padding:18px 22px; margin-bottom:32px; display:flex; gap:14px; align-items:flex-start; }
+  .safety-icon { font-size:1.3rem; flex-shrink:0; margin-top:2px; }
+  .safety-text h5 { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.2em; color:var(--ember); text-transform:uppercase; margin-bottom:6px; }
+  .safety-text p { font-size:0.88rem; color:var(--stone); line-height:1.65; font-style:italic; }
+
+  /* MOOD SCENT CARDS */
+  .mood-scent-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-bottom:32px; }
+  .mood-scent { border-radius:3px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); }
+  .mood-scent-top { padding:20px 18px 16px; position:relative; }
+  .mood-scent-top::after { content:''; position:absolute; bottom:0;left:0;right:0; height:1px; background:rgba(255,255,255,0.05); }
+  .mood-rgb { width:32px; height:32px; border-radius:50%; margin-bottom:10px; }
+  .mood-scent-name { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.15em; color:var(--cream); text-transform:uppercase; margin-bottom:4px; }
+  .mood-scent-feel { font-size:0.8rem; color:var(--stone); font-style:italic; }
+  .mood-scent-bottom { padding:14px 18px; background:var(--deep); }
+  .mood-scent-bottom ul { list-style:none; display:flex; flex-direction:column; gap:5px; }
+  .mood-scent-bottom li { font-size:0.82rem; color:var(--stone); padding-left:12px; position:relative; line-height:1.4; }
+  .mood-scent-bottom li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.1rem; line-height:1; }
+  .mood-scent-bottom li strong { color:var(--cream); font-weight:400; font-style:normal; }
+
+  /* ROOM CARDS */
+  .room-scent { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; margin-bottom:16px; overflow:hidden; }
+  .room-scent-header { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  .room-scent-header h4 { font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.15em; color:var(--cream); font-weight:600; }
+  .room-scent-header span { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.15em; color:var(--jade); }
+  .room-scent-body { display:grid; grid-template-columns:1fr 1fr; gap:0; }
+  .rsb-col { padding:18px 20px; }
+  .rsb-col:first-child { border-right:1px solid rgba(255,255,255,0.04); }
+  .rsb-col h5 { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--jade); text-transform:uppercase; margin-bottom:10px; }
+  .rsb-col ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .rsb-col li { font-size:0.85rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .rsb-col li::before { content:'▸'; position:absolute; left:0; color:var(--jade); font-size:0.6rem; top:4px; }
+  .rsb-col li strong { color:var(--cream); font-weight:400; }
+
+  /* DIFFUSER TYPES */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  .card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:22px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .card:hover { border-color:rgba(61,122,74,0.35); }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--jade),transparent); }
+  .card.gold::before { background:linear-gradient(90deg,var(--gold),transparent); }
+  .card.ember::before { background:linear-gradient(90deg,var(--ember),transparent); }
+  .card.teal::before { background:linear-gradient(90deg,var(--teal),transparent); }
+  .card.stone::before { background:linear-gradient(90deg,var(--stone),transparent); }
+  .card-icon { font-size:1.4rem; margin-bottom:10px; }
+  .card h4 { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:10px; font-weight:600; }
+  .card p { font-size:0.87rem; color:var(--stone); line-height:1.65; font-style:italic; margin-bottom:10px; }
+  .card ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .card li { font-size:0.84rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .card li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.2rem; line-height:1; }
+  .card.gold li::before { color:var(--gold); }
+  .card.ember li::before { color:var(--ember); }
+  .card li strong { color:var(--cream); font-weight:400; }
+
+  /* OIL BLENDS */
+  .blend-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+  .blend-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:20px; }
+  .blend-name { font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.15em; color:var(--cream); margin-bottom:4px; font-weight:600; }
+  .blend-mood { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.2em; color:var(--jade); text-transform:uppercase; margin-bottom:12px; }
+  .blend-recipe { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+  .blend-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .blend-row:last-child { border-bottom:none; }
+  .blend-oil { font-size:0.85rem; color:var(--stone); }
+  .blend-drops { font-family:'Cinzel',serif; font-size:0.68rem; color:var(--gold); letter-spacing:0.1em; }
+  .blend-note { font-size:0.82rem; color:var(--stone); font-style:italic; line-height:1.55; }
+
+  .callout { padding:20px 24px; border-radius:3px; margin:24px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout.ember { border-left-color:var(--ember); background:rgba(200,64,26,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:8px; }
+  .callout.gold h5 { color:var(--gold); }
+  .callout.ember h5 { color:var(--ember); }
+  .callout p { font-size:0.9rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  /* SHOP TABLE */
+  .shop-wrap { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  th { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss); background:#0a0e0c; }
+  td { padding:11px 16px; font-size:0.85rem; color:var(--stone); border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:var(--mist); }
+  td:first-child { color:var(--cream); }
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-family:'Cinzel',serif; font-size:0.63rem; }
+  .b-low { background:rgba(61,122,74,0.2); color:var(--jade); }
+  .b-mid { background:rgba(201,147,58,0.2); color:var(--gold); }
+
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.25),transparent); }
+  footer { text-align:center; padding:60px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.2); letter-spacing:0.2em; }
+
+  @media(max-width:600px){ .room-scent-body,.cards,.blend-grid,.mood-scent-grid { grid-template-columns:1fr; } .rsb-col:first-child { border-right:none; border-bottom:1px solid rgba(255,255,255,0.04); } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Scent</div>
+  <a onclick="nav('safety')">Safety First</a>
+  <a onclick="nav('howto')">How It Works</a>
+  <a onclick="nav('moods')">Mood Scents</a>
+  <a onclick="nav('rooms')">By Room</a>
+  <a onclick="nav('blends')">DIY Blends</a>
+  <a onclick="nav('natural')">Natural Sources</a>
+  <a onclick="nav('shopping')">Shopping</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Scent Design · Dragon Den</div>
+  <h1 class="hero-title">The Invisible<br>Layer</h1>
+  <p class="hero-sub">Flame-free · Ultrasonic · Synced to your RGB moods · Room by room</p>
+  <div class="hero-divider"></div>
+  <div class="hero-specs">
+    <div class="spec"><div class="spec-num">0</div><div class="spec-label">Open Flames</div></div>
+    <div class="spec"><div class="spec-num">5</div><div class="spec-label">Mood Scents</div></div>
+    <div class="spec"><div class="spec-num">3</div><div class="spec-label">Rooms</div></div>
+    <div class="spec"><div class="spec-num">100%</div><div class="spec-label">Flame-Free</div></div>
+  </div>
+</div>
+
+<!-- SAFETY -->
+<div class="divider"></div>
+<section id="safety">
+  <div class="section-tag ember">Safety First</div>
+  <h2>No Flames. Ever.</h2>
+  <p class="intro">Given your seizure sensitivity to burning smells and smoke, the entire scent system is built around cold diffusion only. Nothing burns, nothing heats, nothing smokes.</p>
+
+  <div class="safety-banner">
+    <div class="safety-icon">⚠️</div>
+    <div class="safety-text">
+      <h5>Removed From All Previous Guides</h5>
+      <p>Earlier sections recommended candles, eucalyptus bundles near heat, and battery LED candles for atmosphere. All real-flame candles and anything that produces a burning smell are removed from your design. The LED candle recommendations stay — they're flameless and scentless. Eucalyptus in the shower is fine — it's cold, not heated.</p>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card ember">
+      <div class="card-icon">🚫</div>
+      <h4>Never In Your Space</h4>
+      <ul>
+        <li>Wax candles — any kind, any size</li>
+        <li>Incense sticks or cones — direct combustion</li>
+        <li>Wax warmers with a bulb or heating element</li>
+        <li>Plug-in oil warmers that use heat</li>
+        <li>Smudge sticks or sage burning</li>
+        <li>Scented matches or anything struck</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <h4>Safe For Your Space</h4>
+      <ul>
+        <li>Ultrasonic diffusers — cold water mist, zero heat</li>
+        <li>Reed diffusers — passive evaporation, no heat needed</li>
+        <li>Room sprays — quick burst, dissipates fast, controllable</li>
+        <li>Linen sprays — on bedding, curtains, soft surfaces</li>
+        <li>Natural plant sources — eucalyptus in shower, fresh herbs</li>
+        <li>Dried botanicals — lavender bundles, potpourri, zero heat</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">💧</div>
+      <h4>Ultrasonic = Your Primary Method</h4>
+      <p>Ultrasonic diffusers vibrate water at a high frequency to create a cool mist that carries essential oil molecules into the air. No heat, no burning, no smoke smell whatsoever — just clean scented mist.</p>
+      <ul>
+        <li>The mist catches your RGB lighting — looks like magic against dark walls</li>
+        <li>Built-in LED lighting on most units syncs visually with your room mood</li>
+        <li>Intensity is fully controllable — a single drop of oil is enough for a small room</li>
+        <li>Auto-shutoff when water runs out — completely safe to run while sleeping</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="divider"></div>
+<section id="howto">
+  <div class="section-tag">Diffusion Methods</div>
+  <h2>How Each Method Works</h2>
+  <p class="intro">Three tools, each with a different purpose. Ultrasonic is your main system, reed diffusers provide constant low-level background scent, room spray gives you instant on-demand control.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">💧</div>
+      <h4>Ultrasonic Diffuser — Primary</h4>
+      <p>Fills water reservoir, add 3–8 drops of essential oil, mist runs for 2–8 hours depending on setting. Cool water vapor carries scent molecules through the air.</p>
+      <ul>
+        <li><strong>Bedroom:</strong> On the desk shelf or a small bedside surface — mist catches the RGB glow</li>
+        <li><strong>Loft:</strong> On the bar cart or bookshelf — covers the whole space on high setting</li>
+        <li>Change scent by emptying water, wiping reservoir, refilling with new oil blend</li>
+        <li>Use distilled water if possible — extends diffuser life, no mineral buildup</li>
+        <li>Start with 3 drops — you can always add, can't take away</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌾</div>
+      <h4>Reed Diffuser — Passive Background</h4>
+      <p>Glass bottle of scented oil with rattan reeds that wick scent passively 24/7. No power needed, no maintenance beyond flipping the reeds weekly.</p>
+      <ul>
+        <li><strong>Bathroom:</strong> Perfect here — runs constantly, no effort, handles humidity well</li>
+        <li><strong>Small closet near bathroom:</strong> Keeps linens faintly scented</li>
+        <li>Flip reeds upside down weekly to refresh scent throw</li>
+        <li>Lasts 2–3 months per bottle</li>
+        <li>Choose subtle scents here — it runs all the time so too strong gets overwhelming</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <div class="card-icon">💨</div>
+      <h4>Room + Linen Spray — On Demand</h4>
+      <p>Instant scent, immediate control. A few sprays into the air or onto soft surfaces before gaming, before guests arrive, before sleep — scent fades within 30–60 minutes.</p>
+      <ul>
+        <li>Spray into the air, not directly onto electronics or wood surfaces</li>
+        <li>Linen spray on bedding before sleep — controllable intensity, dissipates before it could trigger sensitivity</li>
+        <li>Great for the loft before DnD sessions — one spray, sets the atmosphere</li>
+        <li>Easy to make yourself: distilled water + witch hazel + 15 drops essential oil in a spray bottle</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🌿</div>
+      <h4>Natural Passive Sources</h4>
+      <p>Plants and dried botanicals that release scent naturally with zero heat or flames.</p>
+      <ul>
+        <li><strong>Eucalyptus in shower:</strong> Steam from shower activates the scent — fresh, clean, spa-like. Completely safe</li>
+        <li><strong>Dried lavender bundles:</strong> Hung inside closet or in a dark vase — subtle, constant, calming</li>
+        <li><strong>Fresh herbs:</strong> A small pot of mint or rosemary on the desk shelf releases scent when brushed</li>
+        <li><strong>Cedar blocks:</strong> Inside closet and drawers — earthy, wood-forward, also deters moths</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MOOD SCENTS -->
+<div class="divider"></div>
+<section id="moods">
+  <div class="section-tag">Mood Sync</div>
+  <h2>Scent Paired to RGB Mood</h2>
+  <p class="intro">Each lighting mood gets a corresponding scent profile. When you switch the lights, you switch the diffuser blend. The room shifts completely — visually and atmospherically.</p>
+
+  <div class="mood-scent-grid">
+    <div class="mood-scent">
+      <div class="mood-scent-top" style="background:linear-gradient(135deg,rgba(22,42,22,0.8),rgba(12,20,12,0.9))">
+        <div class="mood-rgb" style="background:radial-gradient(circle,#3d7a4a,#1a2e1e)"></div>
+        <div class="mood-scent-name">Forest Mode</div>
+        <div class="mood-scent-feel">Deep green RGB · calm · reading</div>
+      </div>
+      <div class="mood-scent-bottom">
+        <ul>
+          <li><strong>Primary:</strong> Cedarwood + eucalyptus</li>
+          <li><strong>Add:</strong> A drop of vetiver or pine</li>
+          <li><strong>Feel:</strong> Standing in a damp forest after rain</li>
+          <li><strong>Intensity:</strong> Low — 3 drops total</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mood-scent">
+      <div class="mood-scent-top" style="background:linear-gradient(135deg,rgba(40,12,6,0.8),rgba(20,6,3,0.9))">
+        <div class="mood-rgb" style="background:radial-gradient(circle,#c8401a,#5a1008)"></div>
+        <div class="mood-scent-name">Dragon Mode</div>
+        <div class="mood-scent-feel">Red ember RGB · gaming · hype</div>
+      </div>
+      <div class="mood-scent-bottom">
+        <ul>
+          <li><strong>Primary:</strong> Clove + black pepper</li>
+          <li><strong>Add:</strong> A drop of patchouli or sandalwood</li>
+          <li><strong>Feel:</strong> Spiced, warm, ancient — not smoky</li>
+          <li><strong>Intensity:</strong> Medium — 5 drops total</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mood-scent">
+      <div class="mood-scent-top" style="background:linear-gradient(135deg,rgba(10,10,38,0.8),rgba(5,5,20,0.9))">
+        <div class="mood-rgb" style="background:radial-gradient(circle,#5a6acc,#1a1a5a)"></div>
+        <div class="mood-scent-name">Arcane Mode</div>
+        <div class="mood-scent-feel">Blue-purple RGB · creative · night</div>
+      </div>
+      <div class="mood-scent-bottom">
+        <ul>
+          <li><strong>Primary:</strong> Lavender + frankincense</li>
+          <li><strong>Add:</strong> A drop of bergamot</li>
+          <li><strong>Feel:</strong> Mysterious, focused, slightly floral</li>
+          <li><strong>Intensity:</strong> Low — 3 drops total</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mood-scent">
+      <div class="mood-scent-top" style="background:linear-gradient(135deg,rgba(38,28,6,0.8),rgba(20,14,3,0.9))">
+        <div class="mood-rgb" style="background:radial-gradient(circle,#c9933a,#6b4a10)"></div>
+        <div class="mood-scent-name">Candlelight Mode</div>
+        <div class="mood-scent-feel">Amber RGB · wind down · cozy</div>
+      </div>
+      <div class="mood-scent-bottom">
+        <ul>
+          <li><strong>Primary:</strong> Vanilla + sandalwood</li>
+          <li><strong>Add:</strong> A drop of sweet orange</li>
+          <li><strong>Feel:</strong> Warm, soft, like a cozy inn</li>
+          <li><strong>Intensity:</strong> Low — 3 drops total</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mood-scent">
+      <div class="mood-scent-top" style="background:linear-gradient(135deg,rgba(20,24,28,0.8),rgba(10,12,14,0.9))">
+        <div class="mood-rgb" style="background:radial-gradient(circle,#e0ddd5,#8a8070)"></div>
+        <div class="mood-scent-name">Focus Mode</div>
+        <div class="mood-scent-feel">Cool white RGB · work · WFH</div>
+      </div>
+      <div class="mood-scent-bottom">
+        <ul>
+          <li><strong>Primary:</strong> Peppermint + rosemary</li>
+          <li><strong>Add:</strong> A drop of lemon</li>
+          <li><strong>Feel:</strong> Sharp, clean, mentally activating</li>
+          <li><strong>Intensity:</strong> Very low — 2 drops total</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <h5>Sensitivity Protocol</h5>
+    <p>Always start with 2–3 drops maximum and let the room settle for 10 minutes before adding more. Open a window for the first few uses of a new oil to test your response. If any blend triggers discomfort, stop immediately and air out the room — scent should enhance the space, never overwhelm it. Keep a neutral baseline oil (plain cedarwood or eucalyptus) as your safe default.</p>
+  </div>
+</section>
+
+<!-- BY ROOM -->
+<div class="divider"></div>
+<section id="rooms">
+  <div class="section-tag teal">Room by Room</div>
+  <h2>Each Room's Scent Role</h2>
+  <p class="intro">Different rooms need different scent strategies based on size, purpose, and how long you spend in them.</p>
+
+  <div class="room-scent">
+    <div class="room-scent-header">
+      <h4>Bedroom — Primary Scent Space</h4>
+      <span>Ultrasonic diffuser · mood-synced</span>
+    </div>
+    <div class="room-scent-body">
+      <div class="rsb-col">
+        <h5>Setup</h5>
+        <ul>
+          <li>One ultrasonic diffuser on the desk shelf or floating shelf — mist catches RGB glow beautifully</li>
+          <li>One reed diffuser on the Murphy bed side cabinet — passive background even when diffuser is off</li>
+          <li>Cedar blocks inside the large closet — drawer and shelf level</li>
+          <li>Dried lavender bundle hung inside closet — subtle, calming, helps sleep</li>
+        </ul>
+      </div>
+      <div class="rsb-col">
+        <h5>Scent Strategy</h5>
+        <ul>
+          <li><strong>Gaming:</strong> Dragon mode blend — clove + pepper + patchouli</li>
+          <li><strong>WFH:</strong> Focus mode — peppermint + rosemary + lemon</li>
+          <li><strong>Wind down:</strong> Candlelight mode — vanilla + sandalwood</li>
+          <li><strong>Sleep:</strong> Turn diffuser off, let the reed diffuser and lavender carry it passively</li>
+          <li>Reed diffuser scent: subtle lavender + cedarwood — always present at low level</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="room-scent">
+    <div class="room-scent-header">
+      <h4>Bathroom — Spa Atmosphere</h4>
+      <span>Reed diffuser · eucalyptus · linen spray</span>
+    </div>
+    <div class="room-scent-body">
+      <div class="rsb-col">
+        <h5>Setup</h5>
+        <ul>
+          <li>Reed diffuser on the back of the toilet tank or counter — runs constantly at low level</li>
+          <li>Eucalyptus bundle tied to shower head — steam activates it during showers</li>
+          <li>No ultrasonic diffuser here — humidity already high, no need to add more moisture</li>
+          <li>A small dish of dried botanicals (lavender, rosemary) on the counter — visual and scent both</li>
+        </ul>
+      </div>
+      <div class="rsb-col">
+        <h5>Scent Strategy</h5>
+        <ul>
+          <li><strong>Reed diffuser scent:</strong> Eucalyptus + mint — fresh, clean, spa-forward</li>
+          <li><strong>Shower scent:</strong> Natural eucalyptus steam — most intense moment of scent in the day</li>
+          <li><strong>Skincare routine:</strong> The reed diffuser running makes your routine feel like a spa treatment</li>
+          <li>Replace eucalyptus bundle monthly — Trader Joe's sells fresh bundles for ~$4–6</li>
+          <li>Replace reed diffuser oil every 2–3 months</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="room-scent">
+    <div class="room-scent-header">
+      <h4>Loft — Communal Atmosphere</h4>
+      <span>Larger ultrasonic · room spray · natural plants</span>
+    </div>
+    <div class="room-scent-body">
+      <div class="rsb-col">
+        <h5>Setup</h5>
+        <ul>
+          <li>One larger capacity ultrasonic diffuser (500ml+) on the bookshelf or bar cart — needs more coverage for 27ft space</li>
+          <li>Fresh mint or rosemary plant near the DnD table — guests brush it when reaching for dice, releases scent</li>
+          <li>Room spray on the bar cart — one quick spritz before sessions begins</li>
+          <li>The large windows mean scent dissipates faster here — slightly higher intensity is fine</li>
+        </ul>
+      </div>
+      <div class="rsb-col">
+        <h5>Scent Strategy</h5>
+        <ul>
+          <li><strong>DnD sessions:</strong> Forest mode — cedarwood + eucalyptus. Smells like an ancient forest. Sets the scene</li>
+          <li><strong>Casual hangout:</strong> Candlelight mode — vanilla + sandalwood. Warm, welcoming, universally loved</li>
+          <li><strong>Reading nook zone:</strong> Arcane mode — lavender + frankincense. Focused, calm</li>
+          <li>Keep loft scents softer than bedroom — shared space means accounting for roommate preferences</li>
+          <li>Ask roommates before running strong blends — a light touch works for everyone</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIY BLENDS -->
+<div class="divider"></div>
+<section id="blends">
+  <div class="section-tag gold">DIY Blends</div>
+  <h2>Essential Oil Recipes</h2>
+  <p class="intro">Buying pre-blended oils gets expensive fast. A starter kit of 8–10 single oils covers every mood blend below and lasts months. All recipes are for a standard 100–200ml diffuser.</p>
+
+  <div class="blend-grid">
+    <div class="blend-card">
+      <div class="blend-name">Ancient Forest</div>
+      <div class="blend-mood">Forest Mode · Green RGB</div>
+      <div class="blend-recipe">
+        <div class="blend-row"><span class="blend-oil">Cedarwood</span><span class="blend-drops">3 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Eucalyptus</span><span class="blend-drops">2 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Pine or Fir Needle</span><span class="blend-drops">1 drop</span></div>
+      </div>
+      <div class="blend-note">Earthy, damp, deeply forested. Like opening a door into the woods after rain. Your signature bedroom scent.</div>
+    </div>
+
+    <div class="blend-card">
+      <div class="blend-name">Dragon's Breath</div>
+      <div class="blend-mood">Dragon Mode · Red RGB</div>
+      <div class="blend-recipe">
+        <div class="blend-row"><span class="blend-oil">Black Pepper</span><span class="blend-drops">2 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Clove Bud</span><span class="blend-drops">2 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Patchouli</span><span class="blend-drops">1 drop</span></div>
+      </div>
+      <div class="blend-note">Spiced, ancient, warm — not smoky at all. The clove and pepper feel powerful without any burning quality. Goes with the red lighting perfectly.</div>
+    </div>
+
+    <div class="blend-card">
+      <div class="blend-name">Midnight Spell</div>
+      <div class="blend-mood">Arcane Mode · Blue-Purple RGB</div>
+      <div class="blend-recipe">
+        <div class="blend-row"><span class="blend-oil">Lavender</span><span class="blend-drops">3 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Frankincense</span><span class="blend-drops">2 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Bergamot</span><span class="blend-drops">1 drop</span></div>
+      </div>
+      <div class="blend-note">Calming but mysterious. The frankincense has a slight resinous depth without any smoke. Good for late-night creative work or reading.</div>
+    </div>
+
+    <div class="blend-card">
+      <div class="blend-name">Tavern Warmth</div>
+      <div class="blend-mood">Candlelight Mode · Amber RGB</div>
+      <div class="blend-recipe">
+        <div class="blend-row"><span class="blend-oil">Vanilla (absolute or EO)</span><span class="blend-drops">3 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Sandalwood</span><span class="blend-drops">2 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Sweet Orange</span><span class="blend-drops">1 drop</span></div>
+      </div>
+      <div class="blend-note">Sweet, soft, and universally welcoming. The loft DnD scent for casual sessions and hangouts. Everyone will comment on how good the space smells.</div>
+    </div>
+
+    <div class="blend-card">
+      <div class="blend-name">Sharp Mind</div>
+      <div class="blend-mood">Focus Mode · Cool White RGB</div>
+      <div class="blend-recipe">
+        <div class="blend-row"><span class="blend-oil">Peppermint</span><span class="blend-drops">2 drops</span></div>
+        <div class="blend-row"><span class="blend-oil">Rosemary</span><span class="blend-drops">1 drop</span></div>
+        <div class="blend-row"><span class="blend-oil">Lemon</span><span class="blend-drops">1 drop</span></div>
+      </div>
+      <div class="blend-note">Clinically shown to improve focus and alertness — not just vibes. Use 2 drops total max. This one is potent. Perfect for WFH calls and deep work sessions.</div>
+    </div>
+
+    <div class="blend-card">
+      <div class="blend-name">Stone Bath</div>
+      <div class="blend-mood">Bathroom · Reed Diffuser</div>
+      <div class="blend-recipe">
+        <div class="blend-row"><span class="blend-oil">Eucalyptus</span><span class="blend-drops">Reed diffuser oil</span></div>
+        <div class="blend-row"><span class="blend-oil">Spearmint</span><span class="blend-drops">Reed diffuser oil</span></div>
+        <div class="blend-row"><span class="blend-oil">Tea Tree (tiny amount)</span><span class="blend-drops">Clean, sharp note</span></div>
+      </div>
+      <div class="blend-note">For the reed diffuser — use a pre-blended reed diffuser oil in eucalyptus/mint rather than pure essential oils, which are too concentrated for reeds. Spa, fresh, clean.</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h5>Essential Oil Quality Note</h5>
+    <p>Don't buy the cheapest oils — synthetic fragrance oils smell fine initially but can trigger headaches and often smell "sharp" or chemical. Look for 100% pure essential oils from Plant Therapy, Rocky Mountain Oils, or Eden's Garden. They're affordable, third-party tested, and the quality difference is immediate. Avoid MLM brands (doTERRA, Young Living) — good quality, dramatically overpriced.</p>
+  </div>
+</section>
+
+<!-- NATURAL SOURCES -->
+<div class="divider"></div>
+<section id="natural">
+  <div class="section-tag">Natural Sources</div>
+  <h2>Plants That Scent</h2>
+  <p class="intro">Living plants that contribute to the scent ecosystem passively — no diffuser, no effort, just biology doing its thing.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🌿</div>
+      <h4>Eucalyptus — Shower Hero</h4>
+      <ul>
+        <li>Fresh bundle tied to the shower head with twine — shower steam releases the essential oils naturally</li>
+        <li>Replace monthly, ~$4–6 at Trader Joe's or a florist</li>
+        <li>The scent is strongest during and right after a shower — exactly when you want a spa moment</li>
+        <li>Looks gorgeous against the Mineral Deposit bathroom walls</li>
+        <li>Completely safe — no heat involved, just steam</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌱</div>
+      <h4>Fresh Herbs — Living Scent</h4>
+      <ul>
+        <li><strong>Mint:</strong> A small pot on the desk shelf — brush the leaves when you sit down, releases a clean sharp scent. Also Focus mode in literal plant form</li>
+        <li><strong>Rosemary:</strong> Beside the mint — woodier, herbal, pairs with cedarwood in the diffuser nearby</li>
+        <li>Both thrive in a window with decent light — your west wall window is perfect</li>
+        <li>Bonus: actually usable in cooking if you have kitchen access</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <div class="card-icon">🌸</div>
+      <h4>Dried Botanicals — Passive Always-On</h4>
+      <ul>
+        <li><strong>Lavender bundles:</strong> Inside the closet hung upside down — subtle calming scent on clothes, helps with sleep</li>
+        <li><strong>Cedar blocks:</strong> In drawers and on closet shelves — earthy, wood-forward, also protects clothes</li>
+        <li><strong>Dried rosemary sprigs:</strong> In a dark vase on a shelf — visual decor that also scents</li>
+        <li>All of these last months — low maintenance, always present</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🪵</div>
+      <h4>Passive Wood Scent</h4>
+      <ul>
+        <li>The A-frame's exposed wood beams actually contribute a faint woody scent to the space — especially in warmer months</li>
+        <li>A small piece of raw cedar or sandalwood on a shelf releases scent without any heat — just the natural oils in the wood</li>
+        <li>Dark wood furniture (walnut, cedar, teak) all contribute to the overall scent profile of the room passively</li>
+        <li>This is why the space will smell like a forest cabin even without a diffuser running</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SHOPPING -->
+<div class="divider"></div>
+<section id="shopping">
+  <div class="section-tag">Shopping List</div>
+  <h2>Scent Budget</h2>
+  <p class="intro">The starter kit covers everything. Once you have the diffusers and core oils, ongoing cost is minimal — oils last months, eucalyptus is $5 monthly.</p>
+
+  <div class="shop-wrap">
+    <table>
+      <thead><tr><th>Item</th><th>Where / Notes</th><th>Budget</th></tr></thead>
+      <tbody>
+        <tr><td>Ultrasonic diffuser — bedroom (100–200ml)</td><td>Amazon — URPOWER or InnoGear. Dark wood finish preferred</td><td><span class="badge b-low">$15–30</span></td></tr>
+        <tr><td>Ultrasonic diffuser — loft (500ml+)</td><td>Amazon — larger capacity for bigger space</td><td><span class="badge b-low">$25–45</span></td></tr>
+        <tr><td>Reed diffuser set — bathroom</td><td>Amazon, HomeGoods — eucalyptus/mint scent</td><td><span class="badge b-low">$12–25</span></td></tr>
+        <tr><td>Cedarwood essential oil</td><td>Plant Therapy or Rocky Mountain Oils</td><td><span class="badge b-low">$8–12</span></td></tr>
+        <tr><td>Eucalyptus essential oil</td><td>Plant Therapy or Rocky Mountain Oils</td><td><span class="badge b-low">$8–12</span></td></tr>
+        <tr><td>Lavender essential oil</td><td>Plant Therapy or Rocky Mountain Oils</td><td><span class="badge b-low">$8–12</span></td></tr>
+        <tr><td>Peppermint essential oil</td><td>Plant Therapy or Rocky Mountain Oils</td><td><span class="badge b-low">$6–10</span></td></tr>
+        <tr><td>Sandalwood essential oil</td><td>Plant Therapy — slightly pricier but worth it</td><td><span class="badge b-mid">$14–22</span></td></tr>
+        <tr><td>Black pepper essential oil</td><td>Plant Therapy or Rocky Mountain Oils</td><td><span class="badge b-low">$8–12</span></td></tr>
+        <tr><td>Vanilla absolute or EO</td><td>Plant Therapy — vanilla absolute is richer</td><td><span class="badge b-low">$10–16</span></td></tr>
+        <tr><td>Frankincense essential oil</td><td>Plant Therapy or Rocky Mountain Oils</td><td><span class="badge b-low">$10–16</span></td></tr>
+        <tr><td>Sweet orange essential oil</td><td>Plant Therapy — cheap and cheerful</td><td><span class="badge b-low">$5–8</span></td></tr>
+        <tr><td>Eucalyptus shower bundle (monthly)</td><td>Trader Joe's, florist — fresh bundle</td><td><span class="badge b-low">$4–6/mo</span></td></tr>
+        <tr><td>Dried lavender bundle</td><td>Amazon, HomeGoods, farmer's market</td><td><span class="badge b-low">$8–15</span></td></tr>
+        <tr><td>Cedar blocks for closet (8 pack)</td><td>Amazon</td><td><span class="badge b-low">$10–15</span></td></tr>
+        <tr><td>Small mint + rosemary plant</td><td>Trader Joe's, IKEA, local nursery</td><td><span class="badge b-low">$6–12</span></td></tr>
+        <tr><td>Room spray bottle (4oz glass)</td><td>Amazon — dark glass preferred</td><td><span class="badge b-low">$6–10</span></td></tr>
+        <tr><td>Distilled water (for diffusers)</td><td>Any grocery store — gallon jug</td><td><span class="badge b-low">$1–2</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout gold" style="margin-top:20px;">
+    <h5>Starter Kit Total</h5>
+    <p>Both diffusers + reed diffuser + all 10 core essential oils: roughly <strong style="color:var(--gold)">$130–190</strong> upfront. After that, ongoing cost is just eucalyptus bundles monthly ($5) and replacing oils every 3–6 months (~$10–15 at a time). The whole scent system runs on about <strong style="color:var(--gold)">$5–10 per month</strong> once established — cheaper than a single scented candle.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Scent Design · Dragon Den · The invisible layer that makes it yours</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">🌿</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){
+    var top=el.getBoundingClientRect().top+window.pageYOffset-52;
+    window.scrollTo({top:top,behavior:'smooth'});
+  }
+}
+</script>
+</body>
+</html>

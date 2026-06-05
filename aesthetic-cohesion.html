@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aesthetic Cohesion — Dragon Den</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void:#07090a; --deep:#0c1210; --moss:#2a4530; --jade:#3d7a4a;
+    --stone:#7a7060; --cream:#e8dcc8; --ember:#c8401a; --gold:#c9933a;
+    --mist:rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.97); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  .hero { min-height:55vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 55% 55% at 20% 75%,rgba(61,122,74,0.12) 0%,transparent 55%), radial-gradient(ellipse 50% 40% at 80% 25%,rgba(200,64,26,0.08) 0%,transparent 50%), radial-gradient(ellipse 60% 50% at 50% 100%,rgba(201,147,58,0.07) 0%,transparent 55%); }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--jade); text-transform:uppercase; margin-bottom:14px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,4.5rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--jade) 50%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:1rem; margin-top:12px; position:relative; }
+  .hero-divider { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--jade),transparent); margin:22px auto; position:relative; }
+
+  section { max-width:900px; margin:0 auto; padding:70px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.ember { color:var(--ember); }
+  .section-tag.gold { color:var(--gold); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.6rem,4vw,2.5rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:1rem; line-height:1.75; margin-bottom:32px; max-width:640px; }
+
+  /* THREAD DIAGRAM */
+  .thread-diagram { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:32px; position:relative; overflow:hidden; margin-bottom:28px; }
+  .thread-diagram::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(61,122,74,0.06),transparent); }
+  .thread-center { text-align:center; margin-bottom:32px; position:relative; }
+  .thread-core { display:inline-block; font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; padding:10px 24px; border:1px solid rgba(61,122,74,0.4); border-radius:2px; background:rgba(61,122,74,0.1); }
+  .thread-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; position:relative; }
+  .thread-room { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:3px; padding:18px; }
+  .thread-room-name { font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.2em; color:var(--cream); text-transform:uppercase; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .thread-item { font-size:0.82rem; color:var(--stone); padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.4; }
+  .thread-item:last-child { border-bottom:none; }
+  .thread-item span { color:var(--jade); font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.1em; margin-right:6px; }
+
+  /* RULES */
+  .rules { display:flex; flex-direction:column; gap:0; border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; background:var(--deep); }
+  .rule-row { display:grid; grid-template-columns:1fr 1fr; gap:0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .rule-row:last-child { border-bottom:none; }
+  .rule-bad { padding:16px 18px; border-right:1px solid rgba(255,255,255,0.04); }
+  .rule-good { padding:16px 18px; background:rgba(61,122,74,0.04); }
+  .rule-label { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.25em; text-transform:uppercase; margin-bottom:7px; }
+  .rl-bad { color:var(--ember); }
+  .rl-good { color:var(--jade); }
+  .rule-text { font-size:0.86rem; color:var(--stone); line-height:1.55; font-style:italic; }
+
+  /* ROOM COMPARE */
+  .room-compare { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+  .rc-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .rc-header { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .rc-name { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.15em; color:var(--cream); font-weight:600; }
+  .rc-role { font-size:0.78rem; color:var(--stone); font-style:italic; margin-top:3px; }
+  .rc-body { padding:14px 16px; }
+  .rc-element { display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03); }
+  .rc-element:last-child { border-bottom:none; }
+  .rc-el-label { font-size:0.8rem; color:var(--stone); }
+  .rc-el-val { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.05em; color:var(--cream); text-align:right; max-width:55%; }
+
+  /* CARDS */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:20px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .card:hover { border-color:rgba(61,122,74,0.3); }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--jade),transparent); }
+  .card.ember::before { background:linear-gradient(90deg,var(--ember),transparent); }
+  .card.gold::before { background:linear-gradient(90deg,var(--gold),transparent); }
+  .card-icon { font-size:1.3rem; margin-bottom:10px; }
+  .card h4 { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:10px; font-weight:600; }
+  .card p { font-size:0.86rem; color:var(--stone); line-height:1.65; font-style:italic; margin-bottom:10px; }
+  .card ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .card li { font-size:0.84rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .card li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.2rem; line-height:1; }
+  .card.ember li::before { color:var(--ember); }
+  .card.gold li::before { color:var(--gold); }
+  .card li strong { color:var(--cream); font-weight:400; }
+
+  /* CHECKLIST */
+  .checklist { display:flex; flex-direction:column; gap:0; border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; background:var(--deep); }
+  .check-section { border-bottom:1px solid rgba(255,255,255,0.05); }
+  .check-section:last-child { border-bottom:none; }
+  .check-section-header { padding:12px 16px; background:rgba(255,255,255,0.02); font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; }
+  .csh-bedroom { color:var(--jade); }
+  .csh-bath { color:var(--gold); }
+  .csh-loft { color:var(--ember); }
+  .check-item { display:flex; align-items:flex-start; gap:12px; padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.03); cursor:pointer; transition:background 0.15s; }
+  .check-item:last-child { border-bottom:none; }
+  .check-item:hover { background:var(--mist); }
+  .check-box { width:18px; height:18px; border:1px solid rgba(255,255,255,0.15); border-radius:3px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .check-item.done .check-box { background:var(--jade); border-color:var(--jade); }
+  .check-item.done .check-box::after { content:'✓'; font-size:0.65rem; color:white; }
+  .check-item.done .check-main { opacity:0.4; text-decoration:line-through; }
+  .check-main { font-size:0.87rem; color:var(--cream); line-height:1.4; }
+  .check-sub { font-size:0.78rem; color:var(--stone); font-style:italic; margin-top:2px; }
+
+  .callout { padding:18px 22px; border-radius:3px; margin:20px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout.ember { border-left-color:var(--ember); background:rgba(200,64,26,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:8px; }
+  .callout.gold h5 { color:var(--gold); }
+  .callout.ember h5 { color:var(--ember); }
+  .callout p { font-size:0.9rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.25),transparent); }
+  footer { text-align:center; padding:50px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.18); letter-spacing:0.2em; }
+
+  @media(max-width:640px){ .thread-grid,.room-compare { grid-template-columns:1fr; } .rule-row { grid-template-columns:1fr; } .rule-bad { border-right:none; border-bottom:1px solid rgba(255,255,255,0.04); } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Cohesion</div>
+  <a onclick="nav('thread')">The Thread</a>
+  <a onclick="nav('rooms')">Room by Room</a>
+  <a onclick="nav('rules')">Do / Don't</a>
+  <a onclick="nav('transitions')">Transitions</a>
+  <a onclick="nav('mistakes')">Watch Out</a>
+  <a onclick="nav('checklist')">Final Check</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Aesthetic Cohesion Check · Dragon Den</div>
+  <h1 class="hero-title">One World,<br>Three Rooms</h1>
+  <p class="hero-sub">Bedroom · Bathroom · Loft — the same soul, different expressions</p>
+  <div class="hero-divider"></div>
+</div>
+
+<!-- THE THREAD -->
+<div class="divider"></div>
+<section id="thread">
+  <div class="section-tag">The Concept</div>
+  <h2>The Unifying Thread</h2>
+  <p class="intro">Three rooms read as one world when they share the same underlying language — not the same colors or furniture, but the same materials, mood, and meaning. Here's what runs through every space.</p>
+
+  <div class="thread-diagram">
+    <div class="thread-center">
+      <div class="thread-core">🌲 Dark Forest Dragon Den — The World</div>
+      <div style="font-size:0.8rem; color:var(--stone); font-style:italic; margin-top:10px;">Warm wood · Deep dark walls · Forest green · Dragon ember · Natural texture · Candlelight glow</div>
+    </div>
+    <div class="thread-grid">
+      <div class="thread-room">
+        <div class="thread-room-name">🛏 Bedroom</div>
+        <div class="thread-item"><span>TONE</span>Full immersion — your lair</div>
+        <div class="thread-item"><span>WALLS</span>Tricorn Black + Shade-Grown green</div>
+        <div class="thread-item"><span>WOOD</span>Honey floor + espresso furniture</div>
+        <div class="thread-item"><span>DRAGON</span>Full display — shrine + collection</div>
+        <div class="thread-item"><span>LIGHT</span>All 6 RGB zones active</div>
+        <div class="thread-item"><span>SCENT</span>Mood-synced ultrasonic</div>
+        <div class="thread-item"><span>INTENSITY</span>Maximum</div>
+      </div>
+      <div class="thread-room">
+        <div class="thread-room-name">🚿 Bathroom</div>
+        <div class="thread-item"><span>TONE</span>Hidden onsen — quiet ritual</div>
+        <div class="thread-item"><span>WALLS</span>Mineral Deposit blue-green</div>
+        <div class="thread-item"><span>WOOD</span>Bamboo mat + wooden tray</div>
+        <div class="thread-item"><span>DRAGON</span>Zero — nature is the theme</div>
+        <div class="thread-item"><span>LIGHT</span>Warm vanity + mirror strip</div>
+        <div class="thread-item"><span>SCENT</span>Reed diffuser + eucalyptus</div>
+        <div class="thread-item"><span>INTENSITY</span>Quiet</div>
+      </div>
+      <div class="thread-room">
+        <div class="thread-room-name">🎲 Loft</div>
+        <div class="thread-item"><span>TONE</span>Communal tavern — shared world</div>
+        <div class="thread-item"><span>WALLS</span>Existing A-frame — no paint needed</div>
+        <div class="thread-item"><span>WOOD</span>A-frame beams + dark furniture</div>
+        <div class="thread-item"><span>DRAGON</span>Subtle — one figure, one print</div>
+        <div class="thread-item"><span>LIGHT</span>Pendant + arc lamp + string lights</div>
+        <div class="thread-item"><span>SCENT</span>Ultrasonic + fresh herbs</div>
+        <div class="thread-item"><span>INTENSITY</span>Warm, welcoming</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h5>The Gradient Principle</h5>
+    <p>The aesthetic gets progressively quieter as you move from bedroom → bathroom → loft. Your bedroom is the full expression — maximum dragon, maximum dark, maximum RGB. The bathroom is the palate cleanser — dark but serene. The loft is the public face — warm, atmospheric, universally appealing. Each space earns its intensity level based on who sees it and what it's for.</p>
+  </div>
+</section>
+
+<!-- SHARED ELEMENTS -->
+<div class="divider"></div>
+<section>
+  <div class="section-tag gold">Shared Language</div>
+  <h2>What Runs Through Every Room</h2>
+  <p class="intro">Cohesion doesn't come from matching furniture sets — it comes from repeating a small set of materials, colors, and textures across every space.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🪵</div>
+      <h4>Warm Wood Tone</h4>
+      <p>The honey hardwood floors throughout the house are your anchor. Everything plays off them.</p>
+      <ul>
+        <li><strong>Bedroom:</strong> The floor itself, espresso/walnut furniture, exposed beams</li>
+        <li><strong>Bathroom:</strong> Bamboo bath mat, wooden skincare tray, bamboo vase</li>
+        <li><strong>Loft:</strong> A-frame beams, dark wood DnD table, bookshelf</li>
+        <li>Rule: every room has at least one warm wood element that references the floor</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌿</div>
+      <h4>Living Green</h4>
+      <p>Plants connect the forest theme to reality. Every room has at least two plants.</p>
+      <ul>
+        <li><strong>Bedroom:</strong> Snake plant (corner) + pothos (dragon shelf)</li>
+        <li><strong>Bathroom:</strong> ZZ plant (toilet area) + eucalyptus (shower) + bamboo stalks</li>
+        <li><strong>Loft:</strong> Pothos trailing on railing + mint/rosemary near DnD table</li>
+        <li>Rule: always trailing or tall — nothing that reads as a decorative fake plant</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🔶</div>
+      <h4>Matte Black Hardware</h4>
+      <p>The finish that bridges dark walls, warm wood, and dark furniture across all three rooms.</p>
+      <ul>
+        <li><strong>Bedroom:</strong> Shelf brackets, curtain rod, lamp bases, monitor arm</li>
+        <li><strong>Bathroom:</strong> All hardware — towel ring, toilet paper holder, hooks</li>
+        <li><strong>Loft:</strong> Pendant cage, lamp base, bar cart frame</li>
+        <li>Rule: zero chrome anywhere visible. All chrome gets replaced or hidden</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌑</div>
+      <h4>Dark Textiles</h4>
+      <p>The softness layer that keeps dark walls from feeling stark or cold.</p>
+      <ul>
+        <li><strong>Bedroom:</strong> Forest green velvet duvet, charcoal rug, cream faux fur throw</li>
+        <li><strong>Bathroom:</strong> Charcoal/forest green towels, bamboo mat</li>
+        <li><strong>Loft:</strong> Dark sofa, charcoal armchair, Moroccan poufs, dark rug</li>
+        <li>Rule: velvet or textured fabric in every room — smooth surfaces alone read cold</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🍂</div>
+      <h4>Ember Accent</h4>
+      <p>The dragon-fire color. One ember/rust/terracotta element per room — never more than one.</p>
+      <ul>
+        <li><strong>Bedroom:</strong> One ember accent pillow on the bed + RGB dragon mode</li>
+        <li><strong>Bathroom:</strong> Mirror RGB strip warm amber setting</li>
+        <li><strong>Loft:</strong> One rust/terracotta throw pillow on the sofa or armchair</li>
+        <li>Rule: ember is an accent — not a theme. One per room, maximum. Overuse kills the effect</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🕯️</div>
+      <h4>Warm Light Tone</h4>
+      <p>Every light source defaults to warm — 2200–2700K. Cool white only in Focus mode.</p>
+      <ul>
+        <li><strong>Bedroom:</strong> Smart pendant, beam strips (amber default), desk bias</li>
+        <li><strong>Bathroom:</strong> 2700K vanity bulbs, amber mirror strip default</li>
+        <li><strong>Loft:</strong> Edison pendant, arc lamp, warm string lights</li>
+        <li>Rule: if a bulb came with the space and it's cool white — replace it</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ROOM BY ROOM -->
+<div class="divider"></div>
+<section id="rooms">
+  <div class="section-tag">Room Comparison</div>
+  <h2>Side by Side</h2>
+  <p class="intro">Each room occupies a different emotional register — but the same design vocabulary. Check that each element is present before the room is considered done.</p>
+
+  <div class="room-compare">
+    <div class="rc-card">
+      <div class="rc-header">
+        <div class="rc-name">Bedroom</div>
+        <div class="rc-role">Your sanctuary · Full expression</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-element"><span class="rc-el-label">Wall color</span><span class="rc-el-val">Tricorn Black + Shade-Grown</span></div>
+        <div class="rc-element"><span class="rc-el-label">Hardware</span><span class="rc-el-val">Matte black throughout</span></div>
+        <div class="rc-element"><span class="rc-el-label">Wood</span><span class="rc-el-val">Floor + espresso furniture</span></div>
+        <div class="rc-element"><span class="rc-el-label">Textiles</span><span class="rc-el-val">Green velvet + faux fur</span></div>
+        <div class="rc-element"><span class="rc-el-label">Plants</span><span class="rc-el-val">2–3 plants</span></div>
+        <div class="rc-element"><span class="rc-el-label">Dragon</span><span class="rc-el-val">Full display + shrine</span></div>
+        <div class="rc-element"><span class="rc-el-label">RGB zones</span><span class="rc-el-val">6 zones active</span></div>
+        <div class="rc-element"><span class="rc-el-label">Scent</span><span class="rc-el-val">Ultrasonic mood-synced</span></div>
+        <div class="rc-element"><span class="rc-el-label">Ember accent</span><span class="rc-el-val">One pillow</span></div>
+      </div>
+    </div>
+    <div class="rc-card">
+      <div class="rc-header">
+        <div class="rc-name">Bathroom</div>
+        <div class="rc-role">Hidden onsen · Quiet ritual</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-element"><span class="rc-el-label">Wall color</span><span class="rc-el-val">Mineral Deposit</span></div>
+        <div class="rc-element"><span class="rc-el-label">Hardware</span><span class="rc-el-val">Matte black throughout</span></div>
+        <div class="rc-element"><span class="rc-el-label">Wood</span><span class="rc-el-val">Bamboo mat + wood tray</span></div>
+        <div class="rc-element"><span class="rc-el-label">Textiles</span><span class="rc-el-val">Dark towels + bamboo mat</span></div>
+        <div class="rc-element"><span class="rc-el-label">Plants</span><span class="rc-el-val">3 plants + eucalyptus</span></div>
+        <div class="rc-element"><span class="rc-el-label">Dragon</span><span class="rc-el-val">None — nature only</span></div>
+        <div class="rc-element"><span class="rc-el-label">RGB zones</span><span class="rc-el-val">Mirror strip only</span></div>
+        <div class="rc-element"><span class="rc-el-label">Scent</span><span class="rc-el-val">Reed diffuser always-on</span></div>
+        <div class="rc-element"><span class="rc-el-label">Ember accent</span><span class="rc-el-val">Mirror strip amber setting</span></div>
+      </div>
+    </div>
+    <div class="rc-card">
+      <div class="rc-header">
+        <div class="rc-name">Loft</div>
+        <div class="rc-role">Communal tavern · Shared world</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-element"><span class="rc-el-label">Wall color</span><span class="rc-el-val">Existing A-frame (no paint)</span></div>
+        <div class="rc-element"><span class="rc-el-label">Hardware</span><span class="rc-el-val">Matte black fixtures</span></div>
+        <div class="rc-element"><span class="rc-el-label">Wood</span><span class="rc-el-val">A-frame beams + dark table</span></div>
+        <div class="rc-element"><span class="rc-el-label">Textiles</span><span class="rc-el-val">Dark sofa + poufs + rugs</span></div>
+        <div class="rc-element"><span class="rc-el-label">Plants</span><span class="rc-el-val">2–3 plants</span></div>
+        <div class="rc-element"><span class="rc-el-label">Dragon</span><span class="rc-el-val">One figure + one art print</span></div>
+        <div class="rc-element"><span class="rc-el-label">RGB zones</span><span class="rc-el-val">Bookshelf strip only</span></div>
+        <div class="rc-element"><span class="rc-el-label">Scent</span><span class="rc-el-val">Ultrasonic + fresh herbs</span></div>
+        <div class="rc-element"><span class="rc-el-label">Ember accent</span><span class="rc-el-val">One rust/terracotta pillow</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DO / DON'T -->
+<div class="divider"></div>
+<section id="rules">
+  <div class="section-tag ember">Cohesion Rules</div>
+  <h2>Do and Don't</h2>
+  <p class="intro">These are the boundaries that keep the world coherent. Breaking one doesn't ruin everything — breaking several does.</p>
+
+  <div class="rules">
+    <div style="display:grid; grid-template-columns:1fr 1fr; background:#0a0e0c; border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div style="padding:10px 18px; font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.3em; color:var(--ember); text-transform:uppercase; border-right:1px solid rgba(255,255,255,0.05);">✗ Don't</div>
+      <div style="padding:10px 18px; font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase;">✓ Do Instead</div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Buy furniture in light pine, natural oak, or white finishes — these fight the dark palette and warm floors simultaneously</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Stick to espresso, walnut, dark oak, or matte black metal. Any wood furniture should be darker than the floor, not lighter</div></div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Put dragon figures in the bathroom or scatter them casually across all three rooms as if decorating a gift shop</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Dragon collection lives only in the bedroom. The loft gets one piece maximum. The bathroom gets zero — nature is the theme there</div></div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Use cool-white or blue-toned LED bulbs anywhere — they read clinical and fight the warm wood floors</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Warm 2200–2700K in every fixture by default. Cool white only in RGB Focus mode, never as a permanent fixture bulb</div></div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Mix chrome, brushed nickel, and matte black hardware in the same room — hardware inconsistency reads cheap and unintentional</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Matte black only — in every room, every fixture. It's a $35 swap in the bathroom and worth every cent for the visual unity</div></div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Let the loft become a separate aesthetic from the bedroom — mismatched styles between floors breaks the sense that it's one home</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Dark furniture, warm wood, warm lighting in the loft — it doesn't need to be identical, but the material language should match</div></div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Overfill shelves with too many small items — crowded shelves read as clutter, not collection, and dilute every individual piece</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Odd numbers, breathing room, vary scale. If a shelf looks full, remove something. The empty space is part of the display</div></div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Use synthetic or artificial-looking plants — fake plants in a forest-themed space reads as ironic at best, sad at worst</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Real plants only. Pothos and snake plants are nearly unkillable. If a plant dies, replace it — it's part of the living world</div></div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-bad"><div class="rule-label rl-bad">✗</div><div class="rule-text">Buy a lot of dragon things at once to "fill the shelves" — quantity without curation looks like a store, not a collection</div></div>
+      <div class="rule-good"><div class="rule-label rl-good">✓</div><div class="rule-text">Buy slowly and intentionally. One great piece per month beats ten mediocre pieces all at once. Empty shelf space is better than filler</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSITIONS -->
+<div class="divider"></div>
+<section id="transitions">
+  <div class="section-tag">Spatial Flow</div>
+  <h2>Room Transitions</h2>
+  <p class="intro">The moments between rooms matter as much as the rooms themselves. How you move from one space to the next is part of the experience.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🚪</div>
+      <h4>Bedroom → Bathroom</h4>
+      <ul>
+        <li>The transition is through a door — so the contrast is intentional and immediate</li>
+        <li>Bedroom: dark, electric, RGB. Bathroom: deep teal-green, quiet, spa</li>
+        <li>The contrast IS the experience — stepping from your dragon lair into a hidden onsen feels like a reward</li>
+        <li>Make sure the bathroom door has a hook on the back — robe or towel hanging there is the first thing you see when the door opens</li>
+        <li>The smell changes immediately: bedroom scent ends, reed diffuser begins. This sensory shift reinforces the room change</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🪜</div>
+      <h4>Bedroom → Loft (Stairs)</h4>
+      <ul>
+        <li>The staircase connects your private world to the communal one — it's a decompression zone</li>
+        <li>The A-frame triangle window is visible from the top of the stairs — this is the establishing shot of the loft</li>
+        <li>The railing along the loft edge already frames the space architecturally — let it do its job, don't clutter it</li>
+        <li>One plant trailing along the railing (pothos with hooks) is the only addition needed here</li>
+        <li>Scent: if the bedroom diffuser is running, the loft should be scented too — prevent the "smell cliff" where one zone ends abruptly</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🌲</div>
+      <h4>Loft → Triangle Window</h4>
+      <ul>
+        <li>The window is the climax of the whole space — the real forest outside becomes part of the interior</li>
+        <li>Nothing in front of it. No furniture, no curtain, no decor on the frame</li>
+        <li>At night: the pendant above the DnD table reflects in the glass — the forest becomes infinite</li>
+        <li>In winter: Massachusetts snow on the trees through that window will be extraordinary. Lean into it</li>
+        <li>This view is why the A-frame was designed this way. Honor it</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COMMON MISTAKES -->
+<div class="divider"></div>
+<section id="mistakes">
+  <div class="section-tag ember">Watch Out For</div>
+  <h2>Common Cohesion Killers</h2>
+  <p class="intro">These are the things that most often break a carefully designed space. Knowing them in advance means you can catch them before they happen.</p>
+
+  <div class="cards">
+    <div class="card ember">
+      <div class="card-icon">⚡</div>
+      <h4>The ADHD Accumulation Problem</h4>
+      <p>Objects accumulate in ADHD households faster than systems can handle them. The dark aesthetic is particularly vulnerable because clutter shows up immediately against dark walls.</p>
+      <ul>
+        <li>The Sunday 10-minute reset keeps this contained — see storage guide</li>
+        <li>Every new object needs a designated home before it enters the space</li>
+        <li>The "one in, one out" rule applies to decor as much as clothes</li>
+        <li>If it doesn't have a place, it goes in a box in the closet until you decide — not on a surface</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🎁</div>
+      <h4>Gift and Impulse Decor</h4>
+      <p>People will give you things. You'll buy things on impulse. Some won't fit the aesthetic. This is the number one long-term cohesion threat.</p>
+      <ul>
+        <li>Have a "waiting box" — gifts and impulse buys go in it for 30 days before earning a permanent place</li>
+        <li>If it doesn't fit the world after 30 days: donate, regift, or store</li>
+        <li>The exception: sentimental items get one small designated spot — a "memory shelf" in the bedroom closet, not on display</li>
+        <li>This applies to your existing "useless memento stuff" too — box it, keep what genuinely matters</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">💡</div>
+      <h4>Wrong Light Temperature</h4>
+      <p>A single cool-white bulb in a warm room breaks the entire atmosphere. Light temperature is the easiest thing to get wrong and the most disruptive when you do.</p>
+      <ul>
+        <li>Check every bulb before move-in — the space has existing fixtures with unknown bulbs</li>
+        <li>Replace any cool-white (4000K+) bulbs immediately — warm 2700K costs the same</li>
+        <li>The loft ceiling fan already has a light kit — guaranteed to be the wrong bulb. Change it Day 1</li>
+        <li>One wrong bulb in a dark room reads like a flashlight in a cave</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🗓️</div>
+      <h4>Phase Impatience</h4>
+      <p>The biggest risk with a $500–1,000 budget is trying to do everything at once and ending up with a half-done version of several things rather than a complete version of the essentials.</p>
+      <ul>
+        <li>A painted room with a mattress on the floor and RGB strips running looks intentional and cool</li>
+        <li>An unpainted room with expensive furniture looks like a mismatch</li>
+        <li>Paint first. Always. Everything else is furniture in an empty box without it</li>
+        <li>A sparse, well-lit, well-painted room is better than a cluttered fully furnished one</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout ember">
+    <h5>The Mementos Question</h5>
+    <p>You mentioned having "a bunch of useless memento stuff." Here's the honest answer: most of it probably doesn't belong on display in this space. That's not about sentiment — it's about the fact that a curated world with intentional pieces hits harder than a collection of everything you've ever owned. Box the mementos, keep them safe in the closet, and bring out only the ones that genuinely spark something when you look at them. The rest gets stored, not displayed. The Dragon Den isn't a storage unit — it's a world.</p>
+  </div>
+</section>
+
+<!-- FINAL CHECKLIST -->
+<div class="divider"></div>
+<section id="checklist">
+  <div class="section-tag gold">Final Check</div>
+  <h2>Cohesion Checklist</h2>
+  <p class="intro">Run this checklist when each room is "done." If you can check every box, the space is cohesive. If something is unchecked, it's the next thing to address.</p>
+
+  <div class="checklist">
+    <div class="check-section">
+      <div class="check-section-header csh-bedroom">🛏 Bedroom</div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Walls painted — Tricorn Black (3 walls) + Shade-Grown (north)</div><div class="check-sub">No bare or wrong-color walls visible</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">All hardware matte black — curtain rod, shelf brackets, lamp bases</div><div class="check-sub">Zero chrome visible anywhere in the room</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">All light bulbs warm 2700K or warmer</div><div class="check-sub">Check the pendant and any existing fixtures</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">At least 2 plants — one tall, one trailing</div><div class="check-sub">Real plants only, healthy and positioned intentionally</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Dragon shelves mounted with LED strips active</div><div class="check-sub">Odd-number groupings, breathing room between pieces</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">RGB lighting zones set up and named in Govee app</div><div class="check-sub">5 mood scenes saved: Forest, Dragon, Arcane, Candlelight, Focus</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">One ember accent — one pillow only</div><div class="check-sub">Not two, not three — the accent loses power when repeated</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Zero visible cables on desk surface or walls</div><div class="check-sub">Cable raceway painted black, USB hub under desk, velcro ties</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Ultrasonic diffuser set up with Forest blend as default</div><div class="check-sub">3 drops cedarwood + 2 drops eucalyptus in distilled water</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Desk surface clear except for keyboard, mouse, headset stand, mic arm</div><div class="check-sub">Nothing else lives on the desk permanently</div></div></div>
+    </div>
+    <div class="check-section">
+      <div class="check-section-header csh-bath">🚿 Bathroom</div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Walls painted Mineral Deposit in satin finish</div><div class="check-sub">Cured 7 days before getting walls wet</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">All chrome hardware replaced with matte black</div><div class="check-sub">Towel ring, toilet paper holder, robe hook, shower caddy</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Vanity bulbs swapped to warm 2700K</div><div class="check-sub">The existing bulbs are almost certainly the wrong temperature</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Eucalyptus bundle on shower head</div><div class="check-sub">Fresh from Trader Joe's — replace monthly</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Reed diffuser active on toilet tank or counter</div><div class="check-sub">Eucalyptus/mint scent, reeds flipped weekly</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Skincare collection on dark wooden tray — organized</div><div class="check-sub">Products facing forward, nothing scattered</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Bamboo bath mat in place</div><div class="check-sub">Replaces standard white bath mat</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Dark towels hung — charcoal or forest green</div><div class="check-sub">No pale or white towels visible</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">At least 2 plants present</div><div class="check-sub">ZZ plant + bamboo stalks minimum</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Under-sink organized with labeled clear bins</div><div class="check-sub">Nothing on the floor, nothing loose</div></div></div>
+    </div>
+    <div class="check-section">
+      <div class="check-section-header csh-loft">🎲 Loft</div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">DnD table positioned directly before the triangle window</div><div class="check-sub">Window visible as backdrop — nothing blocking it</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Pendant light above DnD table from beam</div><div class="check-sub">Warm Edison, dimmable — pool of light over the table</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Dark sofa / seating in place — reading nook defined</div><div class="check-sub">Armchair + side table + arc lamp = nook complete</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Two rugs define two zones with a visible threshold gap</div><div class="check-sub">The gap between rugs IS the divider — no wall needed</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">String lights along one beam — warm globe style</div><div class="check-sub">Unified canopy over both zones, smart plug for scheduling</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Exactly one dragon element — figure OR print, not both</div><div class="check-sub">Subtle presence only — the bedroom is where the collection lives</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Fresh mint or rosemary plant near DnD table</div><div class="check-sub">Living scent that guests activate when they reach for dice</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Pothos trailing along railing with small hooks</div><div class="check-sub">Reads like vines — nature claiming the space</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">Ceiling fan bulb replaced with warm 2700K</div><div class="check-sub">The existing bulb is almost certainly cool white</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-main">RÅSKOG bar cart beside DnD table — stocked</div><div class="check-sub">Dice bowl, rulebooks, snacks, room spray, candles (LED)</div></div></div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <h5>Progress Saves Automatically</h5>
+    <p>Check items off as each room comes together — your progress is saved locally in this file. When all 30 boxes are checked, the Dragon Den is complete.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Aesthetic Cohesion · Dragon Den · One world, three rooms</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">🌲</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){ window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-52,behavior:'smooth'}); }
+}
+function toggleCheck(el){
+  el.classList.toggle('done');
+  saveChecks();
+}
+function saveChecks(){
+  var checks=[];
+  document.querySelectorAll('.check-item').forEach(function(c){ checks.push(c.classList.contains('done')?1:0); });
+  try{ localStorage.setItem('cohesion_checks', JSON.stringify(checks)); }catch(e){}
+}
+function loadChecks(){
+  try{
+    var checks=JSON.parse(localStorage.getItem('cohesion_checks')||'[]');
+    document.querySelectorAll('.check-item').forEach(function(c,i){ if(checks[i]) c.classList.add('done'); });
+  }catch(e){}
+}
+loadChecks();
+</script>
+</body>
+</html>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storage + Organization — Dragon Den</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void:#07090a; --deep:#0c1210; --moss:#2a4530; --jade:#3d7a4a;
+    --stone:#7a7060; --cream:#e8dcc8; --ember:#c8401a; --gold:#c9933a;
+    --mist:rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--void); color:var(--cream); font-family:'Crimson Pro',Georgia,serif; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,9,10,0.95); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding:0 20px; display:flex; align-items:center; overflow-x:auto; gap:0;
+  }
+  .nav-brand { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.3em; color:var(--jade); text-transform:uppercase; white-space:nowrap; padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.06); margin-right:4px; flex-shrink:0; }
+  nav a { font-family:'Cinzel',serif; font-size:0.56rem; letter-spacing:0.18em; color:var(--stone); text-transform:uppercase; text-decoration:none; padding:14px 12px; white-space:nowrap; transition:color 0.2s; flex-shrink:0; cursor:pointer; }
+  nav a:hover { color:var(--cream); }
+
+  .hero { min-height:55vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 50% at 25% 80%,rgba(61,122,74,0.13) 0%,transparent 55%), radial-gradient(ellipse 50% 40% at 75% 20%,rgba(201,147,58,0.08) 0%,transparent 50%); }
+  .hero-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:var(--jade); text-transform:uppercase; margin-bottom:14px; position:relative; }
+  .hero-title { font-family:'Cinzel',serif; font-size:clamp(2rem,7vw,4.5rem); font-weight:900; line-height:1.0; background:linear-gradient(135deg,var(--cream) 0%,var(--gold) 60%,var(--jade) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; position:relative; }
+  .hero-sub { font-style:italic; color:var(--stone); font-size:1rem; margin-top:12px; position:relative; }
+  .hero-divider { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--jade),transparent); margin:22px auto; position:relative; }
+  .hero-specs { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; position:relative; }
+  .spec { text-align:center; }
+  .spec-num { font-family:'Cinzel',serif; font-size:1.2rem; color:var(--gold); }
+  .spec-label { font-family:'Cinzel',serif; font-size:0.48rem; letter-spacing:0.3em; color:var(--stone); text-transform:uppercase; margin-top:3px; }
+
+  section { max-width:900px; margin:0 auto; padding:70px 24px; }
+  .section-tag { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.45em; color:var(--jade); text-transform:uppercase; margin-bottom:8px; }
+  .section-tag.ember { color:var(--ember); }
+  .section-tag.gold { color:var(--gold); }
+  h2 { font-family:'Cinzel',serif; font-size:clamp(1.6rem,4vw,2.6rem); font-weight:600; color:var(--cream); margin-bottom:10px; line-height:1.15; }
+  .intro { font-style:italic; color:var(--stone); font-size:1rem; line-height:1.75; margin-bottom:32px; max-width:640px; }
+
+  /* CLOSET DIAGRAMS */
+  .closet-diagram { background:#060808; border:1px solid rgba(61,122,74,0.2); border-radius:3px; padding:24px 20px; font-family:monospace; font-size:0.68rem; line-height:2; overflow-x:auto; white-space:pre; margin-bottom:20px; }
+  .ch { color:var(--gold); }
+  .ce { color:var(--ember); }
+  .cg { color:var(--jade); }
+  .cs { color:rgba(255,255,255,0.18); }
+
+  /* ZONE CARDS */
+  .zone-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  .zone-card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .zone-header { padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; align-items:center; }
+  .zone-header h4 { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.12em; color:var(--cream); font-weight:600; }
+  .zone-header span { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.15em; color:var(--jade); }
+  .zone-body { padding:16px 18px; }
+  .zone-body ul { list-style:none; display:flex; flex-direction:column; gap:7px; }
+  .zone-body li { font-size:0.86rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.55; }
+  .zone-body li::before { content:'▸'; position:absolute; left:0; color:var(--jade); font-size:0.6rem; top:4px; }
+  .zone-body li strong { color:var(--cream); font-weight:400; }
+
+  /* CARDS */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+  .card { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:22px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .card:hover { border-color:rgba(61,122,74,0.35); }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--jade),transparent); }
+  .card.ember::before { background:linear-gradient(90deg,var(--ember),transparent); }
+  .card.gold::before { background:linear-gradient(90deg,var(--gold),transparent); }
+  .card.stone::before { background:linear-gradient(90deg,var(--stone),transparent); }
+  .card-icon { font-size:1.4rem; margin-bottom:10px; }
+  .card h4 { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.12em; color:var(--cream); margin-bottom:10px; font-weight:600; }
+  .card p { font-size:0.87rem; color:var(--stone); line-height:1.65; font-style:italic; margin-bottom:10px; }
+  .card ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .card li { font-size:0.84rem; color:var(--stone); padding-left:14px; position:relative; line-height:1.5; }
+  .card li::before { content:'·'; position:absolute; left:2px; color:var(--jade); font-size:1.2rem; line-height:1; }
+  .card.ember li::before { color:var(--ember); }
+  .card.gold li::before { color:var(--gold); }
+  .card li strong { color:var(--cream); font-weight:400; }
+
+  /* SYSTEM ROWS */
+  .system { display:flex; flex-direction:column; gap:0; border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; background:var(--deep); margin-bottom:20px; }
+  .system-row { display:grid; grid-template-columns:180px 1fr; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .system-row:last-child { border-bottom:none; }
+  .system-label { padding:14px 16px; border-right:1px solid rgba(255,255,255,0.04); font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.1em; color:var(--jade); text-transform:uppercase; display:flex; align-items:center; }
+  .system-val { padding:14px 16px; font-size:0.87rem; color:var(--stone); line-height:1.6; }
+  .system-val strong { color:var(--cream); font-weight:400; }
+
+  .callout { padding:20px 24px; border-radius:3px; margin:24px 0; border-left:2px solid var(--jade); background:rgba(61,122,74,0.07); }
+  .callout.ember { border-left-color:var(--ember); background:rgba(200,64,26,0.06); }
+  .callout.gold { border-left-color:var(--gold); background:rgba(201,147,58,0.06); }
+  .callout h5 { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--jade); margin-bottom:8px; }
+  .callout.ember h5 { color:var(--ember); }
+  .callout.gold h5 { color:var(--gold); }
+  .callout p { font-size:0.9rem; color:var(--stone); line-height:1.7; font-style:italic; }
+
+  /* SHOP TABLE */
+  .shop-wrap { background:var(--deep); border:1px solid rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  th { font-family:'Cinzel',serif; font-size:0.52rem; letter-spacing:0.25em; color:var(--jade); text-transform:uppercase; text-align:left; padding:12px 16px; border-bottom:1px solid var(--moss); background:#0a0e0c; }
+  td { padding:11px 16px; font-size:0.85rem; color:var(--stone); border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:var(--mist); }
+  td:first-child { color:var(--cream); }
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-family:'Cinzel',serif; font-size:0.63rem; }
+  .b-low { background:rgba(61,122,74,0.2); color:var(--jade); }
+  .b-mid { background:rgba(201,147,58,0.2); color:var(--gold); }
+
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(61,122,74,0.25),transparent); }
+  footer { text-align:center; padding:60px 24px; border-top:1px solid rgba(255,255,255,0.04); }
+  footer p { font-size:0.75rem; font-style:italic; color:rgba(61,122,74,0.2); letter-spacing:0.2em; }
+
+  @media(max-width:600px){ .zone-grid,.cards { grid-template-columns:1fr; } .system-row { grid-template-columns:1fr; } .system-label { border-right:none; border-bottom:1px solid rgba(255,255,255,0.04); } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Storage</div>
+  <a onclick="nav('overview')">Overview</a>
+  <a onclick="nav('large-closet')">Large Closet</a>
+  <a onclick="nav('small-closet')">Bath Closet</a>
+  <a onclick="nav('system')">Clothes System</a>
+  <a onclick="nav('shoes')">Shoes</a>
+  <a onclick="nav('cosplay')">Cosplay</a>
+  <a onclick="nav('undersink')">Under-Sink</a>
+  <a onclick="nav('adhd')">ADHD Systems</a>
+  <a onclick="nav('shopping')">Shopping</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Storage + Organization · Dragon Den</div>
+  <h1 class="hero-title">Everything<br>Has a Home</h1>
+  <p class="hero-sub">Large closet · Bath closet · Under-sink · ADHD-proof systems throughout</p>
+  <div class="hero-divider"></div>
+  <div class="hero-specs">
+    <div class="spec"><div class="spec-num">2</div><div class="spec-label">Closets</div></div>
+    <div class="spec"><div class="spec-num">4'×5'</div><div class="spec-label">Small Closet</div></div>
+    <div class="spec"><div class="spec-num">3</div><div class="spec-label">Storage Zones</div></div>
+    <div class="spec"><div class="spec-num">0</div><div class="spec-label">Visible Clutter</div></div>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="divider"></div>
+<section id="overview">
+  <div class="section-tag">Storage Strategy</div>
+  <h2>The Three-Zone System</h2>
+  <p class="intro">Two bedroom closets plus the bathroom under-sink. Each zone has one job. When everything has a designated home, the ADHD brain doesn't have to make decisions about where things go — it's already decided.</p>
+
+  <div class="zone-grid">
+    <div class="zone-card">
+      <div class="zone-header">
+        <h4>Large Closet</h4>
+        <span>East wall, bedroom</span>
+      </div>
+      <div class="zone-body">
+        <ul>
+          <li>All clothing — hung + folded</li>
+          <li>Shoes — floor level</li>
+          <li>Cosplay pieces as they grow</li>
+          <li>Accessories + bags</li>
+        </ul>
+      </div>
+    </div>
+    <div class="zone-card">
+      <div class="zone-header">
+        <h4>Small Closet (4×5)</h4>
+        <span>Outside bathroom</span>
+      </div>
+      <div class="zone-body">
+        <ul>
+          <li>Towels + linens</li>
+          <li>Skincare backup stock</li>
+          <li>Cleaning supplies</li>
+          <li>Toiletry overflow</li>
+        </ul>
+      </div>
+    </div>
+    <div class="zone-card">
+      <div class="zone-header">
+        <h4>Under-Sink</h4>
+        <span>Bathroom</span>
+      </div>
+      <div class="zone-body">
+        <ul>
+          <li>Daily skincare overflow</li>
+          <li>Cleaning products</li>
+          <li>Feminine hygiene</li>
+          <li>Backup toiletries</li>
+        </ul>
+      </div>
+    </div>
+    <div class="zone-card">
+      <div class="zone-header">
+        <h4>Murphy Bed Cabinets</h4>
+        <span>South wall, bedroom</span>
+      </div>
+      <div class="zone-body">
+        <ul>
+          <li>Bedside essentials</li>
+          <li>Current read + journal</li>
+          <li>Meds + small items</li>
+          <li>Charging cables</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h5>The ADHD Storage Rule</h5>
+    <p>Closed storage hides chaos but also hides your stuff — you forget it exists. Open storage reminds you things are there but looks messy. The solution: closed storage for categories you access weekly or less, open/visible storage for daily-use items. Every drawer and bin gets a label. Not optional.</p>
+  </div>
+</section>
+
+<!-- LARGE CLOSET -->
+<div class="divider"></div>
+<section id="large-closet">
+  <div class="section-tag">Large Closet · East Wall</div>
+  <h2>Clothing Command</h2>
+  <p class="intro">You said you need a system from scratch — here's one that's ADHD-proof, expandable for cosplay, and keeps the closet looking intentional even when it's full.</p>
+
+  <div class="closet-diagram"><span class="cs">╔══════════════════════════════════════════════╗</span>
+<span class="cs">║</span>  <span class="ch">TOP SHELF (above hang rod)</span>                   <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ bins × 3 — seasonal / rarely used items ]</span>  <span class="cs">║</span>
+<span class="cs">╠══════════════════════════════════════════════╣</span>
+<span class="cs">║</span>  <span class="ch">UPPER HANG ROD</span>                               <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ dresses · long tops · jackets · coats ]</span>    <span class="cs">║</span>
+<span class="cs">╠══════════════════════════════════════════════╣</span>
+<span class="cs">║</span>  <span class="ch">LOWER HANG ROD (add a second rod)</span>           <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ everyday tops · blouses · short items ]</span>   <span class="cs">║</span>
+<span class="cs">╠════════════════╦═════════════════════════════╣</span>
+<span class="cs">║</span> <span class="ce">SHOE ZONE</span>      <span class="cs">║</span> <span class="ce">DRAWER UNIT</span>                 <span class="cs">║</span>
+<span class="cs">║</span> <span class="cg">floor, left</span>   <span class="cs">║</span> <span class="cg">folded clothes · underwear</span>  <span class="cs">║</span>
+<span class="cs">║</span> <span class="cg">3-tier rack</span>   <span class="cs">║</span> <span class="cg">socks · loungewear</span>          <span class="cs">║</span>
+<span class="cs">╚════════════════╩═════════════════════════════╝</span>
+<span class="cs"> ← closet width ————————————————————————→</span></div>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">👗</div>
+      <h4>The Double Rod Hack</h4>
+      <p>A single closet rod wastes the bottom half of the space. Adding a second rod below doubles your hanging capacity instantly.</p>
+      <ul>
+        <li>Install a second rod using a closet rod doubler — hooks over the existing rod, no drilling needed (~$15)</li>
+        <li><strong>Upper rod:</strong> Long items — dresses, coats, jumpsuits, anything that needs full length</li>
+        <li><strong>Lower rod:</strong> Short items — tops, blouses, cardigans, anything that hits mid-thigh or above</li>
+        <li>Use matching dark velvet slim hangers throughout — non-slip, space-saving, looks intentional</li>
+        <li>Hang by category, then by color within each category — takes 20 minutes to set up, saves minutes every day</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗂️</div>
+      <h4>Drawer Unit Inside Closet</h4>
+      <p>A small 3–4 drawer unit on the floor right side replaces a dresser entirely — keeps folded clothes inside the closet, out of the room.</p>
+      <ul>
+        <li><strong>Drawer 1:</strong> Underwear + bras — use small dividers inside so nothing tangles</li>
+        <li><strong>Drawer 2:</strong> Socks + tights — rolled, not folded flat</li>
+        <li><strong>Drawer 3:</strong> Loungewear + sleepwear</li>
+        <li><strong>Drawer 4 (if 4-drawer):</strong> Workout wear or seasonal overflow</li>
+        <li>IKEA ALEX or MALM 3-drawer — both fit inside a standard closet footprint</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">📦</div>
+      <h4>Top Shelf Bins</h4>
+      <ul>
+        <li>3 matching dark bins or baskets on the top shelf — each gets a label</li>
+        <li><strong>Bin 1:</strong> Seasonal clothes — swap in/out twice a year</li>
+        <li><strong>Bin 2:</strong> Cosplay overflow — pieces waiting for display or next use</li>
+        <li><strong>Bin 3:</strong> Extras — extra bedding, spare towels, anything that doesn't live elsewhere</li>
+        <li>Dark woven bins from HomeGoods or Amazon — stay on the forest aesthetic even inside the closet</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🎭</div>
+      <h4>Cosplay Section — Starting Small</h4>
+      <ul>
+        <li>Since you're just starting: dedicate the right end of the upper rod to cosplay pieces that hang</li>
+        <li>A clear over-door organizer on the back of the closet door holds wigs, accessories, small props</li>
+        <li>As collection grows: one top shelf bin stays permanently cosplay — rotate what's active to the rod</li>
+        <li>Wigs: individual wig stands stored on top shelf or in labeled boxes — never crammed in a bag</li>
+        <li>When cosplay outgrows this: revisit with its own dedicated guide section</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <h5>Closet Door — Replace With Dark Curtain</h5>
+    <p>Per the master guide — swap the louvered closet doors for a ceiling-mounted curtain track (IKEA VIDGA) with a dark linen curtain. Easier to access than doors that swing into the room, looks architectural, and eliminates the visual clutter of closet door hardware. The curtain stays closed by default — out of sight, out of mind, which is exactly what ADHD needs.</p>
+  </div>
+</section>
+
+<!-- SMALL CLOSET -->
+<div class="divider"></div>
+<section id="small-closet">
+  <div class="section-tag">Small Closet · 4'×5' · Outside Bathroom</div>
+  <h2>The Utility Closet</h2>
+  <p class="intro">4 feet wide, 5 feet deep — more space than it sounds. This becomes your household supply hub: towels, skincare backup, cleaning supplies, toiletry overflow. All of the above.</p>
+
+  <div class="closet-diagram"><span class="cs">╔════════════════════════════════╗</span>
+<span class="cs">║</span>  <span class="ch">SHELF 1 — top</span>                  <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ extra towels · spare linens ]</span> <span class="cs">║</span>
+<span class="cs">╠════════════════════════════════╣</span>
+<span class="cs">║</span>  <span class="ch">SHELF 2 — middle</span>               <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ skincare backup stock ]</span>       <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ labeled clear bins ]</span>          <span class="cs">║</span>
+<span class="cs">╠════════════════════════════════╣</span>
+<span class="cs">║</span>  <span class="ch">SHELF 3 — lower</span>               <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ toiletry overflow ]</span>          <span class="cs">║</span>
+<span class="cs">║</span>  <span class="cg">[ backup paper goods ]</span>         <span class="cs">║</span>
+<span class="cs">╠════════════════════════════════╣</span>
+<span class="cs">║</span>  <span class="ch">FLOOR</span>                          <span class="cs">║</span>
+<span class="cs">║</span>  <span class="ce">[ cleaning supplies — caddy ]</span>  <span class="cs">║</span>
+<span class="cs">║</span>  <span class="ce">[ mop / broom — wall hooks ]</span>   <span class="cs">║</span>
+<span class="cs">╚════════════════════════════════╝</span>
+ <span class="cs">← 4'0" wide · 5'0" deep ———→</span></div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🛁</div>
+      <h4>Towels + Linens (Shelf 1)</h4>
+      <ul>
+        <li>Roll towels rather than fold flat — takes up less space, easier to grab one without unraveling the stack</li>
+        <li>Two sets per person minimum: one in use, one clean and ready</li>
+        <li>Dark charcoal or forest green towels — they're already on the bathroom shopping list, store the spares here</li>
+        <li>Extra pillowcases and a spare sheet set folded flat at the back of the shelf</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">🧴</div>
+      <h4>Skincare Backup (Shelf 2)</h4>
+      <ul>
+        <li>Clear labeled bins — one per category: Cleansers · Moisturizers · Treatments · SPF · Tools</li>
+        <li>When a product runs out at the bathroom counter, the backup is already here — no emergency runs</li>
+        <li>FIFO rule: new stock goes behind existing stock, use oldest first</li>
+        <li>Your SkinMedica and ZO lines are investments — storing them cool and dark (in this closet vs on a sunny counter) extends their shelf life</li>
+        <li>A small label maker (~$20) is worth every penny for this shelf</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🧹</div>
+      <h4>Cleaning Supplies (Floor)</h4>
+      <ul>
+        <li>A portable cleaning caddy on the floor — everything in one grab, carry room to room</li>
+        <li>Wall hooks on the inside wall: mop, broom, Swiffer — hang them, don't lean them (they fall)</li>
+        <li>Caddy contents: multi-surface spray, bathroom cleaner, glass cleaner, scrubber, microfiber cloths</li>
+        <li>A small tension rod inside the closet door holds spray bottles by their triggers — saves floor space</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">📋</div>
+      <h4>Toiletry Overflow (Shelf 3)</h4>
+      <ul>
+        <li>Backup toilet paper, paper towels, feminine hygiene — all the stuff that needs a bulk home</li>
+        <li>One clear bin: "restock soon" — when something from the bathroom counter runs low, it goes in this bin as a visual reminder to grab from backup</li>
+        <li>Travel toiletry bag lives here too — pre-packed and ready, not scattered across the bathroom when you need it</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CLOTHES SYSTEM -->
+<div class="divider"></div>
+<section id="system">
+  <div class="section-tag gold">Clothing System</div>
+  <h2>Building From Scratch</h2>
+  <p class="intro">You said you need a system — here's one that works specifically for ADHD. The goal is decision fatigue elimination: every item has a category, every category has a location, getting dressed takes under 2 minutes.</p>
+
+  <div class="system">
+    <div class="system-row">
+      <div class="system-label">Hang everything you can</div>
+      <div class="system-val">Folded items get forgotten. If it can hang without wrinkling — hang it. Tops, dresses, jackets, cardigans, jeans on clip hangers. Only underwear, socks, and loungewear go in drawers.</div>
+    </div>
+    <div class="system-row">
+      <div class="system-label">Category order on rod</div>
+      <div class="system-val"><strong>Left to right:</strong> Jackets/coats → Dresses → Tops (long sleeve) → Tops (short sleeve) → Bottoms → Cosplay. Same order every time — muscle memory kicks in.</div>
+    </div>
+    <div class="system-row">
+      <div class="system-label">Color within category</div>
+      <div class="system-val">Within each category: dark to light, left to right. Black → navy → grey → green → other. Takes one setup session, then you always know where your black top lives.</div>
+    </div>
+    <div class="system-row">
+      <div class="system-label">The return rule</div>
+      <div class="system-val">Worn but not dirty items get a dedicated hook on the back of the closet door or a small valet hook on the wall — not on the floor, not on the chair. This is the ADHD chair problem solved: give the habit somewhere specific to land.</div>
+    </div>
+    <div class="system-row">
+      <div class="system-label">Laundry system</div>
+      <div class="system-val">Two slim laundry bags: darks and lights, both hanging inside the closet. When a bag is full = laundry day. No laundry basket sitting on the floor collecting visual noise.</div>
+    </div>
+    <div class="system-row">
+      <div class="system-label">Seasonal rotation</div>
+      <div class="system-val">Twice a year (spring + fall): pull out-of-season clothes off the rod, fold into the top shelf bin, pull the opposite season bin down and hang. 30 minutes, done for 6 months. The rod stays uncluttered.</div>
+    </div>
+    <div class="system-row">
+      <div class="system-label">The one-in one-out rule</div>
+      <div class="system-val">Small space, limited rod space. Every time something new comes in, something old leaves. Keeps the system from collapsing over time — especially important as the cosplay collection grows.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOES -->
+<div class="divider"></div>
+<section id="shoes">
+  <div class="section-tag">Shoes · Under 10 Pairs</div>
+  <h2>Shoe Storage</h2>
+  <p class="intro">Under 10 pairs is very manageable. One good rack keeps them visible, accessible, and off the floor.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">👟</div>
+      <h4>The Setup</h4>
+      <ul>
+        <li>A 3-tier adjustable shoe rack on the left floor of the large closet — holds 9–12 pairs easily</li>
+        <li>Angled shelves keep shoes visible and easy to grab</li>
+        <li>Arrangement: everyday shoes at eye level (middle tier), occasion shoes top, slippers/house shoes bottom</li>
+        <li><strong>Recommended:</strong> SONGMICS 3-tier adjustable — dark finish, sturdy, ~$25</li>
+        <li>Size 13W note: deep racks (14"+ depth) accommodate larger sizes better than shallow ones</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">📦</div>
+      <h4>Overflow + Special Pairs</h4>
+      <ul>
+        <li>Any shoes that don't fit the daily rotation go in clear drop-front shoe boxes — stackable, visible without opening</li>
+        <li>Clear boxes on the top closet shelf keep special pairs dust-free and visible</li>
+        <li>IRIS USA clear shoe boxes are the standard — ~$3–5 each</li>
+        <li>Label each box on the front with a small label or photo — ADHD brain will thank you</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🔧</div>
+      <h4>Shoe Care Station</h4>
+      <ul>
+        <li>A small dark tray at the closet floor entrance: shoe horn, brush, and a neutral polish/cleaner</li>
+        <li>Keeps shoe care from becoming a drawer-hunting mission</li>
+        <li>A boot insert or boot form for any tall boots — they collapse and crease without support</li>
+        <li>Cedar shoe trees for leather or nicer shoes — absorb moisture and hold shape</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COSPLAY -->
+<div class="divider"></div>
+<section id="cosplay">
+  <div class="section-tag ember">Cosplay Storage</div>
+  <h2>Starting Small, Scaling Up</h2>
+  <p class="intro">Minimal right now — but building the right infrastructure now means your system doesn't collapse as the collection grows. Cosplay has specific storage needs: wigs, props, and garments all need different treatment.</p>
+
+  <div class="cards">
+    <div class="card ember">
+      <div class="card-icon">👘</div>
+      <h4>Garments</h4>
+      <ul>
+        <li>Cosplay pieces that hang go on the dedicated right section of the clothing rod — costume pieces on their own hangers, grouped by character</li>
+        <li>Delicate or structured pieces: garment bags to protect from dust and snags</li>
+        <li>Heavy or armored pieces that can't hang: folded with tissue paper inside structured shapes, stored in labeled bins on the top shelf</li>
+        <li>A small steamer (not iron) for wrinkled cosplay fabric — stored inside the closet near garments</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">💇</div>
+      <h4>Wigs</h4>
+      <ul>
+        <li>Each wig on its own wig head — never stored in a bag or box without a form inside</li>
+        <li>Wig heads on the top closet shelf or a dedicated wall-mounted row of hooks</li>
+        <li>Alternatively: a tall multi-tier wig stand holds 6–8 wigs vertically, folds flat when not in use</li>
+        <li>Label each wig head with the character name — sounds obvious, saves confusion when you have 5+ wigs</li>
+        <li>Cover with a hairnet or light cloth when not in use — keeps dust off and style intact</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚔️</div>
+      <h4>Props + Accessories</h4>
+      <ul>
+        <li>An over-door clear pocket organizer on the back of the closet door: small accessories, jewelry, ears, tails, clips per character</li>
+        <li>Label each pocket section by character or type</li>
+        <li>Larger props (swords, staffs, shields): a tall narrow bin or umbrella stand in the closet corner — leaned upright, not laid flat where they get crushed</li>
+        <li>Foam props and armor: stored flat in a wide shallow bin to prevent warping</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">📸</div>
+      <h4>The Cosplay Inventory</h4>
+      <ul>
+        <li>Start a simple notes doc or photo album: one photo of each full cosplay laid flat, labeled with the character and what's complete vs missing</li>
+        <li>ADHD benefit: you can see your whole collection in 30 seconds without opening every bin</li>
+        <li>Tracks what accessories you still need to source for each look</li>
+        <li>Reference for packing when going to a con — no last-minute "where is the thing" panic</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- UNDER SINK -->
+<div class="divider"></div>
+<section id="undersink">
+  <div class="section-tag">Bathroom · Under-Sink</div>
+  <h2>Under-Sink Organization</h2>
+  <p class="intro">The pipe under the sink eats into usable space — the solution is building around it with the right organizers rather than trying to shove bins in flat.</p>
+
+  <div class="cards">
+    <div class="card gold">
+      <div class="card-icon">🪣</div>
+      <h4>The Two-Tier Approach</h4>
+      <ul>
+        <li>A pull-out under-sink organizer with two tiers built around the pipe — specifically designed for this problem</li>
+        <li><strong>Recommended:</strong> mDesign pull-out cabinet organizer or Lynk Professional slide-out shelf</li>
+        <li>Pull-out means you actually access the back of the cabinet instead of pushing things in and forgetting them</li>
+        <li>Front zone (easy reach): daily use backup items — what runs out most often</li>
+        <li>Back zone: bulk backup — less frequent access is fine here</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗄️</div>
+      <h4>Zone It Out</h4>
+      <ul>
+        <li><strong>Left side of pipe:</strong> Skincare — cleanser backup, moisturizer backup, treatment backups</li>
+        <li><strong>Right side of pipe:</strong> Feminine hygiene, backup soap, backup shampoo/conditioner</li>
+        <li><strong>Door interior:</strong> Tension rod across the door holds spray bottles — cleaning products hung by trigger</li>
+        <li><strong>Small bin front-center:</strong> Trash bags, extra sponges, anything you grab while cleaning</li>
+      </ul>
+    </div>
+    <div class="card ember">
+      <div class="card-icon">🏷️</div>
+      <h4>Label Everything</h4>
+      <ul>
+        <li>Clear bins with labels on the front — not the top, you look at things from the front</li>
+        <li>Categories: Skincare Backup · Hair · Body · Hygiene · Cleaning</li>
+        <li>A label maker is the single best investment for ADHD organization — Dymo LabelManager is ~$20</li>
+        <li>When a bin is empty = buy more. Simple restock trigger that doesn't require mental tracking</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ADHD SYSTEMS -->
+<div class="divider"></div>
+<section id="adhd">
+  <div class="section-tag ember">ADHD-Proof Design</div>
+  <h2>Systems That Actually Work</h2>
+  <p class="intro">Standard organization advice assumes a neurotypical brain. These rules are specifically designed around how ADHD actually operates — out of sight is out of mind, decision fatigue is real, and friction kills habits.</p>
+
+  <div class="cards">
+    <div class="card ember">
+      <div class="card-icon">👁️</div>
+      <h4>Visibility Over Concealment</h4>
+      <ul>
+        <li>If you can't see it, it doesn't exist to the ADHD brain — use clear bins wherever possible</li>
+        <li>Frequently used items stay visible on the counter, shelf, or hook — not buried in a drawer</li>
+        <li>The closet curtain stays open by default during the day — seeing your clothes helps you actually pick an outfit</li>
+        <li>One "catch-all" visible tray per room for things without a home yet — empties weekly, never grows permanently</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <div class="card-icon">⚡</div>
+      <h4>Friction Reduction</h4>
+      <ul>
+        <li>The more steps it takes to put something away, the less likely it gets put away — eliminate steps</li>
+        <li>Laundry bags inside the closet vs a basket across the room = clothes actually make it off the floor</li>
+        <li>Hooks beat hangers for items you wear multiple times — robe, everyday jacket, bag</li>
+        <li>Pull-out organizers beat deep static shelves — you'll actually use what's in the back</li>
+        <li>Charging cables at exactly the spots where you use devices — not one central charging spot</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h4>Reset Rituals</h4>
+      <ul>
+        <li>A 10-minute Sunday reset: everything goes back to its home, the catch-all tray empties, laundry gets sorted</li>
+        <li>This works because it's timed and bounded — not "clean up" but "10 minutes, then done"</li>
+        <li>The room should be resettable in under 15 minutes if the systems are working — if it takes longer, something doesn't have a home yet</li>
+        <li>The dark aesthetic actually helps: clutter shows up immediately against the dark walls, which is a cue to reset sooner</li>
+      </ul>
+    </div>
+    <div class="card stone">
+      <div class="card-icon">🏷️</div>
+      <h4>Label Everything. Seriously.</h4>
+      <ul>
+        <li>Every bin, every drawer, every shelf section — labeled on the front in clear text</li>
+        <li>This isn't just about finding things — it's about knowing where to PUT things back</li>
+        <li>A Dymo label maker takes 20 minutes to label an entire room and pays dividends forever</li>
+        <li>Photo labels on opaque bins (tape a small photo of the contents to the front) work better than text for visual thinkers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h5>The ADHD Chair Problem — Solved</h5>
+    <p>Every ADHD person has a chair, bed corner, or floor spot where "worn but not dirty" clothes pile up. The solution isn't willpower — it's giving that habit a designated landing spot. A small wall-mounted valet hook or a single freestanding hook inside the closet near the door becomes the official "limbo" spot. One hook, one item. When it's full, it's a visual cue to deal with it. The pile disappears because the habit has a home.</p>
+  </div>
+</section>
+
+<!-- SHOPPING -->
+<div class="divider"></div>
+<section id="shopping">
+  <div class="section-tag">Shopping List</div>
+  <h2>Storage Budget</h2>
+  <p class="intro">Most of this is cheap. Good organization is almost entirely about systems, not expensive products.</p>
+
+  <div class="shop-wrap">
+    <table>
+      <thead><tr><th>Item</th><th>Where</th><th>Budget</th></tr></thead>
+      <tbody>
+        <tr><td>Velvet slim hangers (50 pack)</td><td>Amazon — dark grey or black</td><td><span class="badge b-low">$18–25</span></td></tr>
+        <tr><td>Closet rod doubler</td><td>Amazon, Target, The Container Store</td><td><span class="badge b-low">$12–20</span></td></tr>
+        <tr><td>3-drawer unit (inside closet)</td><td>IKEA ALEX or MALM</td><td><span class="badge b-low">$60–120</span></td></tr>
+        <tr><td>Dark woven storage bins × 3 (top shelf)</td><td>HomeGoods, TJ Maxx, Amazon</td><td><span class="badge b-low">$30–50</span></td></tr>
+        <tr><td>3-tier adjustable shoe rack</td><td>Amazon — SONGMICS dark finish</td><td><span class="badge b-low">$20–30</span></td></tr>
+        <tr><td>Clear drop-front shoe boxes × 4</td><td>Amazon — IRIS USA</td><td><span class="badge b-low">$15–25</span></td></tr>
+        <tr><td>IKEA VIDGA curtain track (closet door)</td><td>IKEA</td><td><span class="badge b-low">$25–40</span></td></tr>
+        <tr><td>Dark linen curtain (closet)</td><td>IKEA, Amazon</td><td><span class="badge b-low">$20–40</span></td></tr>
+        <tr><td>Over-door clear pocket organizer</td><td>Amazon, Target</td><td><span class="badge b-low">$15–25</span></td></tr>
+        <tr><td>Slim laundry bags × 2 (darks + lights)</td><td>Amazon, IKEA</td><td><span class="badge b-low">$15–25</span></td></tr>
+        <tr><td>Wall-mounted valet hook (limbo spot)</td><td>Amazon — matte black</td><td><span class="badge b-low">$8–15</span></td></tr>
+        <tr><td>Small closet shelving unit (4×5 closet)</td><td>IKEA IVAR or wire shelf system</td><td><span class="badge b-low">$40–80</span></td></tr>
+        <tr><td>Portable cleaning caddy</td><td>Amazon, Target</td><td><span class="badge b-low">$12–20</span></td></tr>
+        <tr><td>Wall hooks (inside small closet)</td><td>Amazon — matte black, 3-pack</td><td><span class="badge b-low">$10–18</span></td></tr>
+        <tr><td>Pull-out under-sink organizer</td><td>Amazon — mDesign or Lynk</td><td><span class="badge b-low">$25–45</span></td></tr>
+        <tr><td>Clear labeled bins × 6 (under-sink)</td><td>Amazon, Target, Dollar Tree</td><td><span class="badge b-low">$15–30</span></td></tr>
+        <tr><td>Label maker — Dymo LabelManager 160</td><td>Amazon, Staples</td><td><span class="badge b-low">$20–30</span></td></tr>
+        <tr><td>Wig heads × 3–4</td><td>Amazon — foam or canvas</td><td><span class="badge b-low">$12–20</span></td></tr>
+        <tr><td>Garment bags × 3 (cosplay)</td><td>Amazon — clear front, zip</td><td><span class="badge b-low">$15–25</span></td></tr>
+        <tr><td>Tension rod (inside small closet door)</td><td>Amazon, Dollar Tree</td><td><span class="badge b-low">$5–10</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout gold" style="margin-top:20px;">
+    <h5>Total Storage Budget</h5>
+    <p>Full setup across both closets, under-sink, and all organizational tools: roughly <strong style="color:var(--gold)">$350–550</strong> if buying new. Cut that significantly at IKEA As-Is, Dollar Tree for bins, and HomeGoods for the decorative storage pieces. The label maker and velvet hangers are non-negotiable — everything else can be sourced cheap.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Storage + Organization · Dragon Den · Everything has a home</p>
+  <br><p style="opacity:0.06; font-size:1.4rem;">🗂️</p>
+</footer>
+
+<script>
+function nav(id){
+  var el=document.getElementById(id);
+  if(el){
+    var top=el.getBoundingClientRect().top+window.pageYOffset-52;
+    window.scrollTo({top:top,behavior:'smooth'});
+  }
+}
+</script>
+</body>
+</html>
